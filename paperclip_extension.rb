@@ -7,6 +7,7 @@ class PaperclipExtension < Radiant::Extension
   
   define_routes do |map|
     map.resources :assets, :path_prefix => "/admin"
+    map.connect "/admin/assets/:id/remove", :controller => 'assets', :action => 'remove'
   end
   
   def activate

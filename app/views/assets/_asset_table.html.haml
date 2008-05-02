@@ -11,7 +11,7 @@
         %tr.node.level-1
           %td.asset
             - asset_id = "asset_#{asset.id.to_s}"
-            = link_to image_tag(asset.file.url(:thumbnail), :title => asset.filename), asset_edit_url(:id => asset), :class => 'icon'
+            = link_to image_tag(asset.asset.url(:square)), edit_asset_url(:id => asset), :class => 'icon'
           %td.asset-title
             = link_to asset.title, edit_asset_url(:id => asset.id) 
             &nbsp;
@@ -20,7 +20,7 @@
           %td.add-to-bucket
             // = link_to_remote(image_tag('admin/add-to-bucket.png', :alt => 'Add to Bucket'), {:url => add_bucket_url(asset)})
           %td.remove
-            // = link_to image_tag('admin/remove.png', :alt => 'Remove Asset'), asset_remove_url(:id => asset)
+            = link_to image_tag('admin/remove.png', :alt => 'Remove Asset'), :controller => 'assets', :action => 'remove', :id => asset
     - else
       %tr
         %td.note{ :colspan => "4" } 

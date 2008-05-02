@@ -1,0 +1,24 @@
+- content_for(:page_css) do 
+  table td.asset { vertical-align: top; font-weight: bold; }
+
+
+%h1 Remove Asset
+%p 
+  Are you sure you want to  
+  %strong.warning permanently remove
+  the following asset?
+
+%table#site-map.index{ :cellpadding => "0", :cellspacing => "0", :border => "0" }
+  %tbody
+    %tr.node.level-1{ :onmouseover => "Element.addClassName(this, 'highlight');", :onmouseout => "Element.removeClassName(this, 'highlight');" }
+      %td.asset.layout
+        = image_tag @asset.upload.url(:small), :title => @asset.asset_file_name
+        = @asset.title
+
+
+%form{ :method => "post" }
+  %p.buttons
+    = submit_tag "Delete Asset", :class => 'button' 
+    or 
+    = link_to 'Cancel', assets_path 
+    

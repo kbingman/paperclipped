@@ -1,0 +1,11 @@
+- include_stylesheet 'admin/assets' 
+
+%h1= "Edit Asset"
+- form_for :asset, :url => asset_path(@asset), :html => { :method => "put", :multipart => true } do |form|
+  = render :partial => "form", :locals => { :form => form }
+
+
+
+    
+    
+    
