@@ -1,0 +1,3 @@
+- @<%= singular_name %>.attributes.each do |attribute|
+  %p
+    = f.send(attribute.field_type) attribute.name.to_sym

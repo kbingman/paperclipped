@@ -1,0 +1,13 @@
+- include_stylesheet 'admin/assets'
+
+%h1 Images
+  
+%p= link_to image_tag('admin/new-asset.png', :alt => 'New Asset'), new_asset_path
+%p
+  %label Search
+
+
+// = render :partial => 'assets_container'
+
+#assets_table
+  = render :partial => 'asset_table'
