@@ -1,8 +1,7 @@
 class CreateAssets < ActiveRecord::Migration
   def self.up
     create_table :assets do |t|
-      t.column :title,              :string
-      t.column :caption,            :string
+      t.string :caption, :title
     end
     
   end

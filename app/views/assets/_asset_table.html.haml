@@ -18,14 +18,15 @@
             %span.info
               = asset.caption
           %td.add-to-bucket
-            // = link_to_remote(image_tag('admin/add-to-bucket.png', :alt => 'Add to Bucket'), {:url => add_bucket_url(asset)})
+            = link_to_remote(image_tag('admin/add-to-bucket.png', :alt => 'Add to Bucket'), {:url => {:action => 'add_bucket', :id => asset}})
           %td.remove
             = link_to image_tag('admin/remove.png', :alt => 'Remove Asset'), :controller => 'assets', :action => 'remove', :id => asset
     - else
       %tr
         %td.note{ :colspan => "4" } 
           No Assets
-
+          
+= will_paginate @assets
 
 %script{ :type => "text/javascript"}
   // <! [CDATA[

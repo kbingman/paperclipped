@@ -3,11 +3,12 @@ class Asset < ActiveRecord::Base
   
   has_attached_file :asset,
                     :styles => { :square => ["42x42#", :png],
+                                 :normal => "640x640",
                                  :small  => "100x100>" }
                                  
-  # belongs_to :created_by, :class_name => 'User', :foreign_key => 'created_by'
-  # belongs_to :updated_by, :class_name => 'User', :foreign_key => 'updated_by'
-  
+  belongs_to :created_by, :class_name => 'User'
+  belongs_to :updated_by, :class_name => 'User'
+   
   before_save :assign_title
   
   def basename
