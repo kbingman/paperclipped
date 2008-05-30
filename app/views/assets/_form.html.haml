@@ -23,9 +23,9 @@
     - unless @asset.new_record?     
       .asset
         = image_tag @asset.asset.url
-
+    
     = form.file_field :asset, :class => "", :style => "width: 100%"
-
+    = updated_stamp @asset unless @asset.new_record?     
   %p.buttons
     = save_model_button(@asset)
     = save_model_and_continue_editing_button(@asset)

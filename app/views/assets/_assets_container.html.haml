@@ -1,0 +1,29 @@
+- @stylesheets << 'admin/assets'
+- include_javascript 'assets'
+- include_javascript 'dragdrop'
+
+#bucket-container
+  - if @page 
+    #attachment-container
+      %h4 
+        Attached Assets&nbsp;
+        %span.note Assets associated with this page.
+        %span#reorder
+          %a{ :href => "#", :onclick => "reorder_attachments(#{@page.id}); return false;" } Reorder
+        %span#done{ :style => 'display:none' }
+          %a{ :href => "#", :onclick => "done_reordering(); return false;" } Done reordering
+      %ul#attachments
+        = render :partial => "assets/page_assets" 
+        
+    %p{ :style => "clear:both;" }
+  
+  %h4 
+    Bucket&nbsp;
+    %span.note Items placed here can be used in your pages, layouts and snippets.
+    %span#clear-bucket
+      //= link_to_remote('Clear Bucket', {:url => clear_bucket_url} )
+  
+  = render :partial => "assets/bucket"
+
+
+  %p{ :style => "clear:both;" }
