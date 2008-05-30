@@ -1,5 +1,5 @@
 - @stylesheets << 'admin/assets'
-- include_javascript 'assets'
+- include_javascript 'admin/assets'
 - include_javascript 'dragdrop'
 
 #bucket-container
@@ -21,7 +21,7 @@
     Bucket&nbsp;
     %span.note Items placed here can be used in your pages, layouts and snippets.
     %span#clear-bucket
-      //= link_to_remote('Clear Bucket', {:url => clear_bucket_url} )
+      = link_to_remote('Clear Bucket', {:url => clear_bucket_url} )
   
   = render :partial => "assets/bucket"
 

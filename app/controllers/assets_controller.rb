@@ -2,22 +2,27 @@ class AssetsController < ApplicationController
   
   make_resourceful do 
     actions :all
-    
     response_for :create, :update do |format|
       format.html { redirect_to(params[:continue] ? edit_asset_path(@asset) : assets_path) }
     end
-    
   end
   
   def add_bucket
     @asset = Asset.find(params[:id])
-    # if (session[:bucket] ||= {}).key?(url(@asset))
-    #  render :nothing => true and return
-    # end
-    args = asset_image_args_for(@asset)
-    session[:bucket][@asset.asset.url] = args
+    session[:bucket] = [] unless session[:bucket]
+    if session[:bucket].include?(@asset.id)
+      render :nothing => true and return
+    end
+    session[:bucket] << @asset.id
     render :update do |page|
       page[:bucket].replace_html "#{render :partial => 'bucket'}"
+    end
+  end
+  
+  def clear_bucket
+    session[:bucket] = nil
+    render :update do |page|
+      page[:bucket].replace_html '<li><p class="note"><em>Your bucket is empty.</em></p></li>'
     end
   end
   

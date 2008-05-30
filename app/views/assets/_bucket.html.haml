@@ -1,9 +1,10 @@
 %ul#bucket
   - if session[:bucket]
-    - session[:bucket].each do |filename, values| 
-      - info = values[1]
-      - asset = Asset.find(info[:id]) 
-      = render :partial => "admin/asset/asset", :locals => { :asset => asset, :id_name => 'asset' }
+    - session[:bucket].each do |id| 
+      - asset = Asset.find(id) 
+      %li.asset
+        = link_to image_tag(asset.asset.url(:small)), edit_asset_url(:id => asset)
+      //= render :partial => "admin/asset/asset", :locals => { :asset => asset, :id_name => 'asset' }
   - else
     %li
       %p.note Your bucket is empty
