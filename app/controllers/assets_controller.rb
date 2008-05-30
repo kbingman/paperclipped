@@ -37,5 +37,9 @@ class AssetsController < ApplicationController
       # options    = options.reverse_merge(:title => "#{asset.title}")
       [asset.asset.url, thumbnail, options]
     end
-  
+    
+    def current_objects
+      Asset.paginate(:all, :order => 'created_at', :page => params[:page], :per_page => 10)
+    end
+
 end
