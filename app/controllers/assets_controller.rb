@@ -9,11 +9,11 @@ class AssetsController < ApplicationController
   
   def add_bucket
     @asset = Asset.find(params[:id])
-    session[:bucket] = [] unless session[:bucket]
-    if session[:bucket].include?(@asset.id)
+    if (session[:bucket] ||= {}).key?(@asset.asset.url)
       render :nothing => true and return
     end
-    session[:bucket] << @asset.id
+    session[:bucket][@asset.asset.url] = { :thumbnail => @asset.asset.url(:square), :id => @asset.id, :title => @asset.title }
+
     render :update do |page|
       page[:bucket].replace_html "#{render :partial => 'bucket'}"
     end
@@ -37,15 +37,8 @@ class AssetsController < ApplicationController
   
   protected
   
-    def asset_image_args_for(asset, thumbnail = :icon, options = {})
-      # thumb_size = Array.new(2).fill(Asset.attachment_options[:thumbnails][thumbnail].to_i).join('x')
-      # options    = options.reverse_merge(:title => "#{asset.title}")
-      [asset.asset.url, thumbnail, options]
-    end
-    
-    protected
     def current_objects
-      Asset.paginate(:all, :order => 'created_at', :page => params[:page], :per_page => 10)
+      Asset.paginate(:all, :order => 'created_at', :page => params[:page], :per_page => 2)
     end
   
 end
