@@ -72,14 +72,14 @@ p#image-nav a:hover { text-decoration: underline; color: blue; }
 p#asset-name {padding-top: 8px; font-size: 80%;}
 p.info {font-size: 85%;}
 
-.bucket_asset  { position: relative; float:left; margin: 8px 0 8px 8px; padding: 3px;
+#bucket-container li.asset  { position: relative; float:left; margin: 8px 0 8px 8px; padding: 3px;
   background-color:#eaeaea; border: 1px solid #ccc;}
   
-#bucket-container .image_info { position: absolute; top: 5px; left: 57px; width: 320px; background: white; border: 5px solid #c0c0c0; 
-  font-size: 90%; padding: 10px 15px; z-index: 100; }
+#bucket-container .info { position: absolute; top: 5px; left: 57px;  background: white; border: 5px solid #c0c0c0; 
+  font-size: 90%; padding: 10px 15px 15px; z-index: 100; }
 #bucket-container .image_info p { margin: 0;}
-#bucket-container .image_info a { display: inline; background: none; border: none; color: black; text-decoration: none; }
-#bucket-container .image_info a:hover { color: blue; text-decoration: underline; }
+#bucket-container .info a { display: inline; background: none; border: none; color: black; text-decoration: none; }
+#bucket-container .info  a:hover { color: blue; text-decoration: underline; }
 #bucket-container .image_info h4 { margin: 0 0 10px 0; padding: 0; background: none; }
 #bucket-container .image_links { border: 1px solid black; padding: 8px 10px; margin: 0 0 8px 0; }
 
