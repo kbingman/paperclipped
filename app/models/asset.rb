@@ -6,8 +6,8 @@ class Asset < ActiveRecord::Base
                                  :thumbnail  => "100x100>",
                                  :normal => "640x640" },
                     :whiny_thumbnails => false,
-                    :url => "/:attachment/:id/:basename:test.:extension",
-                    :path => ":rails_root/public/:attachment/:id/:basename:test.:extension"
+                    :url => "/:attachment/:id/:basename:no_original_style.:extension",
+                    :path => ":rails_root/public/:attachment/:id/:basename:no_original_style.:extension"
                                  
   has_many :page_attachments, :dependent => :destroy
   has_many :pages, :through => :page_attachments

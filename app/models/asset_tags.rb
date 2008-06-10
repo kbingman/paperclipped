@@ -53,7 +53,7 @@ module AssetTags
      end
    end
   
-  [:filename, :title, :caption, :content_type, :size, :width, :height, :id].each do |method|
+  [:asset_file_name, :title, :caption, :asset_content_type, :asset_file_size, :id].each do |method|
     desc %{
       Renders the `#{method.to_s}' attribute of the asset.     
       The 'title' attribute is required on this tag or the parent tag.
@@ -74,8 +74,7 @@ module AssetTags
     options = tag.attr.dup
     raise TagError, "'title' attribute required" unless title = options.delete('title') or tag.locals.asset
     asset = tag.locals.asset || Asset.find_by_title(tag.attr['title'])
-    size = options.delete('size') || 'original'
-    # path = asset.asset.url(size)
+    size = options['size'] ? options.delete('size') : 'original'
     alt = " alt='#{asset.title}'" unless tag.attr['alt'] rescue nil
     attributes = options.inject('') { |s, (k, v)| s << %{#{k.downcase}="#{v}" } }.strip
     attributes << alt unless alt.nil?
@@ -91,7 +90,7 @@ module AssetTags
     options = tag.attr.dup
     raise TagError, "'title' attribute required" unless title = options.delete('title') or tag.locals.asset
     asset = tag.locals.asset || Asset.find_by_title(tag.attr['title'])
-    size = options.delete('size') || 'original'
+    size = options['size'] ? options.delete('size') : 'original'
     asset.asset.url(size)  rescue nil
   end
   
