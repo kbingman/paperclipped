@@ -1,6 +1,27 @@
 - unless @page.assets.empty?
   - @page.attachments.each do |a|
-    = render :partial => "assets/asset", :locals => { :asset => a.asset, :id_name => 'attachment' } 
+    // = render :partial => "assets/asset", :locals => { :asset => a.asset, :id_name => 'attachment' } 
+    - asset = a.asset
+    - dom_id = "attachment_#{a.id}"
+    %li.asset{ :id => dom_id }
+      = link_to image_tag(asset.asset.url(:small)), asset.asset.url, :onclick => "toggle_image_info(this); return false;"
+      .info{ :id => "#{dom_id}_info", :style => "display: none" }
+        %strong
+          = link_to asset.title, edit_asset_url(asset.id)
+        %br
+        = link_to "Original URL", asset.asset.url
+        %br
+        = link_to "Thumbnail", "#"
+        - if @page
+          %br
+          = link_to_remote "Remove image", :url => remove_page_asset_url(:asset => asset.id, :page => @page.id), | 
+            :confirm => "Are you sure you want to remove this asset from the page?", |
+            :after => "Effect.Fade('#{dom_id}', { duration: 0.5 })", :complete => "Element.remove('#{dom_id}')" |
+          %br
+          %strong
+            Radius Tag
+          %br
+          = "&lt;r:image&nbsp;title='#{asset.title}'&nbsp;/&gt;"
     
 - else
   %li
