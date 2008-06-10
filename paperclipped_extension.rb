@@ -26,7 +26,7 @@ class PaperclippedExtension < Radiant::Extension
     
     Page.class_eval {
       include PageAssetAssociations
-      # include AssetTags
+      include AssetTags
     }
     
     # join already observed models with forum extension models 
