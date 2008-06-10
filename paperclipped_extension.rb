@@ -1,4 +1,6 @@
 require_dependency 'application'
+require File.dirname(__FILE__) + '/lib/url_additions'
+include UrlAdditions
 
 class PaperclippedExtension < Radiant::Extension
   version "1.0"

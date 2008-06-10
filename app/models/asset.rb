@@ -2,11 +2,12 @@ class Asset < ActiveRecord::Base
   order_by 'title'
   
   has_attached_file :asset,
-                    :styles => { :square => ["42x42#", :png],
-                                 :normal => "640x640",
-                                 :small  => "100x100>" },
-                    :url => "/:attachment/:id/:basename_:style.:extension",
-                    :path => ":rails_root/public/:attachment/:id/:basename_:style.:extension"
+                    :styles => { :icon => ["42x42#", :png],
+                                 :thumbnail  => "100x100>",
+                                 :normal => "640x640" },
+                    :whiny_thumbnails => false,
+                    :url => "/:attachment/:id/:basename:test.:extension",
+                    :path => ":rails_root/public/:attachment/:id/:basename:test.:extension"
                                  
   has_many :page_attachments, :dependent => :destroy
   has_many :pages, :through => :page_attachments

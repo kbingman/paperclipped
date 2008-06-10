@@ -8,6 +8,8 @@
 
 %p
   %label Search
+  %input{ :type => "text", :id => "search", :name => "search" }
+  = observe_field 'search',  :frequency => 1, :update => 'assets_table', :url =>  { :controller => 'assets', :action=> 'index' }, :method => 'get', :with => "'search=' + escape(value)"
 
 
 #assets_table

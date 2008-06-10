@@ -12,7 +12,7 @@
   %tbody
     %tr.node.level-1{ :onmouseover => "Element.addClassName(this, 'highlight');", :onmouseout => "Element.removeClassName(this, 'highlight');" }
       %td.asset.layout
-        = image_tag @asset.asset.url(:small), :title => @asset.asset_file_name
+        = image_tag @asset.asset.url(:thumbnail), :title => @asset.asset_file_name
         = @asset.title
 
 

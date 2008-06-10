@@ -11,15 +11,15 @@
           = link_to "Original URL", url
           %br
           = link_to "Thumbnail", info[:thumbnail]
-          - if @page
+          - if @page && !@page.new_record?
             %br
             = link_to_remote "Attach image", :url => attach_page_asset_url(:asset => info[:id], :page => @page.id), |
                                              :after => "Effect.Fade('#{dom_id}_info', { duration: 0.3 })" |
-            %br
-            %strong
-              Radius Tag
-            %br
-            = "&lt;r:image&nbsp;title='#{info[:title]}'&nbsp;/&gt;"
+            // %br
+            // %strong
+            //  Radius Tag
+            // %br
+            // = "&lt;r:image&nbsp;title='#{info[:title]}'&nbsp;/&gt;"
   - else
     %li
       %p.note Your bucket is empty
