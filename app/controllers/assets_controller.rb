@@ -19,6 +19,9 @@ class AssetsController < ApplicationController
     end
   end
   
+  def attach_image
+  end
+  
   def clear_bucket
     session[:bucket] = nil
     render :update do |page|
@@ -38,7 +41,7 @@ class AssetsController < ApplicationController
   protected
   
     def current_objects
-      Asset.paginate(:all, :order => 'created_at', :page => params[:page], :per_page => 2)
+      Asset.paginate(:all, :order => 'created_at', :page => params[:page], :per_page => 10)
     end
 
 end
