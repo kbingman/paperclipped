@@ -14,7 +14,7 @@ var Bucket = Class.create({
 });
 
 function toggle_image_info(element) {
-  image_info = element.next('.image_info');
+  image_info = element.next('.info');
   Effect.toggle(image_info, 'appear', { duration: 0.4 });
 }
 
@@ -26,7 +26,7 @@ function reorder_attachments(page) {
 
   container = $('attachments');
   // attachments = container.select('li.bucket_asset');
-  container.select('li.bucket_asset').each(function(asset) {
+  container.select('li.asset').each(function(asset) {
     link = asset.down();
     link.setStyle({ 
       cursor: 'move'

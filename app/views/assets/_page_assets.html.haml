@@ -1,5 +1,5 @@
 - unless @page.assets.empty?
-  - @page.attachments.each do |a|
+  - @page.page_attachments.each do |a|
     // = render :partial => "assets/asset", :locals => { :asset => a.asset, :id_name => 'attachment' } 
     - asset = a.asset
     - dom_id = "attachment_#{a.id}"
