@@ -12,11 +12,8 @@ class Asset < ActiveRecord::Base
   belongs_to :created_by, :class_name => 'User'
   belongs_to :updated_by, :class_name => 'User'
   
-<<<<<<< HEAD:app/models/asset.rb
-=======
   validates_attachment_presence :asset, :message => "You must choose a file to upload!"
 
->>>>>>> 63ea031083ad57d8313947861b623201fb69012f:app/models/asset.rb
   before_save :assign_title
   
   def basename
