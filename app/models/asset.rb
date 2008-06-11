@@ -4,10 +4,10 @@ class Asset < ActiveRecord::Base
   has_attached_file :asset,
                     :styles => { :icon => ["42x42#", :png],
                                  :thumbnail  => "100x100>",
-                                 :normal => "640x640" },
+                                 :original => "640x640" },
                     :whiny_thumbnails => false,
-                    :url => "/:attachment/:id/:basename:no_original_style.:extension",
-                    :path => ":rails_root/public/:attachment/:id/:basename:no_original_style.:extension"
+                    :url => "/:class/:id/:basename:no_original_style.:extension",
+                    :path => ":rails_root/public/:class/:id/:basename:no_original_style.:extension"
                                  
   has_many :page_attachments, :dependent => :destroy
   has_many :pages, :through => :page_attachments
@@ -24,7 +24,7 @@ class Asset < ActiveRecord::Base
   end
   
   def extension
-    asset_file_name.split('.').last.downcase
+    asset_file_name.split('.').last.downcase if asset_file_name
   end
   
   private

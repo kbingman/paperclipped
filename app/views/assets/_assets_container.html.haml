@@ -9,7 +9,7 @@
         Attached Assets&nbsp;
         %span.note Assets associated with this page.
         %span#reorder
-          %a{ :href => "#", :onclick => "reorder_attachments(#{@page.id}); return false;" } Reorder
+          %a{ :href => "#", :onclick => "reorder_attachments(#{@page.id}, '#{form_authenticity_token}'); return false;" } Reorder
         %span#done{ :style => 'display:none' }
           %a{ :href => "#", :onclick => "done_reordering(); return false;" } Done reordering
       %ul#attachments
@@ -27,3 +27,6 @@
 
 
   %p{ :style => "clear:both;" }
+  
+//= sortable_element 'attachments', :url => { :controller => 'assets', :action => 'reorder', :id => @page }
+  

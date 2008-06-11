@@ -50,9 +50,9 @@ class AssetsController < ApplicationController
   
   def reorder
     params[:attachments].each_with_index do |id,idx| 
-      attachment = Attachment.find_by_page_id(params[:id], :conditions => ['asset_id = ?', id])
-      attachment.position = idx+1
-      attachment.save
+      page_attachment = PageAttachment.find(id)
+      page_attachment.position = idx+1
+      page_attachment.save
     end
     render :nothing => true
   end

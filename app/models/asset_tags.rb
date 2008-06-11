@@ -24,8 +24,6 @@ module AssetTags
   }    
   tag 'assets:each' do |tag|
     result = []
-    # all = tag.attr['all']
-    # all == 'true' ? assets = Asset.find(:all) : assets = tag.locals.page.assets
     attachments = tag.locals.page.page_attachments
     tag.locals.assets = attachments
     attachments.each do |attachment|
@@ -36,10 +34,8 @@ module AssetTags
   end
   
   tag 'assets:first' do |tag|
-     # all = tag.attr['all']
-     # all == 'true' ? assets = Asset.find(:all) : 
-     attachmentss = tag.locals.page.page_attachments
-     if first = attachmentss.first
+     attachments = tag.locals.page.page_attachments
+     if first = attachments.first
        tag.locals.asset = first.asset
        tag.expand
      end
@@ -53,7 +49,7 @@ module AssetTags
      end
    end
   
-  [:asset_file_name, :title, :caption, :asset_content_type, :asset_file_size, :id].each do |method|
+  [:title, :caption, :asset_file_name, :asset_content_type, :asset_file_size, :id].each do |method|
     desc %{
       Renders the `#{method.to_s}' attribute of the asset.     
       The 'title' attribute is required on this tag or the parent tag.

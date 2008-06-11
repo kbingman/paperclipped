@@ -18,12 +18,12 @@ function toggle_image_info(element) {
   Effect.toggle(image_info, 'appear', { duration: 0.4 });
 }
 
-function reorder_attachments(page) {
+function reorder_attachments(page, token) {
   // Toggles Reorder link
   $('reorder').toggle(); 
   $('done').toggle();
   var url = '/admin/assets/reorder/' + page 
-
+  
   container = $('attachments');
   // attachments = container.select('li.bucket_asset');
   container.select('li.asset').each(function(asset) {
@@ -33,17 +33,16 @@ function reorder_attachments(page) {
     }); 
     link.writeAttribute('onclick', 'return false;');
   });
-  Sortable.create('attachments', {constraint:false,ghosting:false});
-    Sortable.create("attachments", {constraint:false,ghosting:false,onUpdate:function(){new Ajax.Request(url, {asynchronous:true, evalScripts:true, parameters:Sortable.serialize("attachments")})}})
+  Sortable.create("attachments", {constraint:false,ghosting:false,onUpdate:function(){new Ajax.Request(url, {asynchronous:true, evalScripts:true, parameters:Sortable.serialize("attachments") + '&authenticity_token=' + encodeURIComponent(token)})}})
 }
 
 function done_reordering() {
   // Toggles Reorder link
   $('reorder').toggle(); 
   $('done').toggle();
-  
+
   container = $('attachments');
-  container.select('li.bucket_asset').each(function(asset,i) {
+  container.select('li.asset').each(function(asset,i) {
     index = 100 - i
     asset.setStyle({ 
       'z-index': index
