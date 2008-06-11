@@ -8,9 +8,19 @@ class AssetsController < ApplicationController
         render :partial => 'assets/asset_table.html.haml', :layout => false
       }
     end
-    response_for :create, :update do |format|
+    after :create do
+      if params[:page]
+        @page = Page.find(params[:page])
+        @asset.pages << @page
+      end
+    end
+    response_for :update do |format|
       format.html { redirect_to(params[:continue] ? edit_asset_path(@asset) : assets_path) }
     end
+    response_for :create do |format|
+      format.html { redirect_to(@page ? page_edit_url(@page) : (params[:continue] ? edit_asset_path(@asset) : assets_path)) }
+    end
+     
   end
   
   def add_bucket
@@ -21,14 +31,14 @@ class AssetsController < ApplicationController
     session[:bucket][@asset.asset.url] = { :thumbnail => @asset.asset.url(:thumbnail), :id => @asset.id, :title => @asset.title }
 
     render :update do |page|
-      page[:bucket].replace_html "#{render :partial => 'bucket'}"
+      page[:bucket_list].replace_html "#{render :partial => 'bucket'}"
     end
   end
   
   def clear_bucket
     session[:bucket] = nil
     render :update do |page|
-      page[:bucket].replace_html '<li><p class="note"><em>Your bucket is empty.</em></p></li>'
+      page[:bucket_list].replace_html '<li><p class="note"><em>Your bucket is empty.</em></p></li>'
     end
   end
   

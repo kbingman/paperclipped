@@ -1,5 +1,10 @@
 - include_stylesheet 'admin/assets' 
 
 %h1= "New Asset"
+
+%p 
+  Choose an asset to upload here. If the <code>Title</code> field is left blank, the filename (without the file type) will be automatically added. 
+  By clicking on <code>More</code>, you can add a caption as well. 
+  
 - form_for :asset, :url => assets_path, :html => { :method => "post", :multipart => true } do |form|
   = render :partial => "form", :locals => { :form => form }

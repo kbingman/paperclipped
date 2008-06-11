@@ -1,4 +1,4 @@
-%table#assets{ :class => "index", :cellpadding => "0", :cellspacing => "0", :border => "0"}
+%table{ :class => "index", :cellpadding => "0", :cellspacing => "0", :border => "0"}
   %thead
     %tr
       %th.asset Image
@@ -15,7 +15,7 @@
           %td.asset-title
             = link_to asset.title, edit_asset_url(:id => asset.id) 
             &nbsp;
-            %span.info
+            %span.caption
               = asset.caption
           %td.add-to-bucket
             = link_to_remote(image_tag('admin/add-to-bucket.png', :alt => 'Add to Bucket'), :url => add_bucket_url(:id => asset))

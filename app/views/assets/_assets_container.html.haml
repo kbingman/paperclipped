@@ -2,11 +2,30 @@
 - include_javascript 'admin/assets'
 - include_javascript 'dragdrop'
 
-#bucket-container
-  - if @page 
-    #attachment-container
-      %h4 
-        Attached Assets&nbsp;
+
+#asset-tabs
+  - if @page && !@page.new_record? 
+    %a.asset-tab.here{ :href => "#page-attachments", :onclick => "asset_tabs(this); return false;"  } Attached Assets
+    %a.asset-tab{ :href => "#upload-assets", :onclick => "asset_tabs(this); return false;" } Upload
+    %a.asset-tab{ :href => "#bucket", :onclick => "asset_tabs(this); return false;"  } Bucket
+  - else
+    %a.asset-tab.here{ :href => "#" } Bucket
+    
+#assets      
+  - bucket_style = "display:none;" if @page
+  #bucket.pane{ :style => bucket_style }
+    %p
+      %span.note Items placed here can be used in your pages, layouts and snippets.
+      %span#clear-bucket
+        = link_to_remote('Clear Bucket', {:url => clear_bucket_url} )
+  
+    = render :partial => "assets/bucket"
+    %div{ :style => "clear:both;" }
+    
+  - if @page && !@page.new_record? 
+  
+    #page-attachments.pane
+      %p
         %span.note Assets associated with this page.
         %span#reorder
           %a{ :href => "#", :onclick => "reorder_attachments(#{@page.id}, '#{form_authenticity_token}'); return false;" } Reorder
@@ -14,19 +33,16 @@
           %a{ :href => "#", :onclick => "done_reordering(); return false;" } Done reordering
       %ul#attachments
         = render :partial => "assets/page_assets" 
-        
-    %p{ :style => "clear:both;" }
-  
-  %h4 
-    Bucket&nbsp;
-    %span.note Items placed here can be used in your pages, layouts and snippets.
-    %span#clear-bucket
-      = link_to_remote('Clear Bucket', {:url => clear_bucket_url} )
-  
-  = render :partial => "assets/bucket"
+      
+      %div{ :style => "clear:both;" }
+    #upload-assets.pane{ :style => "display:none;" }
+      %p
+        %span.note Assets uploaded here will be automatically associated with this page.
+      = render :partial => "assets/upload_to_page"
 
-
-  %p{ :style => "clear:both;" }
   
-//= sortable_element 'attachments', :url => { :controller => 'assets', :action => 'reorder', :id => @page }
+  
+  
+  
+
   

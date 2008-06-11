@@ -1,4 +1,4 @@
-%ul#bucket
+%ul#bucket_list
   - if session[:bucket]
     - session[:bucket].each do |url, info| 
       - dom_id = "asset_#{info[:id]}"
@@ -14,7 +14,7 @@
           - if @page && !@page.new_record?
             %br
             = link_to_remote "Attach image", :url => attach_page_asset_url(:asset => info[:id], :page => @page.id), |
-                                             :after => "Effect.Fade('#{dom_id}_info', { duration: 0.3 })" |
+                                             :after => "Effect.Fade('#{dom_id}_info', { duration: 0.3 }); Element.highlight('assets');" |
             // %br
             // %strong
             //  Radius Tag

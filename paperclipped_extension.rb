@@ -9,7 +9,7 @@ class PaperclippedExtension < Radiant::Extension
   
   define_routes do |map|
     map.resources :assets, :path_prefix => "/admin"
-    map.with_options(:controller => 'admin/assets') do |asset|
+    map.with_options(:controller => 'assets') do |asset|
       asset.remove_asset  "/admin/assets/:id/remove",               :action => 'remove'
       asset.add_bucket    "/admin/assets/:id/add",                  :action => 'add_bucket'
       asset.clear_bucket  "/admin/assets/clear_bucket",             :action => 'clear_bucket'
@@ -22,7 +22,7 @@ class PaperclippedExtension < Radiant::Extension
   def activate
     require_dependency 'application'
     
-    admin.page.edit.add :form_bottom, '/assets/assets_container', :before => "edit_buttons"
+    admin.page.edit.add :main, '/assets/assets_container', :after => "edit_buttons"
     
     Page.class_eval {
       include PageAssetAssociations

@@ -1,6 +1,5 @@
 - unless @page.assets.empty?
   - @page.page_attachments.each do |a|
-    // = render :partial => "assets/asset", :locals => { :asset => a.asset, :id_name => 'attachment' } 
     - asset = a.asset
     - dom_id = "attachment_#{a.id}"
     %li.asset{ :id => dom_id }
@@ -16,7 +15,7 @@
           %br
           = link_to_remote "Remove image", :url => remove_page_asset_url(:asset => asset.id, :page => @page.id), | 
             :confirm => "Are you sure you want to remove this asset from the page?", |
-            :after => "Effect.Fade('#{dom_id}', { duration: 0.5 })", :complete => "Element.remove('#{dom_id}')" |
+            :after => "Effect.Fade('#{dom_id}', { duration: 0.5 })", :complete => "Element.remove('#{dom_id}'); Element.highlight('assets')" |
           // %br
           // %strong
           //  Radius Tag

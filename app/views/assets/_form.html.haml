@@ -22,7 +22,7 @@
 
     - unless @asset.new_record?     
       .asset
-        = image_tag @asset.asset.url(:normal)
+        = image_tag @asset.asset.url
 
     
     = form.file_field :asset, :class => "", :style => "width: 100%"

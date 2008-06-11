@@ -1,5 +1,5 @@
 // the bucket class isn't needed at the moment; it is currently handled with onclick, as this is 
-// easier to turn off again. 
+// easier to turn off again when reording the images. 
 var Bucket = Class.create({
   initialize: function(element) {
     assets = $(element).select('a.controls');
@@ -12,6 +12,16 @@ var Bucket = Class.create({
     });
   }
 });
+
+function asset_tabs(element) {
+  var panes = $('assets').select('.pane');
+  var tabs = $('asset-tabs').select('.asset-tab');
+  var target = element.href.split('#')[1]
+  tabs.each(function(tab) {tab.removeClassName('here')});
+  panes.each(function(pane) {Element.hide(pane)});
+  element.addClassName('here');
+  Element.show($(target));
+}
 
 function toggle_image_info(element) {
   image_info = element.next('.info');
@@ -33,7 +43,8 @@ function reorder_attachments(page, token) {
     }); 
     link.writeAttribute('onclick', 'return false;');
   });
-  Sortable.create("attachments", {constraint:false,ghosting:false,onUpdate:function(){new Ajax.Request(url, {asynchronous:true, evalScripts:true, parameters:Sortable.serialize("attachments") + '&authenticity_token=' + encodeURIComponent(token)})}})
+  Sortable.create("attachments", {constraint:false,ghosting:false,onUpdate:function(){new Ajax.Request(url, {asynchronous:true, evalScripts:true, parameters:Sortable.serialize("attachments") + '&authenticity_token=' + encodeURIComponent(token)})}});
+
 }
 
 function done_reordering() {
