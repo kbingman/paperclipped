@@ -3,8 +3,7 @@ class Asset < ActiveRecord::Base
   
   has_attached_file :asset,
                     :styles => { :icon => ["42x42#", :png],
-                                 :thumbnail  => "100x100>",
-                                 :original => "640x640" },
+                                 :thumbnail  => "100x100>" },
                     :whiny_thumbnails => false,
                     :url => "/:class/:id/:basename:no_original_style.:extension",
                     :path => ":rails_root/public/:class/:id/:basename:no_original_style.:extension"
