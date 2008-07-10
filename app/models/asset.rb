@@ -1,12 +1,16 @@
 class Asset < ActiveRecord::Base
   order_by 'title'
   
-  additional_thumbnails = Radiant::Config["assets.additional_thumbnails"].split(',').collect{|s| s.split('=')}.inject({}) {|ha, (k, v)| ha[k.to_sym] = v; ha}
-  additional_thumbnails[:icon] = ['42x42#', :png]
-  additional_thumbnails[:thumbnail] = '100x100>'
+  if Radiant::Config["assets.additional_thumbnails"]
+    thumbnails = Radiant::Config["assets.additional_thumbnails"].split(',').collect{|s| s.split('=')}.inject({}) {|ha, (k, v)| ha[k.to_sym] = v; ha}
+  else
+    thumbnails = {}
+  end
+  thumbnails[:icon] = ['42x42#', :png]
+  thumbnails[:thumbnail] = '100x100>'
   
   has_attached_file :asset,
-                    :styles => additional_thumbnails,
+                    :styles => thumbnails,
                     :whiny_thumbnails => false,
                     :url => "/:class/:id/:basename:no_original_style.:extension",
                     :path => ":rails_root/public/:class/:id/:basename:no_original_style.:extension"

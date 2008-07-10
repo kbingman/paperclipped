@@ -17,7 +17,7 @@ table .caption { color: #9eb3bf; font-style: italic; font-weight: normal; margin
 table td.add-to-bucket { width: 90px;}
 
 #assets { clear: both; position: relative; margin-bottom: 4px; padding: 0; 
-  border: solid #cdc295; border-width: 0 1px 1px 1px; height: 150px; background: white; }
+  border: solid #cdc295; border-width: 0 1px 1px 1px; min-height: 150px; height: auto !important; height: 150px; background: white; }
 
 #assets h4 { font-size: 100%; font-weight: bold; margin: 0; } 
 #assets .note { font-size: 85%; font-weight: normal; color: black; }
@@ -54,8 +54,10 @@ table td.add-to-bucket { width: 90px;}
 
 #bucket ul, #page-attachments ul { list-style: none; margin: 0; padding: 0 10px 0 0;}
 
-#assets li.asset  { position: relative; float:left; margin: 8px 0 8px 8px; padding: 3px;
-  background-color:#eaeaea; border: 1px solid #ccc;}
+#assets li.asset  { position: relative; float:left; margin: 8px 0 8px 8px; height: 106px;
+  }
+  
+#assets li.asset img { padding: 3px; background-color:#eaeaea; border: 1px solid #ccc; }
   
 #assets .info { position: absolute; top: 5px; left: 57px;  background: white; border: 5px solid #c0c0c0; 
   font-size: 90%; padding: 10px 15px 15px; z-index: 100; min-width: 200px; }

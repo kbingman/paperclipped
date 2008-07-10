@@ -10,7 +10,6 @@ class PaperclippedExtension < Radiant::Extension
   define_routes do |map|
     map.resources :assets, :path_prefix => "/admin"
     map.with_options(:controller => 'assets') do |asset|
-      
       asset.remove_asset      "/admin/assets/:id/remove",               :action => 'remove'
       asset.add_bucket        "/admin/assets/:id/add",                  :action => 'add_bucket'
       asset.clear_bucket      "/admin/assets/clear_bucket",             :action => 'clear_bucket'
@@ -40,8 +39,8 @@ class PaperclippedExtension < Radiant::Extension
     # connect UserActionObserver with my models 
     UserActionObserver.instance.send :add_observer!, Asset 
     
+    # This is just needed for testing if you are using mod_rails
     Paperclip.options[:image_magick_path] = '/usr/local/bin/'
-    
     
     admin.tabs.add "Assets", "/admin/assets", :after => "Snippets", :visibility => [:all]
   end
