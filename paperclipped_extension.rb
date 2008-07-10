@@ -10,12 +10,14 @@ class PaperclippedExtension < Radiant::Extension
   define_routes do |map|
     map.resources :assets, :path_prefix => "/admin"
     map.with_options(:controller => 'assets') do |asset|
-      asset.remove_asset  "/admin/assets/:id/remove",               :action => 'remove'
-      asset.add_bucket    "/admin/assets/:id/add",                  :action => 'add_bucket'
-      asset.clear_bucket  "/admin/assets/clear_bucket",             :action => 'clear_bucket'
-      asset.asset_reorder 'admin/assets/reorder/:id',               :action => 'reorder'
-      asset.attach_page_asset  'admin/assets/attach/:asset/page/:page',  :action => 'attach_asset'
-      asset.remove_page_asset  'admin/assets/remove/:asset/page/:page',  :action => 'remove_asset'
+      
+      asset.remove_asset      "/admin/assets/:id/remove",               :action => 'remove'
+      asset.add_bucket        "/admin/assets/:id/add",                  :action => 'add_bucket'
+      asset.clear_bucket      "/admin/assets/clear_bucket",             :action => 'clear_bucket'
+      asset.asset_reorder     'admin/assets/reorder/:id',               :action => 'reorder'
+      asset.attach_page_asset 'admin/assets/attach/:asset/page/:page',  :action => 'attach_asset'
+      asset.remove_page_asset 'admin/assets/remove/:asset/page/:page',  :action => 'remove_asset'
+      asset.refresh_assets    "/refresh",                               :action => 'regenerate_thumbnails'
     end
   end
   
@@ -37,6 +39,9 @@ class PaperclippedExtension < Radiant::Extension
 
     # connect UserActionObserver with my models 
     UserActionObserver.instance.send :add_observer!, Asset 
+    
+    Paperclip.options[:image_magick_path] = '/usr/local/bin/'
+    
     
     admin.tabs.add "Assets", "/admin/assets", :after => "Snippets", :visibility => [:all]
   end

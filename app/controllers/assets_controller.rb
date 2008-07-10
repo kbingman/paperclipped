@@ -23,6 +23,19 @@ class AssetsController < ApplicationController
      
   end
   
+  def regenerate_thumbnails
+    if request.post?
+      @assets = Asset.find(:all)
+      @assets.each do |asset|
+        asset.asset.reprocess!
+        asset.save
+      end
+    else
+      render "Do not access this url directly"
+    end
+    redirect_to assets_path
+  end
+  
   def add_bucket
     @asset = Asset.find(params[:id])
     if (session[:bucket] ||= {}).key?(@asset.asset.url)
