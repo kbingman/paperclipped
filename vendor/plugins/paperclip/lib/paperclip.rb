@@ -133,7 +133,7 @@ module Paperclip
       end
 
       validates_each(name) do |record, attr, value|
-        value.send(:flush_errors)
+        value.send(:flush_errors) unless value.valid?
       end
     end
 
@@ -190,7 +190,7 @@ module Paperclip
           unless options[:content_type].blank?
             content_type = instance[:"#{name}_content_type"]
             unless valid_types.any?{|t| t === content_type }
-              options[:message] || ActiveRecord::Errors.default_error_messages[:inclusion]
+              options[:message] || "is not one of the allowed file types."
             end
           end
         end
