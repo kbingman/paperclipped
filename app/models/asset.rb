@@ -2,7 +2,7 @@ class Asset < ActiveRecord::Base
   order_by 'title'
   
   if Radiant::Config["assets.additional_thumbnails"]
-    thumbnails = Radiant::Config["assets.additional_thumbnails"].split(',').collect{|s| s.split('=')}.inject({}) {|ha, (k, v)| ha[k.to_sym] = v; ha}
+    thumbnails = Radiant::Config["assets.additional_thumbnails"].split(', ').collect{|s| s.split('=')}.inject({}) {|ha, (k, v)| ha[k.to_sym] = v; ha}
   else
     thumbnails = {}
   end

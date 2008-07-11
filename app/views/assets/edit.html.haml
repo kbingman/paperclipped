@@ -2,7 +2,31 @@
 
 %h1= "Edit Asset"
 - form_for :asset, :url => asset_path(@asset), :html => { :method => "put", :multipart => true } do |form|
-  = render :partial => "form", :locals => { :form => form }
+  .form-area
+    = render :partial => "form", :locals => { :form => form }
+  
+    %p.content
+      %label.filename
+        = "Filename: #{@asset.asset_file_name unless @asset.new_record?}"
+      .asset
+        = image_tag @asset.asset.url(Radiant::Config['assets.display_size'].to_sym)
+      = updated_stamp @asset
+      
+    %p.upload
+      %label.upload Replace File
+      = form.file_field :asset, :class => "", :style => "width: 100%"
+      
+    %p.buttons
+      = save_model_button(@asset)
+      = save_model_and_continue_editing_button(@asset)
+      or
+      = link_to "Cancel", assets_url
+  
+%p 
+  You can regenerate the asset thumbnails here. Beware that this will take a while and consume considerable resources on your server. 
+
+  - form_tag refresh_assets_path(@asset) do
+    %input.button{ :type => "submit", :value => "Regenerate" }
 
 
 

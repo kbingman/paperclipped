@@ -22,8 +22,7 @@ namespace :radiant do
           mkdir_p RAILS_ROOT + directory
           cp file, RAILS_ROOT + path
         end
-        Radiant::Config['assets.additional_thumbnails'] = "small=480x480>,normal=640x640>"
-        puts "Setting default display sizes in Radiant::Config"
+        
       end  
     end
   end

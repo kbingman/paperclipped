@@ -1,34 +1,15 @@
-.form-area
+%p.title
+  %label{ :for => "asset_title" } Title
+  = form.text_field :title, :class => 'textbox', :maxlength => 100 
+#extended-metadata{ :class => "row", :style => "display: none" }
+  %table.fieldset{ :cellpadding => "0", :cellspacing => "0", :border => "0" }
+    %tr
+      %td.label
+        %label{ :for => "asset_caption" } Caption
+      %td.field
+        = form.text_field :caption, :class => 'textbox', :maxlength => 255 
+%p
+  %small
+    %a{ :id => "more-extended-metadata", :href => "#", :onclick => "#{toggle_javascript_for('extended-metadata')}; return false;" } More
+    %a{ :id => "less-extended-metadata", :href => "#", :onclick => "#{toggle_javascript_for('extended-metadata')}; return false;", :style => "display: none" } Less
 
-  %p.title
-    %label{ :for => "asset_title" } Title
-    = form.text_field :title, :class => 'textbox', :maxlength => 100 
-  #extended-metadata{ :class => "row", :style => "display: none" }
-    %table.fieldset{ :cellpadding => "0", :cellspacing => "0", :border => "0" }
-      %tr
-        %td.label
-          %label{ :for => "asset_caption" } Caption
-        %td.field
-          = form.text_field :caption, :class => 'textbox', :maxlength => 255 
-  %p
-    %small
-      %a{ :id => "more-extended-metadata", :href => "#", :onclick => "#{toggle_javascript_for('extended-metadata')}" } More
-      %a{ :id => "less-extended-metadata", :href => "#", :onclick => "#{toggle_javascript_for('extended-metadata')}", :style => "display: none" } Less
-
-  %p.content
-    %label{ :for => "layout_content", :class => "asset" }
-      Filename:
-      = @asset.asset_file_name unless @asset.new_record? 
-
-    - unless @asset.new_record?     
-      .asset
-        = image_tag @asset.asset.url(:normal)
-
-    
-    = form.file_field :asset, :class => "", :style => "width: 100%"
-    = updated_stamp @asset unless @asset.new_record?     
-  %p.buttons
-    = save_model_button(@asset)
-    = save_model_and_continue_editing_button(@asset)
-    or
-    = link_to "Cancel", assets_url
