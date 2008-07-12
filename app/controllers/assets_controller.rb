@@ -15,10 +15,16 @@ class AssetsController < ApplicationController
       end
     end
     response_for :update do |format|
-      format.html { redirect_to(params[:continue] ? edit_asset_path(@asset) : assets_path) }
+      format.html { 
+        flash[:notice] = "Asset successfully updated."
+        redirect_to(params[:continue] ? edit_asset_path(@asset) : assets_path) 
+      }
     end
     response_for :create do |format|
-      format.html { redirect_to(@page ? page_edit_url(@page) : (params[:continue] ? edit_asset_path(@asset) : assets_path)) }
+      format.html { 
+        flash[:notice] = "Asset successfully uploaded."
+        redirect_to(@page ? page_edit_url(@page) : (params[:continue] ? edit_asset_path(@asset) : assets_path)) 
+      }
     end
      
   end
@@ -31,11 +37,13 @@ class AssetsController < ApplicationController
           asset.asset.reprocess!
           asset.save
         end
+        flash[:notice] = "Thumbnails successfully refreshed."
         redirect_to assets_path
       else
         @asset = Asset.find(params[:id])
         @asset.asset.reprocess!
         @asset.save
+        flash[:notice] = "Thumbnails successfully refreshed."
         redirect_to edit_asset_path(@asset)
       end
     else
