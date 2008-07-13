@@ -5,7 +5,12 @@ class AssetsController < ApplicationController
     response_for :index do |format|
       format.html { render }
       format.js {
-        render :partial => 'assets/asset_table.html.haml', :layout => false
+        if params[:asset_page]
+          @asset_page = Page.find(params[:asset_page])
+          render :partial => 'assets/search_results.html.haml', :layout => false
+        else
+          render :partial => 'assets/asset_table.html.haml', :layout => false
+        end
       }
     end
     after :create do

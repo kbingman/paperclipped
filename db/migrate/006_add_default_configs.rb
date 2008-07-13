@@ -3,7 +3,7 @@ class AddDefaultConfigs < ActiveRecord::Migration
   class Config < ActiveRecord::Base; end
   
   def self.up
-    Radiant::Config['assets.additional_thumbnails'] = "small=480x480>, normal=640x640>"
+    Radiant::Config['assets.additional_thumbnails'] = "normal=640x640>"
     Radiant::Config['assets.display_size'] = "original"
     puts "-- Setting default display sizes in Radiant::Config"
     # Config.find(:all).each do |c|

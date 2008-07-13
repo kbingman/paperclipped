@@ -19,10 +19,9 @@
   
 = render :partial => 'assets_container'
   
-
-
-%p 
-  You can regenerate all thumbnails here. Beware that this will take a while and consume considerable resources on your server. 
+- if current_user.admin? or current_user.developer?
+  %p 
+    You can regenerate all thumbnails here. Beware that this will take a while and consume considerable resources on your server. 
   
-- form_tag refresh_assets_path do
-  %input.button{ :type => "submit", :value => "Regenerate" }
+  - form_tag refresh_assets_path do
+    %input.button{ :type => "submit", :value => "Regenerate" }

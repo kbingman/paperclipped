@@ -21,7 +21,7 @@ table td.add-to-bucket { width: 90px;}
 
 #assets h4 { font-size: 100%; font-weight: bold; margin: 0; } 
 #assets .note { font-size: 85%; font-weight: normal; color: black; }
-#assets p { padding: 5px 10px 7px; background: #eae3c5; margin: 0; }
+#assets p { padding: 0 10px 7px; background: #eae3c5; margin: 0; height: 20px; line-height: 22px; }
 
 #assets p.note { margin: 5px 0; font-size: 85%; font-style: italic;  background: #fff;}
 
@@ -52,7 +52,7 @@ table td.add-to-bucket { width: 90px;}
 #asset-tabs .asset-tab.here { background-color: #eae3c5; border: 1px solid #cdc295; border-bottom: 1px solid #eae3c5; }
 
 
-#bucket ul, #page-attachments ul { list-style: none; margin: 0; padding: 0 10px 0 0;}
+#bucket ul, #page-attachments ul, #search-results ul { list-style: none; margin: 0; padding: 0 10px 0 0;}
 
 #assets li.asset  { position: relative; float:left; margin: 8px 0 8px 8px; height: 106px;
   }
@@ -78,14 +78,15 @@ table td.add-to-bucket { width: 90px;}
 p#asset-name { padding-top: 8px; font-size: 80%; }
 p.info { font-size: 85%; }
 
-
-
+.asset-buttons { font-size: 80%; }
 
 table#site-map td.assets, table#site-map th.assets  { text-align: right; border: 1px solid red;}
 
 #upload-assets { }
 #upload-assets a { color: black; font-weight: bold; text-decoration: none; }
 #upload-assets a:hover { color: blue; text-decoration: underline; }
-#upload-form { margin: 0 10px; }
+#upload-form .file { padding: 10px 10px 5px; }
+#upload-form .upload-buttons { padding: 0 10px; font-size: 80%; }
+#upload-form label { margin-bottom: 5px; display: block; font-weight: bold; }
 
-
+#search p input{ margin: -3px 0 -3px; padding: 1px; }

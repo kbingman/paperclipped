@@ -8,6 +8,7 @@
     %a.asset-tab.here{ :href => "#page-attachments", :onclick => "asset_tabs(this); return false;"  } Attached Assets
     %a.asset-tab{ :href => "#upload-assets", :onclick => "asset_tabs(this); return false;" } Upload
     %a.asset-tab{ :href => "#bucket", :onclick => "asset_tabs(this); return false;"  } Bucket
+    %a.asset-tab{ :href => "#search-assets", :onclick => "asset_tabs(this); return false;"  } Search
   - else
     %a.asset-tab.here{ :href => "#" } Bucket
     
@@ -39,9 +40,13 @@
       %p
         %span.note Assets uploaded here will be automatically associated with this page.
       = render :partial => "assets/upload_to_page"
-
-  
-  
+    #search-assets.pane{ :style => "display:none;" }
+      %p
+        %span.note Search for assets 
+        %input{ :type => "text", :id => "search", :name => "search" }
+        
+      #search-results
+      = observe_field 'search',  :frequency => 1, :update => 'search-results', :url =>  assets_path(:asset_page => @page), :method => 'get', :with => "'search=' + escape(value)"
   
   
 

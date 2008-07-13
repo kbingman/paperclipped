@@ -21,12 +21,13 @@
       = save_model_and_continue_editing_button(@asset)
       or
       = link_to "Cancel", assets_url
-  
-%p 
-  You can regenerate the asset thumbnails here. Beware that this will take a while and consume considerable resources on your server. 
+- if current_user.admin? or current_user.developer?
+  %p 
+    You can regenerate the asset thumbnails here. Beware that this will take a while and consume considerable resources on your server. 
 
   - form_tag refresh_assets_path(@asset) do
-    %input.button{ :type => "submit", :value => "Regenerate" }
+    %p.asset-buttons
+      %input.button{ :type => "submit", :value => "Regenerate" }
 
 
 

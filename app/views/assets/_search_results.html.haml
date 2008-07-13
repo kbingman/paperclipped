@@ -1,0 +1,18 @@
+%ul#search_list
+  - unless @assets.empty?
+    - @assets.each do |asset| 
+      - dom_id = "asset_#{asset.id}"
+      %li.asset{ :id => dom_id }
+        = link_to image_tag(asset.asset.url(:thumbnail)), asset.asset.url, :onclick => "toggle_image_info(this); return false;"
+        .info{ :id => "#{dom_id}_info", :style => "display: none" }
+          %strong
+            = link_to asset.title, edit_asset_url(asset)
+          %br
+          = link_to "Original URL", asset.asset.url
+          %br
+          = link_to "Thumbnail", asset.asset.url(:thumbnail)
+          %br
+          = link_to_remote "Attach image", :url => attach_page_asset_url(:asset => asset.id, :page => @asset_page.id),:after => "Effect.Fade('#{dom_id}_info', { duration: 0.3 }); Element.highlight('assets');" 
+  - else
+    %li
+      %p.note There were no assets found
