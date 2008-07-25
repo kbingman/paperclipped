@@ -11,7 +11,7 @@
         %tr.node.level-1
           %td.asset
             - asset_id = "asset_#{asset.id.to_s}"
-            = link_to image_tag(asset.asset.url(:icon)), edit_asset_url(:id => asset), :class => 'icon'
+            = link_to image_tag(asset.thumbnail(:icon)), edit_asset_url(:id => asset), :class => 'icon'
           %td.asset-title
             = link_to asset.title, edit_asset_url(:id => asset.id) 
             &nbsp;

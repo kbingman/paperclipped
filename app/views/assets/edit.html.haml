@@ -9,7 +9,7 @@
       %label.filename
         = "Filename: #{@asset.asset_file_name unless @asset.new_record?}"
       .asset
-        = image_tag @asset.asset.url(Radiant::Config['assets.display_size'].to_sym)
+        = image_tag @asset.thumbnail(Radiant::Config['assets.display_size'].to_sym)
       = updated_stamp @asset
       
     %p.upload

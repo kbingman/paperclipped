@@ -25,6 +25,10 @@ class Asset < ActiveRecord::Base
 
   before_save :assign_title
   
+  def thumbnail(size = nil)
+    path = size ? "/images/assets/pdf_#{size.to_s}.png" : "/images/assets/pdf.png"
+    asset_content_type == "application/pdf" && size != :original ? path : self.asset.url(size)
+  end
   
   def basename
     File.basename(asset_file_name, ".*") if asset_file_name

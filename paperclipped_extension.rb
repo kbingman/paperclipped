@@ -29,18 +29,12 @@ class PaperclippedExtension < Radiant::Extension
       include PageAssetAssociations
       include AssetTags
     }
-    
-    # join already observed models with forum extension models 
-    observables = UserActionObserver.instance.observed_classes | [Asset] 
-
-    # update list of observables 
-    UserActionObserver.send :observe, observables 
 
     # connect UserActionObserver with my models 
     UserActionObserver.instance.send :add_observer!, Asset 
     
     # This is just needed for testing if you are using mod_rails
-    Paperclip.options[:image_magick_path] = '/usr/local/bin/'
+    Paperclip.options[:image_magick_path] = Radiant::Config["assets.image_magick_path"] if Radiant::Config["assets.image_magick_path"]
     
     admin.tabs.add "Assets", "/admin/assets", :after => "Snippets", :visibility => [:all]
   end

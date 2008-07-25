@@ -1,3 +1,7 @@
-= Assets
+Paperclip is a new file management plugin from Thoughtbot which has a  few advantages over attachment_fu: it doesn't use RMagick, which uses a lot of RAM and is a bit of overkill for just making thumbnails. Instead it directly uses ImageMagick, making it much easier to install. It also offers very flexible asset paths, and using this, I have made the same file structure as attachment_fu. I have also successfully adapted the db tables from the old extension without too much trouble.
 
-Description goes here
+To install it, just run rake production radiant:extensions:migrate, then run rake radiant:extensions:paperclipped:update to install the javascripts, images and css.
+
+Once installed, you get a new Tab with the entire assets library, a Bucket à la Mephisto (though only the concept is stolen) and a search. You can also easily attach assets to any page and directly upload them to a page.
+
+If you install the Setting Extension (highly recommended), you can also easily adjust both the sizes of any additional thumbnails and which thumbnails are displayed in the image edit view. The default is the original file, but any image size can be used by giving in the name of that size. 

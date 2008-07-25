@@ -62,7 +62,7 @@ class AssetsController < ApplicationController
     if (session[:bucket] ||= {}).key?(@asset.asset.url)
       render :nothing => true and return
     end
-    session[:bucket][@asset.asset.url] = { :thumbnail => @asset.asset.url(:thumbnail), :id => @asset.id, :title => @asset.title }
+    session[:bucket][@asset.asset.url] = { :thumbnail => @asset.thumbnail(:thumbnail), :id => @asset.id, :title => @asset.title }
 
     render :update do |page|
       page[:bucket_list].replace_html "#{render :partial => 'bucket'}"
