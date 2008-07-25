@@ -3,7 +3,7 @@
     - asset = a.asset
     - dom_id = "attachment_#{a.id}"
     %li.asset{ :id => dom_id }
-      = link_to image_tag(asset.thumbnail(:thumbnail)), asset.thumbail, :onclick => "toggle_image_info(this); return false;"
+      = link_to image_tag(asset.thumbnail(:thumbnail)), asset.thumbnail, :onclick => "toggle_image_info(this); return false;"
       .info{ :id => "#{dom_id}_info", :style => "display: none" }
         %strong
           = link_to asset.title, edit_asset_url(asset.id)
