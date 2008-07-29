@@ -3,7 +3,7 @@
     - session[:bucket].each do |url, info| 
       - dom_id = "asset_#{info[:id]}"
       %li.asset{ :id => dom_id }
-        = link_to image_tag(info[:thumbnail]), url, :onclick => "toggle_image_info(this); return false;"
+        = link_to image_tag(info[:thumbnail]), url, :onclick => "return false;", :title => info[:title], :class => "bucket_link"
         .info{ :id => "#{dom_id}_info", :style => "display: none" }
           %strong
             = link_to info[:title], edit_asset_url(info[:id])

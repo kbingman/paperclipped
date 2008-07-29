@@ -1,16 +1,19 @@
-// the bucket class isn't needed at the moment; it is currently handled with onclick, as this is 
-// easier to turn off again when reording the images. 
-var Bucket = Class.create({
-  initialize: function(element) {
-    assets = $(element).select('a.controls');
-    assets.each(function(link) {
-      link.observe('click', function(e) {
-        image_info = link.next();
-        Effect.toggle(image_info, 'appear', { duration: 0.4 });
-        e.stop();
-      });
+document.observe("dom:loaded", function() {
+  // initially hide all containers for tab content
+  $$('#bucket li.asset').each(function(element){
+    new Draggable(element, { revert: true });
+  });
+  
+  $$('.textarea').each(function(box){
+    Droppables.add(box, {
+      accept: 'asset',
+      onDrop: function(element) {
+        var link = element.select('a.bucket_link')[0]
+        box.value = box.value + '<r:assets:image title="' + link.title + '" />'
+      }
     });
-  }
+  });
+  
 });
 
 function asset_tabs(element) {
