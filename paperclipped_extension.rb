@@ -24,6 +24,7 @@ class PaperclippedExtension < Radiant::Extension
     require_dependency 'application'
     
     admin.page.edit.add :main, '/assets/assets_container', :after => "edit_buttons"
+    admin.snippet.edit.add :main, '/assets/assets_container', :after => "edit_buttons"
     
     Page.class_eval {
       include PageAssetAssociations

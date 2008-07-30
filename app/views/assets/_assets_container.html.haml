@@ -5,18 +5,17 @@
 
 #asset-tabs
   - if @page && !@page.new_record? 
-    %a.asset-tab.here{ :href => "#page-attachments", :onclick => "asset_tabs(this); return false;"  } Attached Assets
+    %a.asset-tab.here{ :href => "#bucket", :onclick => "asset_tabs(this); return false;"  } Bucket
+    %a.asset-tab{ :href => "#page-attachments", :onclick => "asset_tabs(this); return false;"  } Attached Assets
     %a.asset-tab{ :href => "#upload-assets", :onclick => "asset_tabs(this); return false;" } Upload
-    %a.asset-tab{ :href => "#bucket", :onclick => "asset_tabs(this); return false;"  } Bucket
     %a.asset-tab{ :href => "#search-assets", :onclick => "asset_tabs(this); return false;"  } Search
   - else
     %a.asset-tab.here{ :href => "#" } Bucket
     
 #assets      
-  - bucket_style = "display:none;" if @page
-  #bucket.pane{ :style => bucket_style }
+  #bucket.pane
     %p
-      %span.note Items placed here can be used in your pages, layouts and snippets.
+      %span.note Items here can be inserted by simply dragging them to the text area. 
       %span#clear-bucket
         = link_to_remote('Clear Bucket', {:url => clear_bucket_url} )
   
@@ -25,7 +24,7 @@
     
   - if @page && !@page.new_record? 
   
-    #page-attachments.pane
+    #page-attachments.pane{ :style => "display:none;" }
       %p
         %span.note Assets associated with this page.
         %span#reorder

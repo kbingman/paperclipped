@@ -93,12 +93,14 @@ module AssetTags
   
   tag 'assets:link' do |tag|
     options = tag.attr.dup
-    asset = tag.locals.asset
+    raise TagError, "'title' attribute required" unless title = options.delete('title') or tag.locals.asset
+    asset = tag.locals.asset || Asset.find_by_title(tag.attr['title'])
     size = options['size'] ? options.delete('size') : 'original'
+    text = tag.attr['text'] || tag.attr['title']
     anchor = options['anchor'] ? "##{options.delete('anchor')}" : ''
     attributes = options.inject('') { |s, (k, v)| s << %{#{k.downcase}="#{v}" } }.strip
     attributes = " #{attributes}" unless attributes.empty?
-    text = tag.double? ? tag.expand : tag.render('title')
+    text = tag.double? ? tag.expand : text
     url = asset.thumbnail(size.to_sym)
     %{<a href="#{url  }#{anchor}"#{attributes}>#{text}</a>} rescue nil
   end
@@ -111,5 +113,6 @@ module AssetTags
       tag.locals.page.send(method)
     end
   end
+  
   
 end
