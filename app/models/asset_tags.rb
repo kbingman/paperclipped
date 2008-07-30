@@ -4,11 +4,11 @@ module AssetTags
   class TagError < StandardError; end
   
   desc %{
-    The namespace for referencing images and assets.  You may specify the 'name'
+    The namespace for referencing images and assets.  You may specify the 'title'
     attribute on this tag for all contained tags to refer to that asset.  
     
     *Usage:* 
-    <pre><code><r:asset [title="asset_title"] >...</r:asset></code></pre>
+    <pre><code><r:assets [title="asset_title"]>...</r:assets></code></pre>
   }    
   tag 'assets' do |tag|
     tag.locals.asset = Asset.find_by_title(tag.attr['title'])
@@ -16,11 +16,10 @@ module AssetTags
   end
   
   desc %{
-    The namespace for referencing images and assets.  You may specify the 'name'
-    attribute on this tag for all contained tags to refer to that asset.  
+    Cycles through all assets attached to the current page.  
     
     *Usage:* 
-    <pre><code><r:asset [title="asset_title"] >...</r:asset></code></pre>
+    <pre><code><r:assets:each>...</r:assets:each></code></pre>
   }    
   tag 'assets:each' do |tag|
     result = []
@@ -33,6 +32,12 @@ module AssetTags
     result
   end
   
+  desc %{
+    References the first asset attached to the current page.  
+    
+    *Usage:* 
+    <pre><code><r:assets:first>...</r:assets:first></code></pre>
+  }
   tag 'assets:first' do |tag|
      attachments = tag.locals.page.page_attachments
      if first = attachments.first
@@ -62,9 +67,11 @@ module AssetTags
   end
   
   desc %{
+    Renders an image tag for the asset. Using the option size attribute, different sizes can be display. Thumbnail and icon are built 
+    in, but custom sizes can be set using assets.addition_thumbnails in the Radiant::Config settings.
     
     *Usage:* 
-    <pre><code><r:image [title="asset_title"] ></code></pre>
+    <pre><code><r:assets:image [title="asset_title"] [size="icon|thumbnail"]></code></pre>
   }    
   tag 'assets:image' do |tag|
     options = tag.attr.dup
@@ -79,9 +86,11 @@ module AssetTags
   end
   
   desc %{
-
+    Renders an image tag for the asset. If the asset is an image, the <code>size</code> attribute can be used to 
+    generate the url for that size. 
+    
     *Usage:* 
-    <pre><code><r:image [title="asset_title"] ></code></pre>
+    <pre><code><r:image [title="asset_title"] [size="icon|thumbnail"]></code></pre>
   }    
   tag 'assets:url' do |tag|
     options = tag.attr.dup

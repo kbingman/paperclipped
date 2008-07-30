@@ -1,7 +1,8 @@
 document.observe("dom:loaded", function() {
-  // initially hide all containers for tab content
-  $$('#bucket li.asset').each(function(element){
+  
+  $$('#assets li.asset').each(function(element){
     new Draggable(element, { revert: true });
+    element.addClassName('move')
   });
   
   $$('.textarea').each(function(box){
@@ -9,12 +10,30 @@ document.observe("dom:loaded", function() {
       accept: 'asset',
       onDrop: function(element) {
         var link = element.select('a.bucket_link')[0]
-        box.value = box.value + '<r:assets:image title="' + link.title + '" />'
+        var asset_type = 'image';
+        var tag = '<r:assets:' + asset_type + ' title="' + link.title + '" />'
+        //Form.Element.focus(box);
+        
+      	if(!!document.selection){
+      		box.focus();
+      		var range = (box.range) ? box.range : document.selection.createRange();
+      		range.text = tag;
+      		range.select();
+      	}else if(!!box.setSelectionRange){
+      		var selection_start = box.selectionStart;
+      		box.value = box.value.substring(0,selection_start) + tag + box.value.substring(box.selectionEnd);
+      		box.setSelectionRange(selection_start + tag.length,selection_start + tag.length);
+      	}
+      	
+      	box.focus();
+      	
       }
     });
   });
   
+
 });
+
 
 function asset_tabs(element) {
   var panes = $('assets').select('.pane');
