@@ -54,15 +54,19 @@ table td.add-to-bucket { width: 90px;}
 
 #bucket ul, #page-attachments ul, #search-results ul { list-style: none; margin: 0; padding: 0 10px 0 0;}
 
-#assets li.asset  { position: relative; float:left; margin: 8px 0 8px 8px; height: 106px;
-  }
+#assets li { position: relative; float:left; margin: 8px 0 8px 8px; height: 106px; }
+#assets .asset  { position: relative; }
+#assets .asset img { padding: 3px; background-color:#eaeaea; border: 1px solid #ccc; }
   
-#assets li.asset img { padding: 3px; background-color:#eaeaea; border: 1px solid #ccc; }
+#assets .info { position: absolute; top: 0; right: 0; }
+#assets .info p { margin: 0; }
+#assets .info a { display: block; color: black; text-decoration: none; height: 16; width: 16px; border: 1px solid #cdc295;
+  text-indent: -10000px; margin: 0 0 5px 0; }
   
-#assets .info { position: absolute; top: 5px; left: 57px;  background: white; border: 5px solid #c0c0c0; 
-  font-size: 90%; padding: 10px 15px 15px; z-index: 100; min-width: 200px; }
-#assets .info p { margin: 0;}
-#assets .info a { display: inline; background: none; border: none; color: black; text-decoration: none; }
+#assets .info a#edit_asset { background: #fff url('/images/assets/edit.png') center center no-repeat; } 
+#assets .info a#add_asset { background: #fff url('/images/admin/plus.png') center center no-repeat; } 
+#assets .info a#remove_asset { background: #fff url('/images/admin/minus.png') center center no-repeat; } 
+  
 #assets .info  a:hover { color: blue; text-decoration: underline; }
 #assets .image_info h4 { margin: 0 0 10px 0; padding: 0; background: none; }
  
@@ -90,3 +94,4 @@ table#site-map td.assets, table#site-map th.assets  { text-align: right; border:
 #upload-form label { margin-bottom: 5px; display: block; font-weight: bold; }
 
 #search p input{ margin: -3px 0 -3px; padding: 1px; }
+.move a { cursor: move; }

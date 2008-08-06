@@ -2,25 +2,18 @@
   - @page.page_attachments.each do |a|
     - asset = a.asset
     - dom_id = "attachment_#{a.id}"
-    %li.asset{ :id => dom_id }
-      = link_to image_tag(asset.thumbnail(:thumbnail)), asset.thumbnail, :onclick => "return false;", :class => "bucket_link", :title => asset.title
-      .info{ :id => "#{dom_id}_info", :style => "display: none" }
+    %li{ :id => dom_id }
+      .asset
+        = link_to image_tag(asset.thumbnail(:thumbnail)), asset.thumbnail, :onclick => "return false;", :class => "bucket_link", :title => asset.title
+      .info{ :id => "#{dom_id}_info" }
         %strong
-          = link_to asset.title, edit_asset_url(asset.id)
-        %br
-        = link_to "Original URL", asset.thumbnail
-        %br
-        = link_to "Thumbnail", asset.thumbnail(:thumbnail)
+          = link_to "edit", edit_asset_url(asset.id), :id => "edit_asset", :title => "Edit #{asset.title}"
         - if @page
-          %br
-          = link_to_remote "Remove image", :url => remove_page_asset_url(:asset => asset.id, :page => @page.id), | 
+          
+          = link_to_remote "remove", :html => { :id => "remove_asset", :title => "remove asset" }, :url => remove_page_asset_url(:asset => asset.id, :page => @page.id), | 
             :confirm => "Are you sure you want to remove this asset from the page?", |
             :after => "Effect.Fade('#{dom_id}', { duration: 0.5 })", :complete => "Element.remove('#{dom_id}'); Element.highlight('assets')" |
-          // %br
-          // %strong
-          //  Radius Tag
-          // %br
-          // = "&lt;r:image&nbsp;title='#{asset.title}'&nbsp;/&gt;"
+
     
 - else
   %li

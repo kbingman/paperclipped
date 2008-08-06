@@ -1,8 +1,21 @@
 document.observe("dom:loaded", function() {
-  
-  $$('#assets li.asset').each(function(element){
+  var assets = $$('#assets .asset')
+  assets.each(function(element){
     new Draggable(element, { revert: true });
     element.addClassName('move')
+  });
+  
+  $$('#assets li').each(function(el){
+    el.observe('mouseover', function(){
+      el.setStyle({
+        paddingRight: '24px'
+      });
+    });
+    el.observe('mouseout', function(){
+      el.setStyle({
+        paddingRight: '0px'
+      });
+    });
   });
   
   $$('.textarea').each(function(box){
@@ -10,8 +23,8 @@ document.observe("dom:loaded", function() {
       accept: 'asset',
       onDrop: function(element) {
         var link = element.select('a.bucket_link')[0]
-        var asset_type = 'image';
-        var tag = '<r:assets:' + asset_type + ' title="' + link.title + '" />'
+        var tag_type = 'image';
+        var tag = '<r:assets:' + tag_type + ' title="' + link.title + '" />'
         //Form.Element.focus(box);
         
       	if(!!document.selection){
@@ -34,6 +47,9 @@ document.observe("dom:loaded", function() {
 
 });
 
+function respondToClick(el) {
+  alert(el.id);
+}
 
 function asset_tabs(element) {
   var panes = $('assets').select('.pane');
@@ -74,18 +90,6 @@ function done_reordering() {
   $('reorder').toggle(); 
   $('done').toggle();
 
-  container = $('attachments');
-  container.select('li.asset').each(function(asset,i) {
-    index = 100 - i
-    asset.setStyle({ 
-      'z-index': index
-    });
-    link = asset.down();
-    link.setStyle({ 
-      'cursor': 'pointer'
-    }); 
-    link.writeAttribute('onclick', 'toggle_image_info(this); return false;');
-  });
   Sortable.destroy('attachments');
   
 }

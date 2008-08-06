@@ -2,24 +2,16 @@
   - if session[:bucket]
     - session[:bucket].each do |url, info| 
       - dom_id = "asset_#{info[:id]}"
-      %li.asset{ :id => dom_id }
-        = link_to image_tag(info[:thumbnail]), url, :onclick => "return false;", :title => info[:title], :class => "bucket_link"
-        .info{ :id => "#{dom_id}_info", :style => "display: none" }
-          %strong
-            = link_to info[:title], edit_asset_url(info[:id])
-          %br
-          = link_to "Original URL", url
-          %br
-          = link_to "Thumbnail", info[:thumbnail]
+      %li{ :id => dom_id }
+        .asset
+          = link_to image_tag(info[:thumbnail]), url, :onclick => "return false;", :title => info[:title], :class => "bucket_link"
+        .info{ :id => "#{dom_id}_info" }
+          = link_to "edit", edit_asset_url(info[:id]), :id => "edit_asset"
           - if @page && !@page.new_record?
-            %br
-            = link_to_remote "Attach image", :url => attach_page_asset_url(:asset => info[:id], :page => @page.id), |
-                                             :after => "Effect.Fade('#{dom_id}_info', { duration: 0.3 }); Element.highlight('assets');" |
-            // %br
-            // %strong
-            //  Radius Tag
-            // %br
-            // = "&lt;r:image&nbsp;title='#{info[:title]}'&nbsp;/&gt;"
+            
+            = link_to_remote "add", :html => { :id => "add_asset" }, :url => attach_page_asset_url(:asset => info[:id], :page => @page.id), |
+                                             :after => "Element.highlight('assets');" |
+
   - else
     %li
       %p.note Your bucket is empty
