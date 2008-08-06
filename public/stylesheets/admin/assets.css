@@ -33,34 +33,23 @@ table td.add-to-bucket { width: 90px;}
 #assets .pane {  }
 
 #asset-tabs { margin: 24px 0 0 0; border-bottom: 1px solid #cdc295;  }
-#asset-tabs .asset-tab {
-  background-color: #f5f1e2;
-  border: 1px solid #f5f1e2; 
-  border-bottom: 1px solid #cdc295;
-  color: black;
-  display: inline-block;
-  font-size: 100%;
-  font-weight: bold;
-  text-align: left;
-  margin: 0 0 -1px 0;
-  padding: 7px 10px 4px;
-  text-decoration: none;
-  text-transform: titlecase;
-  outline: none;
-  -moz-outline: none;
+#asset-tabs .asset-tab { background-color: #f5f1e2; border: 1px solid #f5f1e2; border-bottom: 1px solid #cdc295;
+  color: black; display: inline-block; font-size: 100%; font-weight: bold; text-align: left; margin: 0 0 -1px 0;
+  padding: 7px 10px 4px; text-decoration: none; text-transform: titlecase; outline: none; -moz-outline: none;
 }
+
 #asset-tabs .asset-tab.here { background-color: #eae3c5; border: 1px solid #cdc295; border-bottom: 1px solid #eae3c5; }
 
 
 #bucket ul, #page-attachments ul, #search-results ul { list-style: none; margin: 0; padding: 0 10px 0 0;}
 
-#assets li { position: relative; float:left; margin: 8px 0 8px 8px; height: 106px; }
+#assets li { position: relative; float:left; margin: 8px 0 8px 8px; height: 106px; padding-right: 24px;}
 #assets .asset  { position: relative; }
 #assets .asset img { padding: 3px; background-color:#eaeaea; border: 1px solid #ccc; }
   
 #assets .info { position: absolute; top: 0; right: 0; }
 #assets .info p { margin: 0; }
-#assets .info a { display: block; color: black; text-decoration: none; height: 16; width: 16px; border: 1px solid #cdc295;
+#assets .info a { display: block; color: black; text-decoration: none; height: 16; width: 16px; border: 1px solid #ccc;
   text-indent: -10000px; margin: 0 0 5px 0; }
   
 #assets .info a#edit_asset { background: #fff url('/images/assets/edit.png') center center no-repeat; } 

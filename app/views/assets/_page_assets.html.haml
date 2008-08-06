@@ -18,3 +18,10 @@
 - else
   %li
     %p.note You have no attached assets.
+    
+%script{ :type => "text/javascript" }
+  var assets = $$('#assets .asset');
+  assets.each(function(element){
+  new Draggable(element, { revert: true });
+  element.addClassName('move');
+  });

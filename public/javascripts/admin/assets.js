@@ -5,19 +5,6 @@ document.observe("dom:loaded", function() {
     element.addClassName('move')
   });
   
-  $$('#assets li').each(function(el){
-    el.observe('mouseover', function(){
-      el.setStyle({
-        paddingRight: '24px'
-      });
-    });
-    el.observe('mouseout', function(){
-      el.setStyle({
-        paddingRight: '0px'
-      });
-    });
-  });
-  
   $$('.textarea').each(function(box){
     Droppables.add(box, {
       accept: 'asset',
