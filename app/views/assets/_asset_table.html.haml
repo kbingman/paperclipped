@@ -17,6 +17,8 @@
             &nbsp;
             %span.caption
               = asset.caption
+          %td.content_type
+            = asset.asset_content_type
           %td.add-to-bucket
             = link_to_remote(image_tag('assets/add-to-bucket.png', :alt => 'Add to Bucket'), :url => add_bucket_url(:id => asset))
           %td.remove
