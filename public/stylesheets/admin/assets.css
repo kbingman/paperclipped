@@ -4,7 +4,8 @@ table.index h4 { font-size: 110%; margin-top: .5em; margin-bottom: .25em;}
 table.index p { margin-top: .25em; margin-bottom: .5em; }
 table.index td.asset { width: 72px; }
 
-table.index td.asset a img { padding: 3px; background-color: #eaeaea; border: 1px solid #ccc; }
+table.index td.asset a {   }
+table.index td.asset a img { padding: 2px; background-color: #eee; border: 1px solid #ccc;}
 
 table.index td.asset-title, table.index td.tag-name { font-size: 115%; font-weight: bold;}
 table.index td.asset-title a, table.index td.tag-name a { text-decoration: none; color: black; }
@@ -14,6 +15,8 @@ table td.asset-title a:hover, table.index td.asset-tags a:hover, table.index td.
  color: blue; text-decoration: underline; }
 table .caption { color: #9eb3bf; font-style: italic; font-weight: normal; margin: 10px; }
 
+table th.content_type { width: 120px; }
+table td.content_type { width: 120px; color: #9eb3bf; font-style: italic; font-weight: normal; }
 table td.add-to-bucket { width: 90px;}
 
 #assets { clear: both; position: relative; margin-bottom: 4px; padding: 0; 

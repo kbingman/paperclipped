@@ -17,6 +17,7 @@ module AssetTags
   
   desc %{
     Cycles through all assets attached to the current page.  
+    This tag does not require the title atttribute, nor do any of its children.
     
     *Usage:* 
     <pre><code><r:assets:each>...</r:assets:each></code></pre>
@@ -86,7 +87,7 @@ module AssetTags
   end
   
   desc %{
-    Renders an image tag for the asset. If the asset is an image, the <code>size</code> attribute can be used to 
+    Renders an the url for the asset. If the asset is an image, the <code>size</code> attribute can be used to 
     generate the url for that size. 
     
     *Usage:* 
@@ -100,6 +101,13 @@ module AssetTags
     asset.thumbnail(size) rescue nil
   end
   
+  desc %{
+    Renders a link to the asset. If the asset is an image, the <code>size</code> attribute can be used to 
+    generate a link to that size. 
+    
+    *Usage:* 
+    <pre><code><r:image [title="asset_title"] [size="icon|thumbnail"]></code></pre>
+  }
   tag 'assets:link' do |tag|
     options = tag.attr.dup
     raise TagError, "'title' attribute required" unless title = options.delete('title') or tag.locals.asset
@@ -113,8 +121,6 @@ module AssetTags
     url = asset.thumbnail(size)
     %{<a href="#{url  }#{anchor}"#{attributes}>#{text}</a>} rescue nil
   end
-  
-
   
   # Resets the page Url and title within the asset tag
   [:title, :url].each do |method|
