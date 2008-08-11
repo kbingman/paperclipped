@@ -58,6 +58,7 @@ table td.add-to-bucket { width: 90px;}
 #assets .info a#edit_asset { background: #fff url('/images/assets/edit.png') center center no-repeat; } 
 #assets .info a#add_asset { background: #fff url('/images/admin/plus.png') center center no-repeat; } 
 #assets .info a#remove_asset { background: #fff url('/images/admin/minus.png') center center no-repeat; } 
+#assets .info img.reorder { border: 1px solid #ccc; cursor: move; }
   
 #assets .info  a:hover { color: blue; text-decoration: underline; }
 #assets .image_info h4 { margin: 0 0 10px 0; padding: 0; background: none; }

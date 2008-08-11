@@ -63,7 +63,7 @@ function reorder_attachments(page, token) {
     }); 
     link.writeAttribute('onclick', 'return false;');
   });
-  Sortable.create("attachments", {constraint:false,ghosting:false,onUpdate:function(){new Ajax.Request(url, {asynchronous:true, evalScripts:true, parameters:Sortable.serialize("attachments") + '&authenticity_token=' + encodeURIComponent(token)})}});
+  Sortable.create("attachments", {constraint:'horizontal',handle:'reorder',ghosting:false,onUpdate:function(){new Ajax.Request(url, {asynchronous:true, evalScripts:true, parameters:Sortable.serialize("attachments") + '&authenticity_token=' + encodeURIComponent(token)})}});
 
 }
 
