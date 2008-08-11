@@ -3,7 +3,8 @@
     - asset = a.asset
     - dom_id = "attachment_#{a.id}"
     %li{ :id => dom_id }
-      .asset
+      - asset_type = asset.image? ? "image" : "link"
+      %div{ :class => "#{asset_type} asset" }
         = link_to image_tag(asset.thumbnail(:thumbnail)), asset.thumbnail, :onclick => "return false;", :class => "bucket_link", :title => asset.title
       .info{ :id => "#{dom_id}_info" }
         %strong

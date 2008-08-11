@@ -5,7 +5,8 @@ document.observe("dom:loaded", function() {
       accept: 'asset',
       onDrop: function(element) {
         var link = element.select('a.bucket_link')[0]
-        var tag_type = 'image';
+        var classes = element.className.split(' ')
+        var tag_type = classes[0];
         var tag = '<r:assets:' + tag_type + ' title="' + link.title + '" />'
         //Form.Element.focus(box);
         
