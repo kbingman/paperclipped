@@ -7,10 +7,10 @@
         %div{ :class => "#{asset_type} asset" }
           = link_to image_tag(info[:thumbnail]), url, :onclick => "return false;", :title => info[:title], :class => "bucket_link"
         .info{ :id => "#{dom_id}_info" }
-          = link_to "edit", edit_asset_url(info[:id]), :id => "edit_asset"
+          = link_to "edit", edit_asset_url(info[:id]), :id => "edit_asset", :title => "Edit #{info[:title]}"
           - if @page && !@page.new_record?
             
-            = link_to_remote "add", :html => { :id => "add_asset" }, :url => attach_page_asset_url(:asset => info[:id], :page => @page.id), |
+            = link_to_remote "add", :html => { :id => "add_asset", :title => "Attach to page" }, :url => attach_page_asset_url(:asset => info[:id], :page => @page.id), |
                                              :after => "Element.highlight('assets');" |
 
   - else
