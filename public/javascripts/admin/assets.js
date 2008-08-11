@@ -1,10 +1,5 @@
 document.observe("dom:loaded", function() {
-  var assets = $$('#assets .asset')
-  assets.each(function(element){
-    new Draggable(element, { revert: true });
-    element.addClassName('move')
-  });
-  
+
   $$('.textarea').each(function(box){
     Droppables.add(box, {
       accept: 'asset',
@@ -60,8 +55,7 @@ function reorder_attachments(page, token) {
   var url = '/admin/assets/reorder/' + page 
   
   container = $('attachments');
-  // attachments = container.select('li.bucket_asset');
-  container.select('li.asset').each(function(asset) {
+  container.select('li').each(function(asset) {
     link = asset.down();
     link.setStyle({ 
       cursor: 'move'
