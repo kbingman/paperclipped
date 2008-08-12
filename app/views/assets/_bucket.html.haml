@@ -1,10 +1,10 @@
 %ul#bucket_list
   - if session[:bucket]
     - session[:bucket].each do |url, info| 
-      - dom_id = "asset_#{info[:id]}"
-      %li{ :id => dom_id }
+      - dom_id = "bucket_#{info[:id]}"
+      %li
         - asset_type = info[:type]
-        %div{ :class => "#{asset_type} asset" }
+        %div{ :class => "#{asset_type} asset", :id => dom_id }
           = link_to image_tag(info[:thumbnail]), url, :onclick => "return false;", :title => info[:title], :class => "bucket_link"
         .info{ :id => "#{dom_id}_info" }
           = link_to "edit", edit_asset_url(info[:id]), :id => "edit_asset", :title => "Edit #{info[:title]}"

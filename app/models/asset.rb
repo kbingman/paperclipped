@@ -1,18 +1,23 @@
 class Asset < ActiveRecord::Base
   # used for extra mime types that dont follow the convention
-  @@content_types = ['image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/jpg']
+  @@image_content_types = ['image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/jpg']
   @@extra_content_types = { :audio => ['application/ogg'], :movie => ['application/x-shockwave-flash'], :pdf => ['application/pdf'] }.freeze
-  cattr_reader :extra_content_types, :content_types
+  cattr_reader :extra_content_types, :image_content_types
 
   # use #send due to a ruby 1.8.2 issue
-  @@movie_condition = send(:sanitize_sql, ['content_type LIKE ? OR content_type IN (?)', 'video%', extra_content_types[:movie]]).freeze
-  @@audio_condition = send(:sanitize_sql, ['content_type LIKE ? OR content_type IN (?)', 'audio%', extra_content_types[:audio]]).freeze
+  @@image_condition = send(:sanitize_sql, ['asset_content_type IN (?)', image_content_types]).freeze
+  @@movie_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'video%', extra_content_types[:movie]]).freeze
+  @@audio_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'audio%', extra_content_types[:audio]]).freeze
+  
+  @@other_condition = send(:sanitize_sql, [
+    'asset_content_type NOT LIKE ? AND asset_content_type NOT LIKE ? AND asset_content_type NOT IN (?)',
+    'audio%', 'video%', (extra_content_types[:movie] + extra_content_types[:audio] + image_content_types)]).freeze
   cattr_reader *%w(movie audio image other).collect! { |t| "#{t}_condition".to_sym }
   
   
   class << self
     def image?(asset_content_type)
-      content_types.include?(asset_content_type)
+      image_content_types.include?(asset_content_type)
     end
     
     def movie?(asset_content_type)
@@ -31,11 +36,11 @@ class Asset < ActiveRecord::Base
       extra_content_types[:pdf].include? asset_content_type
     end
 
-    def find_all_by_asset_content_types(types, *args)
-      with_asset_content_types(types) { find *args }
+    def find_all_by_content_types(types, *args)
+      with_content_types(types) { find *args }
     end
 
-    def with_asset_content_types(types, &block)
+    def with_content_types(types, &block)
       with_scope(:find => { :conditions => types_to_conditions(types).join(' OR ') }, &block)
     end
 

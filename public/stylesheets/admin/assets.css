@@ -84,7 +84,13 @@ table#site-map td.assets, table#site-map th.assets  { text-align: right; border:
 #upload-assets a:hover { color: blue; text-decoration: underline; }
 #upload-form .file { padding: 10px 10px 5px; }
 #upload-form .upload-buttons { padding: 0 10px; font-size: 80%; }
-#upload-form label { margin-bottom: 5px; display: block; font-weight: bold; }
+#upload-form label { margin-bottom: 5px; display: block; font-weight: bold; margin-left: 10px;  }
 
-#search p input{ margin: -3px 0 -3px; padding: 1px; }
+#filesearchform { margin-bottom: 18px; }
+#filesearchform #search p input{ margin: -3px 0 -3px; padding: 1px; }
+#filesearchform label { font-weight: bold; }
+#filesearchform a { font-weight: bold; color: black; text-decoration: none; outline: none; -moz-outline: none; }
+#filesearchform a:hover { color: blue; text-decoration: underline; }
+#filesearchform a.pressed { color: #cc0000; }
+
 .move a { cursor: move; }

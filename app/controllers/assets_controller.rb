@@ -114,15 +114,20 @@ class AssetsController < ApplicationController
   protected
   
     def current_objects
-      term = params['search'].downcase + '%' if params['search']
-      condition = [ 'LOWER(title) LIKE ? or LOWER(caption) LIKE ? or LOWER(asset_file_name) LIKE ?', '%' + term, '%' + term, '%' + term  ] if term
-      @mark_term = params['search']
+      term = params['search'].downcase + '%' unless params['search'].blank?
+      @conditions =  term  ? [ 'LOWER(title) LIKE ? or LOWER(caption) LIKE ? or LOWER(asset_file_name) LIKE ?', '%' + term, '%' + term, '%' + term  ] : [] 
+      @file_types = params[:filter].blank? ? [] : params[:filter].keys
       
-      if @mark_term
-        Asset.paginate(:all, :conditions => condition, :order => 'created_at DESC', :page => params[:page], :per_page => 10)
+      if not @file_types.empty?
+        Asset.paginate_by_content_types(@file_types, :all, :conditions => @conditions, :order => 'created_at DESC', :page => params[:page], :per_page => 10, :total_entries => count_by_conditions)
       else
-        Asset.paginate(:all, :order => 'created_at DESC', :page => params[:page], :per_page => 10)
+        Asset.paginate(:all, :conditions => @conditions, :order => 'created_at DESC', :page => params[:page], :per_page => 10)
       end
+    end
+    
+    def count_by_conditions
+      type_conditions = @file_types.blank? ? nil : Asset.types_to_conditions(@file_types.dup).join(" OR ")
+      @count_by_conditions ||= @conditions.empty? ? Asset.count(:all, :conditions => type_conditions) : Asset.count(:all, :conditions => @conditions)
     end
 
 end

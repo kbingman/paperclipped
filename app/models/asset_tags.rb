@@ -61,8 +61,8 @@ module AssetTags
       The 'title' attribute is required on this tag or the parent tag.
     }
     tag "assets:#{method.to_s}" do |tag|
-      raise TagError, "'title' attribute required" unless title = tag.attr['title'] or tag.locals.asset
-      asset = tag.locals.asset || Asset.find_by_title(tag.attr['title'])
+      options = tag.attr.dup
+      asset = find_asset(tag, options)
       asset.send(method) rescue nil
     end
   end
@@ -76,18 +76,21 @@ module AssetTags
   }    
   tag 'assets:image' do |tag|
     options = tag.attr.dup
-    raise TagError, "'title' attribute required" unless title = options.delete('title') or tag.locals.asset
-    asset = tag.locals.asset || Asset.find_by_title(tag.attr['title'])
-    size = options['size'] ? options.delete('size') : 'original'
-    alt = " alt='#{asset.title}'" unless tag.attr['alt'] rescue nil
-    attributes = options.inject('') { |s, (k, v)| s << %{#{k.downcase}="#{v}" } }.strip
-    attributes << alt unless alt.nil?
-    url = asset.thumbnail(size)
-    %{<img src="#{url}" #{attributes unless attributes.empty?} />} rescue nil
+    asset = find_asset(tag, options)
+    if asset.image?
+      size = options['size'] ? options.delete('size') : 'original'
+      alt = " alt='#{asset.title}'" unless tag.attr['alt'] rescue nil
+      attributes = options.inject('') { |s, (k, v)| s << %{#{k.downcase}="#{v}" } }.strip
+      attributes << alt unless alt.nil?
+      url = asset.thumbnail(size)
+      %{<img src="#{url}" #{attributes unless attributes.empty?} />} rescue nil
+    else
+      raise TagError, "Asset is not an image"
+    end
   end
   
   desc %{
-    Renders an the url for the asset. If the asset is an image, the <code>size</code> attribute can be used to 
+    Renders the url for the asset. If the asset is an image, the <code>size</code> attribute can be used to 
     generate the url for that size. 
     
     *Usage:* 
@@ -95,8 +98,8 @@ module AssetTags
   }    
   tag 'assets:url' do |tag|
     options = tag.attr.dup
-    raise TagError, "'title' attribute required" unless title = options.delete('title') or tag.locals.asset
-    asset = tag.locals.asset || Asset.find_by_title(tag.attr['title'])
+    asset = find_asset(tag, options)
+    asset = tag.locals.asset || Asset.find_by_title(title)
     size = options['size'] ? options.delete('size') : 'original'
     asset.thumbnail(size) rescue nil
   end
@@ -110,10 +113,9 @@ module AssetTags
   }
   tag 'assets:link' do |tag|
     options = tag.attr.dup
-    raise TagError, "'title' attribute required" unless title = options.delete('title') or tag.locals.asset
-    asset = tag.locals.asset || Asset.find_by_title(tag.attr['title'])
+    asset = find_asset(tag, options)
     size = options['size'] ? options.delete('size') : 'original'
-    text = tag.attr['text'] || tag.attr['title']
+    text = options['text'] || options['title']
     anchor = options['anchor'] ? "##{options.delete('anchor')}" : ''
     attributes = options.inject('') { |s, (k, v)| s << %{#{k.downcase}="#{v}" } }.strip
     attributes = " #{attributes}" unless attributes.empty?
@@ -128,6 +130,16 @@ module AssetTags
       tag.locals.page.send(method)
     end
   end
+  
+  private
+    
+    def find_asset(tag, options)
+      raise TagError, "'title' attribute required" unless title = options.delete('title') or id = options.delete('id') or tag.locals.asset
+      tag.locals.asset || Asset.find_by_title(title) || Asset.find(id)
+    end
+    
+  
+  
   
   
 end

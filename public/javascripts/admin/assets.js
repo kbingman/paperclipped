@@ -1,15 +1,38 @@
 document.observe("dom:loaded", function() {
-
+  $$('#filesearchform a').each(function(element){
+    element.observe('click', function(){
+      var type_id = element.text.downcase();
+      var type_check = $(type_id + '-check');
+      var search_form = $('filesearchform')
+      if(element.hasClassName('pressed')) {
+        element.removeClassName('pressed');
+        type_check.removeAttribute('checked');
+      } else {
+        element.addClassName('pressed');
+        type_check.setAttribute('checked', 'checked');
+      }
+      new Ajax.Updater('assets_table', search_form.action, {
+        asynchronous: true, 
+        evalScripts:  true, 
+        parameters:   Form.serialize(search_form),
+        method: 'get',
+        onComplete: 'assets_table'
+      }); 
+      return false;
+    });
+    
+  }); 
+  
   $$('.textarea').each(function(box){
     Droppables.add(box, {
       accept: 'asset',
       onDrop: function(element) {
         var link = element.select('a.bucket_link')[0]
-        var classes = element.className.split(' ')
+        var asset_id = element.id.split('_').last();
+        var classes = element.className.split(' ');
         var tag_type = classes[0];
-        var tag = '<r:assets:' + tag_type + ' title="' + link.title + '" />'
+        var tag = '<r:assets:' + tag_type + ' id="' + asset_id + '" />'
         //Form.Element.focus(box);
-        
       	if(!!document.selection){
       		box.focus();
       		var range = (box.range) ? box.range : document.selection.createRange();
@@ -20,19 +43,12 @@ document.observe("dom:loaded", function() {
       		box.value = box.value.substring(0,selection_start) + tag + box.value.substring(box.selectionEnd);
       		box.setSelectionRange(selection_start + tag.length,selection_start + tag.length);
       	}
-      	
       	box.focus();
-      	
       }
     });
   });
-  
 
 });
-
-function respondToClick(el) {
-  alert(el.id);
-}
 
 function asset_tabs(element) {
   var panes = $('assets').select('.pane');
@@ -44,35 +60,5 @@ function asset_tabs(element) {
   Element.show($(target));
 }
 
-function toggle_image_info(element) {
-  image_info = element.next('.info');
-  Effect.toggle(image_info, 'appear', { duration: 0.4 });
-}
 
-function reorder_attachments(page, token) {
-  // Toggles Reorder link
-  $('reorder').toggle(); 
-  $('done').toggle();
-  var url = '/admin/assets/reorder/' + page 
-  
-  container = $('attachments');
-  container.select('li').each(function(asset) {
-    link = asset.down();
-    link.setStyle({ 
-      cursor: 'move'
-    }); 
-    link.writeAttribute('onclick', 'return false;');
-  });
-  Sortable.create("attachments", {constraint:'horizontal',handle:'reorder',ghosting:false,onUpdate:function(){new Ajax.Request(url, {asynchronous:true, evalScripts:true, parameters:Sortable.serialize("attachments") + '&authenticity_token=' + encodeURIComponent(token)})}});
-
-}
-
-function done_reordering() {
-  // Toggles Reorder link
-  $('reorder').toggle(); 
-  $('done').toggle();
-
-  Sortable.destroy('attachments');
-  
-}
 

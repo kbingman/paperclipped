@@ -4,7 +4,7 @@
     - dom_id = "attachment_#{a.id}"
     %li{ :id => dom_id }
       - asset_type = asset.image? ? "image" : "link"
-      %div{ :class => "#{asset_type} asset" }
+      %div{ :class => "#{asset_type} asset", :id => "asset_#{asset.id}"}
         = link_to image_tag(asset.thumbnail(:thumbnail)), asset.thumbnail, :onclick => "return false;", :class => "bucket_link", :title => asset.title
       .info{ :id => "#{dom_id}_info" }
         %strong
