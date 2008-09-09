@@ -22,6 +22,9 @@ table td.add-to-bucket { width: 90px;}
 #assets { clear: both; position: relative; margin-bottom: 4px; padding: 0; 
   border: solid #cdc295; border-width: 0 1px 1px 1px; min-height: 150px; height: auto !important; height: 150px; background: white; }
 
+#asset-bucket { width: 70%; border: 5px solid #c0c0c0; background: white; padding: 20px; }
+#close-link { margin-top: 10px; }
+   
 #assets h4 { font-size: 100%; font-weight: bold; margin: 0; } 
 #assets .note { font-size: 85%; font-weight: normal; color: black; }
 #assets p { padding: 0 10px 7px; background: #eae3c5; margin: 0; height: 20px; line-height: 22px; }
@@ -35,7 +38,7 @@ table td.add-to-bucket { width: 90px;}
    
 #assets .pane {  }
 
-#asset-tabs { margin: 24px 0 0 0; border-bottom: 1px solid #cdc295;  }
+#asset-tabs { margin: 0; border-bottom: 1px solid #cdc295;  }
 #asset-tabs .asset-tab { background-color: #f5f1e2; border: 1px solid #f5f1e2; border-bottom: 1px solid #cdc295;
   color: black; display: inline-block; font-size: 100%; font-weight: bold; text-align: left; margin: 0 0 -1px 0;
   padding: 7px 10px 4px; text-decoration: none; text-transform: titlecase; outline: none; -moz-outline: none;
@@ -94,3 +97,12 @@ table#site-map td.assets, table#site-map th.assets  { text-align: right; border:
 #filesearchform a.pressed { color: #cc0000; }
 
 .move a { cursor: move; }
+
+#show-bucket {
+  float: right;
+  position: relative;
+}
+#show-bucket a { display: block; text-decoration: none; color: black; border: 1px solid rgb(0, 92, 157);
+  line-height: 20px; width: 120px; cursor: pointer; margin: 0 5px; padding: 5px 10px;
+  font-size: 80%; font-style: italic; background: white; -moz-border-radius: 3px; -webkit-border-radius: 3px;
+}

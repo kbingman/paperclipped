@@ -96,8 +96,26 @@ class Asset < ActiveRecord::Base
       elsif self.other?
         "/images/assets/doc_#{size.to_s}.png"
       else
-        self.asset.url(size)
+        self.asset.url(size.to_sym)
       end
+    end
+  end
+  
+  def generate_thumbnail(name, args)
+    path = File.join(RAILS_ROOT, 'public', self.asset(:original))
+    self.asset do 
+      path = File.join(RAILS_ROOT, 'public', self.asset(:original))
+      begin
+        dimensions, format = args
+        dimensions = dimensions.call(instance) if dimensions.respond_to? :call
+        @queued_for_write[name] = Paperclip::Thumbnail.make(File.new(path), 
+                                                 dimensions,
+                                                 format, 
+                                                 @whiny_thumnails)
+      rescue PaperclipError => e
+        @errors << e.message if @whiny_thumbnails
+      end
+      attachment.save
     end
   end
   

@@ -11,7 +11,7 @@ module AssetTags
     <pre><code><r:assets [title="asset_title"]>...</r:assets></code></pre>
   }    
   tag 'assets' do |tag|
-    tag.locals.asset = Asset.find_by_title(tag.attr['title'])
+    tag.locals.asset = Asset.find_by_title(tag.attr['title']) || Asset.find(tag.attr['id']) unless tag.attr.empty?
     tag.expand
   end
   
@@ -87,6 +87,13 @@ module AssetTags
     else
       raise TagError, "Asset is not an image"
     end
+  end
+  
+  tag 'assets:thumbnail' do |tag|
+    options = tag.attr.dup
+    asset = find_asset(tag, options)
+    asset.generate_thumbnail('test', ['24x24#',nil])
+    asset.save    
   end
   
   desc %{

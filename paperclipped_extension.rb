@@ -23,6 +23,7 @@ class PaperclippedExtension < Radiant::Extension
   def activate
     require_dependency 'application'
     
+    admin.page.edit.add :main, '/assets/show_bucket_link', :before => "edit_header"
     admin.page.edit.add :main, '/assets/assets_container', :after => "edit_buttons"
     admin.snippet.edit.add :main, '/assets/assets_container', :after => "edit_buttons"
     

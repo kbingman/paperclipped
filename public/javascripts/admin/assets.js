@@ -31,7 +31,7 @@ document.observe("dom:loaded", function() {
         var asset_id = element.id.split('_').last();
         var classes = element.className.split(' ');
         var tag_type = classes[0];
-        var tag = '<r:assets:' + tag_type + ' id="' + asset_id + '" />'
+        var tag = '<r:assets:' + tag_type + ' id="' + asset_id + '" size="original" />'
         //Form.Element.focus(box);
       	if(!!document.selection){
       		box.focus();
@@ -59,6 +59,30 @@ function asset_tabs(element) {
   element.addClassName('here');
   Element.show($(target));
 }
+
+var Asset = {};
+
+Asset.ShowBucket = Behavior.create({
+  onclick: function(e){
+    e.stop();
+    var element = $('asset-bucket');
+    center(element);
+    element.show();
+  }
+});
+
+Asset.HideBucket = Behavior.create({
+  onclick: function(e){
+    e.stop();
+    var element = $('asset-bucket');
+    element.hide();
+  }
+});
+
+Event.addBehavior({
+  '#close-link a' : Asset.HideBucket,
+  '#show-bucket a' : Asset.ShowBucket
+});
 
 
 
