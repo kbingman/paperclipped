@@ -10,22 +10,23 @@ class PaperclippedExtension < Radiant::Extension
   define_routes do |map|
     map.resources :assets, :path_prefix => "/admin"
     map.with_options(:controller => 'assets') do |asset|
-      asset.remove_asset      "/admin/assets/:id/remove",               :action => 'remove'
-      asset.add_bucket        "/admin/assets/:id/add",                  :action => 'add_bucket'
-      asset.clear_bucket      "/admin/assets/clear_bucket",             :action => 'clear_bucket'
+      asset.remove_asset      "/admin/assets/:id/remove",                :action => 'remove'
+      asset.add_bucket        "/admin/assets/:id/add",                   :action => 'add_bucket'
+      asset.clear_bucket      "/admin/assets/clear_bucket",              :action => 'clear_bucket'
       asset.reorder_assets    '/admin/assets/reorder/:id',               :action => 'reorder'
       asset.attach_page_asset '/admin/assets/attach/:asset/page/:page',  :action => 'attach_asset'
       asset.remove_page_asset '/admin/assets/remove/:asset/page/:page',  :action => 'remove_asset'
-      asset.refresh_assets    "/admin/assets/refresh/:id",                               :action => 'regenerate_thumbnails'
+      asset.refresh_assets    "/admin/assets/refresh/:id",               :action => 'regenerate_thumbnails'
     end
   end
   
   def activate
     require_dependency 'application'
     
-    admin.page.edit.add :main, '/assets/show_bucket_link', :before => "edit_header"
-    admin.page.edit.add :main, '/assets/assets_container', :after => "edit_buttons"
-    admin.snippet.edit.add :main, '/assets/assets_container', :after => "edit_buttons"
+    %w{page snippet}.each do |view|
+      admin.send(view).edit.add :main, "/assets/show_bucket_link", :before => "edit_header"
+      admin.send(view).edit.add :main, "/assets/assets_container", :after => "edit_buttons"
+    end
     
     Page.class_eval {
       include PageAssetAssociations

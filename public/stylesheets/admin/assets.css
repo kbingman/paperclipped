@@ -19,10 +19,10 @@ table th.content_type { width: 120px; }
 table td.content_type { width: 120px; color: #9eb3bf; font-style: italic; font-weight: normal; }
 table td.add-to-bucket { width: 90px;}
 
-#assets { clear: both; position: relative; margin-bottom: 4px; padding: 0; 
+#assets { clear: both; position: relative; margin-bottom: 4px; padding: 0; cursor: default;
   border: solid #cdc295; border-width: 0 1px 1px 1px; min-height: 150px; height: auto !important; height: 150px; background: white; }
 
-#asset-bucket { width: 70%; border: 5px solid #c0c0c0; background: white; padding: 20px; }
+#asset-bucket { width: 70%; border: 5px solid #c0c0c0; background: white; padding: 20px; cursor: move; }
 #close-link { margin-top: 10px; }
    
 #assets h4 { font-size: 100%; font-weight: bold; margin: 0; } 

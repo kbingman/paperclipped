@@ -1,28 +1,4 @@
 document.observe("dom:loaded", function() {
-  $$('#filesearchform a').each(function(element){
-    element.observe('click', function(){
-      var type_id = element.text.downcase();
-      var type_check = $(type_id + '-check');
-      var search_form = $('filesearchform')
-      if(element.hasClassName('pressed')) {
-        element.removeClassName('pressed');
-        type_check.removeAttribute('checked');
-      } else {
-        element.addClassName('pressed');
-        type_check.setAttribute('checked', 'checked');
-      }
-      new Ajax.Updater('assets_table', search_form.action, {
-        asynchronous: true, 
-        evalScripts:  true, 
-        parameters:   Form.serialize(search_form),
-        method: 'get',
-        onComplete: 'assets_table'
-      }); 
-      return false;
-    });
-    
-  }); 
-  
   $$('.textarea').each(function(box){
     Droppables.add(box, {
       accept: 'asset',
@@ -47,20 +23,26 @@ document.observe("dom:loaded", function() {
       }
     });
   });
-
+  new Draggable('asset-bucket', { starteffect: 'none' });
 });
 
-function asset_tabs(element) {
-  var panes = $('assets').select('.pane');
-  var tabs = $('asset-tabs').select('.asset-tab');
-  var target = element.href.split('#')[1]
-  tabs.each(function(tab) {tab.removeClassName('here')});
-  panes.each(function(pane) {Element.hide(pane)});
-  element.addClassName('here');
-  Element.show($(target));
-}
-
 var Asset = {};
+
+Asset.Tabs = Behavior.create({
+  onclick: function(e){
+    e.stop();
+
+    var pane = $(this.element.href.split('#')[1]);
+    var panes = $('assets').select('.pane');
+    
+    var tabs = $('asset-tabs').select('.asset-tab');
+    tabs.each(function(tab) {tab.removeClassName('here')});
+    
+    this.element.addClassName('here');;
+    panes.each(function(pane) {Element.hide(pane)});
+    Element.show($(pane));
+  }
+});
 
 Asset.ShowBucket = Behavior.create({
   onclick: function(e){
@@ -79,9 +61,35 @@ Asset.HideBucket = Behavior.create({
   }
 });
 
+Asset.FileTypes = Behavior.create({
+  onclick: function(e){
+    e.stop();
+    var element = this.element;
+    var type_id = element.text.downcase();
+    var type_check = $(type_id + '-check');
+    var search_form = $('filesearchform')
+    if(element.hasClassName('pressed')) {
+      element.removeClassName('pressed');
+      type_check.removeAttribute('checked');
+    } else {
+      element.addClassName('pressed');
+      type_check.setAttribute('checked', 'checked');
+    }
+    new Ajax.Updater('assets_table', search_form.action, {
+      asynchronous: true, 
+      evalScripts:  true, 
+      parameters:   Form.serialize(search_form),
+      method: 'get',
+      onComplete: 'assets_table'
+    });
+  }
+});
+
 Event.addBehavior({
-  '#close-link a' : Asset.HideBucket,
-  '#show-bucket a' : Asset.ShowBucket
+  '#asset-tabs a'     : Asset.Tabs,
+  '#close-link a'     : Asset.HideBucket,
+  '#show-bucket a'    : Asset.ShowBucket,
+  '#filesearchform a' : Asset.FileTypes
 });
 
 
