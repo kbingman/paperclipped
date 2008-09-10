@@ -25,7 +25,7 @@ class PaperclippedExtension < Radiant::Extension
     
     %w{page snippet}.each do |view|
       admin.send(view).edit.add :main, "/assets/show_bucket_link", :before => "edit_header"
-      admin.send(view).edit.add :main, "/assets/assets_container", :after => "edit_buttons"
+      admin.send(view).edit.add :main, "/assets/assets_bucket", :after => "edit_buttons"
     end
     
     Page.class_eval {

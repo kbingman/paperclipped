@@ -3,49 +3,47 @@
 - include_javascript 'admin/assets'
 - include_javascript 'dragdrop'
 
+#asset-tabs
+  - if @page && !@page.new_record? 
+    %a.asset-tab.here{ :href => "#bucket" } Bucket
+    %a.asset-tab{ :href => "#page-attachments" } Attached Assets
+    %a.asset-tab{ :href => "#upload-assets" } Upload
+    // %a.asset-tab{ :href => "#search-assets" } Search
+  - else
+    %a.asset-tab.here{ :href => "#" } Bucket
 
-#asset-bucket{ :style => "display: none" }
-  #asset-tabs
-    - if @page && !@page.new_record? 
-      %a.asset-tab.here{ :href => "#bucket" } Bucket
-      %a.asset-tab{ :href => "#page-attachments" } Attached Assets
-      %a.asset-tab{ :href => "#upload-assets" } Upload
-      // %a.asset-tab{ :href => "#search-assets" } Search
-    - else
-      %a.asset-tab.here{ :href => "#" } Bucket
-  
-  #assets      
-    #bucket.pane
+#assets      
+  #bucket.pane
+    %p
+      %span.note Items here can be inserted by simply dragging them to the text area. 
+      %span#clear-bucket
+        = link_to_remote('Clear Bucket', {:url => clear_bucket_url} )
+
+    = render :partial => "assets/bucket"
+    %div{ :style => "clear:both;" }
+
+  - if @page && !@page.new_record? 
+    #page-attachments.pane{ :style => "display:none;" }
       %p
-        %span.note Items here can be inserted by simply dragging them to the text area. 
-        %span#clear-bucket
-          = link_to_remote('Clear Bucket', {:url => clear_bucket_url} )
-
-      = render :partial => "assets/bucket"
+        %span.note Attached assets. These can be inserted with drag and drop or shown with the <code>&lt;r:assets:each /&gt;</code> tag.
+      %ul#attachments
+        = render :partial => "assets/page_assets" 
+  
       %div{ :style => "clear:both;" }
-  
-    - if @page && !@page.new_record? 
-      #page-attachments.pane{ :style => "display:none;" }
-        %p
-          %span.note Attached assets. These can be inserted with drag and drop or shown with the <code>&lt;r:assets:each /&gt;</code> tag.
-        %ul#attachments
-          = render :partial => "assets/page_assets" 
+    #upload-assets.pane{ :style => "display:none;" }
+      %p
+        %span.note Assets uploaded here will be automatically associated with this page.
+      = render :partial => "assets/upload_to_page"
+    #search-assets.pane{ :style => "display:none;" }
+      %p
+        %span.note Search for assets 
+        %input{ :type => "text", :id => "search", :name => "search" }
     
-        %div{ :style => "clear:both;" }
-      #upload-assets.pane{ :style => "display:none;" }
-        %p
-          %span.note Assets uploaded here will be automatically associated with this page.
-        = render :partial => "assets/upload_to_page"
-      #search-assets.pane{ :style => "display:none;" }
-        %p
-          %span.note Search for assets 
-          %input{ :type => "text", :id => "search", :name => "search" }
-      
-        #search-results
-        = observe_field 'search',  :frequency => 1, :update => 'search-results', :url =>  assets_path(:asset_page => @page), :method => 'get', :with => "'search=' + escape(value)"
-  
-  #close-link     
-    = link_to "Close", "#"    
+      #search-results
+      = observe_field 'search',  :frequency => 1, :update => 'search-results', :url =>  assets_path(:asset_page => @page), :method => 'get', :with => "'search=' + escape(value)"
+
+#close-link     
+  = link_to "Close", "#"    
     
 
 
