@@ -9,7 +9,7 @@ module Paperclip
     #   almost all cases, should) be coordinated with the value of the +url+ option to
     #   allow files to be saved into a place where Apache can serve them without
     #   hitting your app. Defaults to 
-    #   ":rails_root/public/:class/:attachment/:id/:style_:filename". 
+    #   ":rails_root/public/:attachment/:id/:style/:basename.:extension"
     #   By default this places the files in the app's public directory which can be served 
     #   directly. If you are using capistrano for deployment, a good idea would be to 
     #   make a symlink to the capistrano-created system directory from inside your app's 
@@ -36,8 +36,10 @@ module Paperclip
       alias_method :to_io, :to_file
 
       def flush_writes #:nodoc:
+        logger.info("[paperclip] Writing files for #{name}")
         @queued_for_write.each do |style, file|
           FileUtils.mkdir_p(File.dirname(path(style)))
+          logger.info("[paperclip] -> #{path(style)}")
           result = file.stream_to(path(style))
           file.close
           result.close
@@ -46,8 +48,10 @@ module Paperclip
       end
 
       def flush_deletes #:nodoc:
+        logger.info("[paperclip] Deleting files for #{name}")
         @queued_for_delete.each do |path|
           begin
+            logger.info("[paperclip] -> #{path}")
             FileUtils.rm(path) if File.exist?(path)
           rescue Errno::ENOENT => e
             # ignore file-not-found, let everything else pass
@@ -76,14 +80,25 @@ module Paperclip
     #   This is not required, however, and the file may simply look like this:
     #     access_key_id: 456...
     #     secret_access_key: 456... 
-    #   In which case, those access keys will be used in all environments.
+    #   In which case, those access keys will be used in all environments. You can also
+    #   put your bucket name in this file, instead of adding it to the code directly.
+    #   This is useful when you want the same account but a different bucket for 
+    #   development versus production.
     # * +s3_permissions+: This is a String that should be one of the "canned" access
     #   policies that S3 provides (more information can be found here:
     #   http://docs.amazonwebservices.com/AmazonS3/2006-03-01/RESTAccessPolicy.html#RESTCannedAccessPolicies)
     #   The default for Paperclip is "public-read".
+    # * +s3_protocol+: The protocol for the URLs generated to your S3 assets. Can be either 
+    #   'http' or 'https'. Defaults to 'http' when your :s3_permissions are 'public-read' (the
+    #   default), and 'https' when your :s3_permissions are anything else.
     # * +bucket+: This is the name of the S3 bucket that will store your files. Remember
     #   that the bucket must be unique across all of Amazon S3. If the bucket does not exist
     #   Paperclip will attempt to create it. The bucket name will not be interpolated.
+    # * +url+: There are two options for the S3 url. You can choose to have the bucket's name
+    #   placed domain-style (bucket.s3.amazonaws.com) or path-style (s3.amazonaws.com/bucket).
+    #   Normally, this won't matter in the slightest and you can leave the default (which is
+    #   path-style, or :s3_path_url). But in some cases paths don't work and you need to use
+    #   the domain-style (:s3_domain_url). Anything else here will be treated like path-style.
     # * +path+: This is the key under the bucket in which the file will be stored. The
     #   URL will be constructed from the bucket and the path. This is what you will want
     #   to interpolate. Keys should be unique, like filenames, and despite the fact that
@@ -93,15 +108,20 @@ module Paperclip
       def self.extended base
         require 'right_aws'
         base.instance_eval do
-          @bucket             = @options[:bucket]
-          @s3_credentials     = parse_credentials(@options[:s3_credentials])
-          @s3_options         = @options[:s3_options] || {}
-          @s3_permissions     = @options[:s3_permissions] || 'public-read'
-          @url                = ":s3_url"
+          @s3_credentials = parse_credentials(@options[:s3_credentials])
+          @bucket         = @options[:bucket] || @s3_credentials[:bucket]
+          @s3_options     = @options[:s3_options] || {}
+          @s3_permissions = @options[:s3_permissions] || 'public-read'
+          @s3_protocol    = @options[:s3_protocol] || (@s3_permissions == 'public-read' ? 'http' : 'https')
+          @url            = ":s3_path_url" unless @url.to_s.match(/^:s3.*url$/)
         end
-        base.class.interpolations[:s3_url] = lambda do |attachment, style|
-          "https://s3.amazonaws.com/#{attachment.bucket_name}/#{attachment.path(style).gsub(%r{^/}, "")}"
+        base.class.interpolations[:s3_path_url] = lambda do |attachment, style|
+          "#{attachment.s3_protocol}://s3.amazonaws.com/#{attachment.bucket_name}/#{attachment.path(style).gsub(%r{^/}, "")}"
         end
+        base.class.interpolations[:s3_domain_url] = lambda do |attachment, style|
+          "#{attachment.s3_protocol}://#{attachment.bucket_name}.s3.amazonaws.com/#{attachment.path(style).gsub(%r{^/}, "")}"
+        end
+        ActiveRecord::Base.logger.info("[paperclip] S3 Storage Initalized.")
       end
 
       def s3
@@ -127,6 +147,10 @@ module Paperclip
         s3_bucket.key(path(style)) ? true : false
       end
 
+      def s3_protocol
+        @s3_protocol
+      end
+
       # Returns representation of the data of the file assigned to the given
       # style, in the format most representative of the current storage.
       def to_file style = default_style
@@ -135,8 +159,10 @@ module Paperclip
       alias_method :to_io, :to_file
 
       def flush_writes #:nodoc:
+        logger.info("[paperclip] Writing files for #{name}")
         @queued_for_write.each do |style, file|
           begin
+            logger.info("[paperclip] -> #{path(style)}")
             key = s3_bucket.key(path(style))
             key.data = file
             key.put(nil, @s3_permissions)
@@ -148,8 +174,10 @@ module Paperclip
       end
 
       def flush_deletes #:nodoc:
+        logger.info("[paperclip] Writing files for #{name}")
         @queued_for_delete.each do |path|
           begin
+            logger.info("[paperclip] -> #{path}")
             if file = s3_bucket.key(path)
               file.delete
             end

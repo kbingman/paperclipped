@@ -2,18 +2,20 @@ module Paperclip
   # Handles thumbnailing images that are uploaded.
   class Thumbnail
 
-    attr_accessor :file, :current_geometry, :target_geometry, :format, :whiny_thumbnails
+    attr_accessor :file, :current_geometry, :target_geometry, :format, :whiny_thumbnails, :convert_options
 
     # Creates a Thumbnail object set to work on the +file+ given. It
     # will attempt to transform the image into one defined by +target_geometry+
     # which is a "WxH"-style string. +format+ will be inferred from the +file+
     # unless specified. Thumbnail creation will raise no errors unless
-    # +whiny_thumbnails+ is true (which it is, by default.
-    def initialize file, target_geometry, format = nil, whiny_thumbnails = true
+    # +whiny_thumbnails+ is true (which it is, by default. If +convert_options+ is
+    # set, the options will be appended to the convert command upon image conversion 
+    def initialize file, target_geometry, format = nil, convert_options = nil, whiny_thumbnails = true
       @file             = file
       @crop             = target_geometry[-1,1] == '#'
       @target_geometry  = Geometry.parse target_geometry
       @current_geometry = Geometry.from_file file
+      @convert_options  = convert_options
       @whiny_thumbnails = whiny_thumbnails
 
       @current_format   = File.extname(@file.path)
@@ -24,13 +26,18 @@ module Paperclip
 
     # Creates a thumbnail, as specified in +initialize+, +make+s it, and returns the
     # resulting Tempfile.
-    def self.make file, dimensions, format = nil, whiny_thumbnails = true
-      new(file, dimensions, format, whiny_thumbnails).make
+    def self.make file, dimensions, format = nil, convert_options = nil, whiny_thumbnails = true
+      new(file, dimensions, format, convert_options, whiny_thumbnails).make
     end
 
     # Returns true if the +target_geometry+ is meant to crop.
     def crop?
       @crop
+    end
+    
+    # Returns true if the image is meant to make use of additional convert options.
+    def convert_options?
+      not @convert_options.blank?
     end
 
     # Performs the conversion of the +file+ into a thumbnail. Returns the Tempfile
@@ -42,13 +49,13 @@ module Paperclip
 
       command = <<-end_command
         #{ Paperclip.path_for_command('convert') }
-        "#{ File.expand_path(src.path) }"
+        "#{ File.expand_path(src.path) }[0]"
         #{ transformation_command }
         "#{ File.expand_path(dst.path) }"
       end_command
       success = system(command.gsub(/\s+/, " "))
 
-      if success && $?.exitstatus != 0 && @whiny_thumbnails
+      if !success && $?.exitstatus != 0 && @whiny_thumbnails
         raise PaperclipError, "There was an error processing this thumbnail"
       end
 
@@ -59,8 +66,9 @@ module Paperclip
     # into the thumbnail.
     def transformation_command
       scale, crop = @current_geometry.transformation_to(@target_geometry, crop?)
-      trans = "-scale \"#{scale}\""
+      trans = "-resize \"#{scale}\""
       trans << " -crop \"#{crop}\" +repage" if crop
+      trans << " #{convert_options}" if convert_options?
       trans
     end
   end

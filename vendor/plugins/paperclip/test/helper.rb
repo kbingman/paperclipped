@@ -5,6 +5,7 @@ require 'mocha'
 require 'tempfile'
 
 require 'active_record'
+require 'active_support'
 begin
   require 'ruby-debug'
 rescue LoadError
@@ -32,6 +33,7 @@ def rebuild_model options = {}
     table.column :avatar_file_name, :string
     table.column :avatar_content_type, :string
     table.column :avatar_file_size, :integer
+    table.column :avatar_updated_at, :datetime
   end
 
   ActiveRecord::Base.send(:include, Paperclip)
@@ -40,5 +42,16 @@ def rebuild_model options = {}
   Dummy.class_eval do
     include Paperclip
     has_attached_file :avatar, options
+  end
+end
+
+def temporary_rails_env(new_env)
+  old_env = defined?(RAILS_ENV) ? RAILS_ENV : nil
+  silence_warnings do
+    Object.const_set("RAILS_ENV", new_env)
+  end
+  yield
+  silence_warnings do
+    Object.const_set("RAILS_ENV", old_env)
   end
 end

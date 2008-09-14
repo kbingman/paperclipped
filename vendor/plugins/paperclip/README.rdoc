@@ -16,15 +16,17 @@ In your migrations:
 
   class AddAvatarColumnsToUser < ActiveRecord::Migration
     def self.up
-      add_column :users, :avatar_file_name, :string
+      add_column :users, :avatar_file_name,    :string
       add_column :users, :avatar_content_type, :string
-      add_column :users, :avatar_file_size, :integer
+      add_column :users, :avatar_file_size,    :integer
+      add_column :users, :avatar_updated_at,   :datetime
     end
 
     def self.down
       remove_column :users, :avatar_file_name
       remove_column :users, :avatar_content_type
       remove_column :users, :avatar_file_size
+      remove_column :users, :avatar_updated_at
     end
   end
 
@@ -46,3 +48,12 @@ In your show view:
   <%= image_tag @user.avatar.url(:medium) %>
   <%= image_tag @user.avatar.url(:thumb) %>
 
+==Contributing
+
+If you'd like to contribute a feature or bugfix, thanks! To make sure your fix/feature
+has a high chance of being added, please read the following guidelines:
+
+1. Ask on the mailing list, or post a ticket in Lighthouse.
+2. Make sure there are tests! I will not accept any patch that is not tested.
+   It's a rare time when explicit tests aren't needed. If you have questions about
+   writing tests for paperclip, please ask the mailing list.
