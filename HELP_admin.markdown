@@ -25,25 +25,24 @@ Once installed, you get a new Tab with the entire assets library, a Bucket à la
 
 ###Asset Tags
 
-There are a veriety of new tags. The basic tag is the <code><r:assets /></code> tag, which can be used either alone or as a double tag. This tag requires the "title" attribute, which references the asset. If you use the drag and drop from the asset bucket, this title will be added for you. 
+There are a veriety of new tags. The basic tag is the <r:assets /> tag, which can be used either alone or as a double tag. This tag requires the "title" attribute, which references the asset. If you use the drag and drop from the asset bucket, this title will be added for you. 
 
-The <code><r:assets /></code> tag can be combined with other tags for a variety of uses: 
+The *&lt;r:assets /&gt;* tag can be combined with other tags for a variety of uses: 
 
-  <r:assets:image title="foo" /> will return <img src="/path/to/foo" alt="foo" />
-
-  <r:assets:link title="foo" /> will return <a href="/path/to/foo">foo</a>
+    <r:assets:image title="foo" /> will return <img src="/path/to/foo" alt="foo" />
+    <r:assets:link title="foo" /> will return <a href="/path/to/foo">foo</a>
 
 You could also use: 
 
-  <r:assets:link title="foo" text="This is the link to foo" /> will return <a href="/path/to/foo">This is the link to foo</a>
+    <r:assets:link title="foo" text="This is the link to foo" /> will return <a href="/path/to/foo">This is the link to foo</a>
 
 or 
 
-  <rassets:link title="foo">This is another link</r:link>
+    <rassets:link title="foo">This is another link</r:link>
 
 Asset links are also available, such as content_type, file_size, and url. 
 
-Another important tag is the <code><r:assets:each>...</r:assets:each></code>. If a page has attached assets, the assets:each tag will cycle through each asset. You can then use an image, link or url tag to display or connect your assets. 
+Another important tag is the *&lt;r:assets:each&gt;...&lt;/r:assets:each&gt;*. If a page has attached assets, the assets:each tag will cycle through each asset. You can then use an image, link or url tag to display or connect your assets. 
 
 Thumbnails are automatically geneerated for images when the images are uploaded. By default, two sizes are made for use within the extension itself. These are "icon" 42px by 42px and "thumbnail" which is fit into 100px, maintaining its aspect ratio. 
 
@@ -54,13 +53,17 @@ If you're moving from page_attachments to paperclipped, here's how to migrate sm
 First, remove or disable the page_attachments extension, and install the paperclipped extension.
 For example:
 
-  rake ray:dis name=page_attachments
-  rake ray:assets
+    rake ray:dis name=page_attachments
+    rake ray:assets
+
+or
+
+    rm -rf vendor/extensions/page_attachments
+    script/extension install 
   
 The migration has now copied your original page_attachments table to old_page_attachments.
 
-  rake radiant:extensions:paperclipped:migrate_from_page_attachments
+    rake radiant:extensions:paperclipped:migrate_from_page_attachments
   
 This rake task will create paperclipped-style attachments for all OldPageAttachments. It will also ask you if you want to clean up the old table and thumbnails in /public/page_attachments.
-
 Done!
