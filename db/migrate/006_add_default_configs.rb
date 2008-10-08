@@ -14,6 +14,8 @@ class AddDefaultConfigs < ActiveRecord::Migration
        
          when 'assets.display_size'
            'Sets which of your image sizes is shown is the edit view. Defaults to the "original" image size, but any size may be used. '
+         else
+           c.description
        end
        c.update_attribute :description, description
       end

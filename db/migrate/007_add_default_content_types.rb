@@ -14,6 +14,8 @@ class AddDefaultContentTypes < ActiveRecord::Migration
        
          when 'assets.max_asset_size'
            'The size in megabytes that will be the max size allowed to be uploaded for an asset'
+         else
+           c.description
        end
        c.update_attribute :description, description
       end
