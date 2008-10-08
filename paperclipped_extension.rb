@@ -37,7 +37,9 @@ class PaperclippedExtension < Radiant::Extension
     UserActionObserver.instance.send :add_observer!, Asset 
     
     # This is just needed for testing if you are using mod_rails
-    Paperclip.options[:image_magick_path] = Radiant::Config["assets.image_magick_path"] if Radiant::Config["assets.image_magick_path"]
+    if Radiant::Config.table_exists? && Radiant::Config["assets.image_magick_path"]
+      Paperclip.options[:image_magick_path] = Radiant::Config["assets.image_magick_path"]
+    end
     
     admin.tabs.add "Assets", "/admin/assets", :after => "Snippets", :visibility => [:all]
   end
