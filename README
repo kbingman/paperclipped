@@ -20,6 +20,8 @@ If you install the Settings Extension (highly recommended), you can also easily 
 If you do install the Settings Extension you should be sure to add a config.exetensions line to your environment.rb file: 
 
    config.extensions = [ :settings, :all ]
+   
+Also the Settings Extension migration should be run before Paperclipped's migration.
 
 The configuration settings also enable a list of the allowed file types, maximum file size and should you need it, the path to your installation of Image Magick (this should not be needed, but I sometimes had a problem when using mod_rails).
 
