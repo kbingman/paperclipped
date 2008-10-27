@@ -9,6 +9,6 @@ class CreatePageAttachments < ActiveRecord::Migration
   end
   
   def self.down
-    drop_table :page_attachmentss
+    drop_table :page_attachments
   end
 end
