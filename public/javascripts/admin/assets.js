@@ -23,7 +23,7 @@ document.observe("dom:loaded", function() {
       }
     });
   });
-  new Draggable('asset-bucket', { starteffect: 'none' });
+  new Draggable('asset-bucket', { starteffect: false, endeffect: false });
 });
 
 var Asset = {};

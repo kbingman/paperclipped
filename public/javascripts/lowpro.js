@@ -1,13 +1,13 @@
 LowPro = {};
 LowPro.Version = '0.5';
-LowPro.CompatibleWithPrototype = '1.6.0';
+LowPro.CompatibleWithPrototype = '1.6';
 
-if (Prototype.Version != LowPro.CompatibleWithPrototype && console && console.warn)
+if (Prototype.Version.indexOf(LowPro.CompatibleWithPrototype) != 0 && window.console && window.console.warn)
   console.warn("This version of Low Pro is tested with Prototype " + LowPro.CompatibleWithPrototype + 
                   " it may not work as expected with this version (" + Prototype.Version + ")");
 
 if (!Element.addMethods) 
-  Element.addMethods = function(o) { Object.extend(Element.Methods, o) };
+  Element.addMethods = function(o) { Object.extend(Element.Methods, o); };
 
 // Simple utility methods for working with the DOM
 DOM = {};
@@ -15,19 +15,19 @@ DOM = {};
 // DOMBuilder for prototype
 DOM.Builder = {
 	tagFunc : function(tag) {
-	  return function() {
-	    var attrs, children; 
-	    if (arguments.length>0) { 
-	      if (arguments[0].nodeName || 
-	        typeof arguments[0] == "string") 
-	        children = arguments; 
-	      else { 
-	        attrs = arguments[0]; 
-	        children = Array.prototype.slice.call(arguments, 1); 
-	      };
-	    }
-	    return DOM.Builder.create(tag, attrs, children);
-	  };
+    return function() {
+     var attrs, children;
+     if (arguments.length>0) {
+       if (arguments[0].constructor == Object) {
+         attrs = arguments[0];
+         children = Array.prototype.slice.call(arguments, 1);
+       } else {
+         children = arguments;
+       };
+       children = $A(children).flatten();
+     }
+     return DOM.Builder.create(tag, attrs, children);
+    };
   },
 	create : function(tag, attrs, children) {
 		attrs = attrs || {}; children = children || []; tag = tag.toLowerCase();
@@ -97,7 +97,7 @@ Event.addBehavior = function(rules) {
     Ajax.Responders.register({
       onComplete : function() { 
         if (Event.addBehavior.reassignAfterAjax) 
-          setTimeout(function() { ab.reload() }, 10);
+          setTimeout(function() { ab.reload(); }, 10);
       }
     });
     ab.responderApplied = true;
@@ -107,6 +107,14 @@ Event.addBehavior = function(rules) {
     this.onReady(ab.load.bind(ab, rules));
   }
   
+};
+
+Event.delegate = function(rules) {
+  return function(e) {
+      var element = $(e.element());
+      for (var selector in rules)
+        if (element.match(selector)) return rules[selector].apply(this, $A(arguments));
+    };
 };
 
 Object.extend(Event.addBehavior, {
@@ -119,7 +127,7 @@ Object.extend(Event.addBehavior, {
       var observer = rules[selector];
       var sels = selector.split(',');
       sels.each(function(sel) {
-        var parts = sel.split(/:(?=[a-z:]+$)/), css = parts.shift(), event = parts.join(':');
+        var parts = sel.split(/:(?=[a-z]+$)/), css = parts[0], event = parts[1];
         $$(css).each(function(element) {
           if (event) {
             observer = Event.addBehavior._wrapObserver(observer);
@@ -155,7 +163,7 @@ Object.extend(Event.addBehavior, {
   _wrapObserver: function(observer) {
     return function(event) {
       if (observer.call(this, event) === false) event.stop(); 
-    }
+    };
   }
   
 });
@@ -252,6 +260,8 @@ var Behavior = {
   }
 };
 
+
+
 Remote = Behavior.create({
   initialize: function(options) {
     if (this.element.nodeName == 'FORM') new Remote.Form(this.element, options);
@@ -264,13 +274,29 @@ Remote.Base = {
     this.options = Object.extend({
       evaluateScripts : true
     }, options || {});
+    
+    this._bindCallbacks();
   },
   _makeRequest : function(options) {
-    if (options.update) new Ajax.Updater(options.update, options.url, options);
-    else new Ajax.Request(options.url, options);
-    return false;
+    if (options.confirm) {
+      if (confirm(options.confirm)) {
+        if (options.update) new Ajax.Updater(options.update, options.url, options);
+        else new Ajax.Request(options.url, options);
+        return false;
+      }
+    } else {
+      if (options.update) new Ajax.Updater(options.update, options.url, options);
+      else new Ajax.Request(options.url, options);
+      return false;
+    }
+  },
+  _bindCallbacks: function() {
+    $w('onCreate onComplete onException onFailure onInteractive onLoading onLoaded onSuccess').each(function(cb) {
+      if (Object.isFunction(this.options[cb]))
+        this.options[cb] = this.options[cb].bind(this);
+    }.bind(this));
   }
-}
+};
 
 Remote.Link = Behavior.create(Remote.Base, {
   onclick : function() {
@@ -285,14 +311,29 @@ Remote.Form = Behavior.create(Remote.Base, {
     var sourceElement = e.element();
     
     if (['input', 'button'].include(sourceElement.nodeName.toLowerCase()) && 
-        sourceElement.type == 'submit')
+        sourceElement.type.match(/submit|image/))
       this._submitButton = sourceElement;
   },
   onsubmit : function() {
+    var parameters = this.element.serialize();
+
+    if (parameters.blank()) {
+      parameters = this.options.parameters;
+    } else {
+      parameters = parameters + '&' + this.options.parameters;
+    }
+    delete this.options.parameters;
+    if (this._submitButton) {
+      if (parameters.blank()) {
+        parameters = this._submitButton.name + "=" + this._submitButton.value;
+      } else {
+        parameters = parameters + '&' + this._submitButton.name + "=" + this._submitButton.value;
+      }
+    }
     var options = Object.extend({
       url : this.element.action,
       method : this.element.method || 'get',
-      parameters : this.element.serialize({ submit: this._submitButton.name })
+      parameters : parameters
     }, this.options);
     this._submitButton = null;
     return this._makeRequest(options);
@@ -317,5 +358,4 @@ Observed = Behavior.create({
                                       new Form.Element.EventObserver(this.element, this.callback);
   }
 });
-
 
