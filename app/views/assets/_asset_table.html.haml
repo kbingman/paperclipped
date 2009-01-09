@@ -26,7 +26,7 @@
             = link_to image_tag('admin/remove.png', :alt => 'Remove Asset'), remove_asset_url(:id => asset)
     - else
       %tr
-        %td.note{ :colspan => "4" } 
+        %td.note{ :colspan => "5" } 
           No Assets
     
 = will_paginate @assets

@@ -23,7 +23,36 @@ namespace :radiant do
           cp file, RAILS_ROOT + path
         end
         
-      end  
+      end
+      
+      desc "Migrates page attachments from the original page attachments extension into new Assets"
+      task :migrate_from_page_attachments => :environment do
+        puts "This task can clean up traces of the page_attachments (think table records and files currently in /public/page_attachments).
+If you would like to use this mode type \"yes\", type \"no\" or just hit enter to leave them untouched for now."
+        answer = STDIN.gets.chomp
+        erase_tracks = answer.eql?('yes') ? true : false
+        OldPageAttachment.find_all_by_parent_id(nil).each do |opa|
+          asset = opa.create_paperclipped_record
+          # move the actual file
+          old_dir = "#{RAILS_ROOT}/public/page_attachments/0000/#{opa.id.to_s.rjust(4,'0')}"
+          new_dir = "#{RAILS_ROOT}/public/assets/#{asset.id}"
+          puts "Copying #{old_dir.gsub(RAILS_ROOT, '')}/#{opa.filename} to #{new_dir.gsub(RAILS_ROOT, '')}/#{opa.filename}..."
+          mkdir_p new_dir
+          cp old_dir + "/#{opa.filename}", new_dir + "/#{opa.filename}"
+          # remove old record and remainings
+          if erase_tracks
+            rm_rf old_dir
+          end
+        end
+        # regenerate thumbnails
+        @assets = Asset.find(:all)
+        @assets.each do |asset|
+          asset.asset.reprocess!
+          asset.save
+        end
+        puts "Done."
+      end
+      
     end
   end
 end
