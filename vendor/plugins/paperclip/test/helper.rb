@@ -1,8 +1,11 @@
 require 'rubygems'
 require 'test/unit'
+gem 'thoughtbot-shoulda', ">= 2.0.0"
 require 'shoulda'
 require 'mocha'
 require 'tempfile'
+
+gem 'sqlite3-ruby'
 
 require 'active_record'
 require 'active_support'
@@ -25,7 +28,7 @@ ENV['RAILS_ENV'] ||= 'test'
 FIXTURES_DIR = File.join(File.dirname(__FILE__), "fixtures") 
 config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
 ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/debug.log")
-ActiveRecord::Base.establish_connection(config[ENV['RAILS_ENV'] || 'test'])
+ActiveRecord::Base.establish_connection(config['test'])
 
 def rebuild_model options = {}
   ActiveRecord::Base.connection.create_table :dummies, :force => true do |table|
@@ -35,7 +38,10 @@ def rebuild_model options = {}
     table.column :avatar_file_size, :integer
     table.column :avatar_updated_at, :datetime
   end
+  rebuild_class options
+end
 
+def rebuild_class options = {}
   ActiveRecord::Base.send(:include, Paperclip)
   Object.send(:remove_const, "Dummy") rescue nil
   Object.const_set("Dummy", Class.new(ActiveRecord::Base))

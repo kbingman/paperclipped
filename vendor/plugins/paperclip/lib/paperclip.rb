@@ -29,41 +29,96 @@ require 'tempfile'
 require 'paperclip/upfile'
 require 'paperclip/iostream'
 require 'paperclip/geometry'
+require 'paperclip/processor'
 require 'paperclip/thumbnail'
 require 'paperclip/storage'
 require 'paperclip/attachment'
+if defined? RAILS_ROOT
+  Dir.glob(File.join(File.expand_path(RAILS_ROOT), "lib", "paperclip_processors", "*.rb")).each do |processor|
+    require processor
+  end
+end
 
 # The base module that gets included in ActiveRecord::Base. See the
 # documentation for Paperclip::ClassMethods for more useful information.
 module Paperclip
 
-  VERSION = "2.1.2"
+  VERSION = "2.2.2"
 
   class << self
     # Provides configurability to Paperclip. There are a number of options available, such as:
     # * whiny_thumbnails: Will raise an error if Paperclip cannot process thumbnails of 
     #   an uploaded image. Defaults to true.
-    # * image_magick_path: Defines the path at which to find the +convert+ and +identify+ 
+    # * log: Logs progress to the Rails log. Uses ActiveRecord's logger, so honors
+    #   log levels, etc. Defaults to true.
+    # * command_path: Defines the path at which to find the command line
     #   programs if they are not visible to Rails the system's search path. Defaults to 
-    #   nil, which uses the first executable found in the search path.
+    #   nil, which uses the first executable found in the user's search path.
+    # * image_magick_path: Deprecated alias of command_path.
     def options
       @options ||= {
         :whiny_thumbnails  => true,
-        :image_magick_path => nil
+        :image_magick_path => nil,
+        :command_path      => nil,
+        :log               => true,
+        :swallow_stderr    => true
       }
     end
 
     def path_for_command command #:nodoc:
-      path = [options[:image_magick_path], command].compact
+      if options[:image_magick_path]
+        ActiveSupport::Deprecation.warn(":image_magick_path is deprecated and "+
+                                        "will be removed. Use :command_path "+
+                                        "instead")
+      end
+      path = [options[:image_magick_path] || options[:command_path], command].compact
       File.join(*path)
+    end
+
+    # The run method takes a command to execute and a string of parameters
+    # that get passed to it. The command is prefixed with the :command_path
+    # option from Paperclip.options. If you have many commands to run and
+    # they are in different paths, the suggested course of action is to
+    # symlink them so they are all in the same directory.
+    #
+    # If the command returns with a result code that is not one of the
+    # expected_outcodes, a PaperclipCommandLineError will be raised. Generally
+    # a code of 0 is expected, but a list of codes may be passed if necessary.
+    def run cmd, params = "", expected_outcodes = 0
+      command = %Q<#{%Q[#{path_for_command(cmd)} #{params}].gsub(/\s+/, " ")}>
+      command = "#{command} 2>#{bit_bucket}" if Paperclip.options[:swallow_stderr]
+      output = `#{command}`
+      unless [expected_outcodes].flatten.include?($?.exitstatus)
+        raise PaperclipCommandLineError, "Error while running #{cmd}"
+      end
+      output
+    end
+
+    def bit_bucket #:nodoc:
+      File.exists?("/dev/null") ? "/dev/null" : "NUL"
     end
 
     def included base #:nodoc:
       base.extend ClassMethods
+      unless base.respond_to?(:define_callbacks)
+        base.send(:include, Paperclip::CallbackCompatability)
+      end
+    end
+
+    def processor name #:nodoc:
+      name = name.to_s.camelize
+      processor = Paperclip.const_get(name)
+      unless processor.ancestors.include?(Paperclip::Processor)
+        raise PaperclipError.new("Processor #{name} was not found") 
+      end
+      processor
     end
   end
 
   class PaperclipError < StandardError #:nodoc:
+  end
+
+  class PaperclipCommandLineError < StandardError #:nodoc:
   end
 
   class NotIdentifiedByImageMagickError < PaperclipError #:nodoc:
@@ -82,14 +137,15 @@ module Paperclip
     # * +url+: The full URL of where the attachment is publically accessible. This can just
     #   as easily point to a directory served directly through Apache as it can to an action
     #   that can control permissions. You can specify the full domain and path, but usually
-    #   just an absolute path is sufficient. The leading slash must be included manually for 
-    #   absolute paths. The default value is "/:class/:attachment/:id/:style_:filename". See
+    #   just an absolute path is sufficient. The leading slash *must* be included manually for 
+    #   absolute paths. The default value is 
+    #   "/system/:attachment/:id/:style/:basename.:extension". See
     #   Paperclip::Attachment#interpolate for more information on variable interpolaton.
-    #     :url => "/:attachment/:id/:style_:basename:extension"
+    #     :url => "/:class/:attachment/:id/:style_:basename.:extension"
     #     :url => "http://some.other.host/stuff/:class/:id_:extension"
     # * +default_url+: The URL that will be returned if there is no attachment assigned. 
     #   This field is interpolated just as the url is. The default value is 
-    #   "/:class/:attachment/missing_:style.png"
+    #   "/:attachment/:style/missing.png"
     #     has_attached_file :avatar, :default_url => "/images/default_:style_avatar.png"
     #     User.new.avatar_url(:small) # => "/images/default_small_avatar.png"
     # * +styles+: A hash of thumbnail styles and their geometries. You can find more about 
@@ -103,8 +159,8 @@ module Paperclip
     #     has_attached_file :avatar, :styles => { :normal => "100x100#" },
     #                       :default_style => :normal
     #     user.avatar.url # => "/avatars/23/normal_me.png"
-    # * +whiny_thumbnails+: Will raise an error if Paperclip cannot process thumbnails of an
-    #   uploaded image. This will ovrride the global setting for this attachment. 
+    # * +whiny_thumbnails+: Will raise an error if Paperclip cannot post_process an uploaded file due
+    #   to a command line error. This will override the global setting for this attachment. 
     #   Defaults to true. 
     # * +convert_options+: When creating thumbnails, use this free-form options
     #   field to pass in various convert command options.  Typical options are "-strip" to
@@ -115,7 +171,7 @@ module Paperclip
     #   of thumbnail being generated. You can also specify :all as a key, which will apply
     #   to all of the thumbnails being generated. If you specify options for the :original,
     #   it would be best if you did not specify destructive options, as the intent of keeping
-    #   the original around is to regenerate all the thumbnails then requirements change.
+    #   the original around is to regenerate all the thumbnails when requirements change.
     #     has_attached_file :avatar, :styles => { :large => "300x300", :negative => "100x100" }
     #                                :convert_options => {
     #                                  :all => "-strip",
@@ -129,11 +185,14 @@ module Paperclip
       include InstanceMethods
 
       write_inheritable_attribute(:attachment_definitions, {}) if attachment_definitions.nil?
-      attachment_definitions[name] = {:validations => []}.merge(options)
+      attachment_definitions[name] = {:validations => {}}.merge(options)
 
       after_save :save_attached_files
       before_destroy :destroy_attached_files
 
+      define_callbacks :before_post_process, :after_post_process
+      define_callbacks :"before_#{name}_post_process", :"after_#{name}_post_process"
+     
       define_method name do |*args|
         a = attachment_for(name)
         (args.length > 0) ? a.to_s(args.first) : a
@@ -159,23 +218,14 @@ module Paperclip
     # * +greater_than+: equivalent to :in => options[:greater_than]..Infinity
     # * +message+: error message to display, use :min and :max as replacements
     def validates_attachment_size name, options = {}
-      attachment_definitions[name][:validations] << lambda do |attachment, instance|
-        unless options[:greater_than].nil?
-          options[:in] = (options[:greater_than]..(1/0)) # 1/0 => Infinity
-        end
-        unless options[:less_than].nil?
-          options[:in] = (0..options[:less_than])
-        end
-        
-        if attachment.file? && !options[:in].include?(instance[:"#{name}_file_size"].to_i)
-          min = options[:in].first
-          max = options[:in].last
-          
-          if options[:message]
-            options[:message].gsub(/:min/, min.to_s).gsub(/:max/, max.to_s)
-          else
-            "file size is not between #{min} and #{max} bytes."
-          end
+      min     = options[:greater_than] || (options[:in] && options[:in].first) || 0
+      max     = options[:less_than]    || (options[:in] && options[:in].last)  || (1.0/0)
+      range   = (min..max)
+      message = options[:message] || "file size must be between :min and :max bytes."
+
+      attachment_definitions[name][:validations][:size] = lambda do |attachment, instance|
+        if attachment.file? && !range.include?(attachment.size.to_i)
+          message.gsub(/:min/, min.to_s).gsub(/:max/, max.to_s)
         end
       end
     end
@@ -187,28 +237,29 @@ module Paperclip
 
     # Places ActiveRecord-style validations on the presence of a file.
     def validates_attachment_presence name, options = {}
-      attachment_definitions[name][:validations] << lambda do |attachment, instance|
-        unless attachment.file?
-          options[:message] || "must be set."
-        end
+      message = options[:message] || "must be set."
+      attachment_definitions[name][:validations][:presence] = lambda do |attachment, instance|
+        message unless attachment.file?
       end
     end
     
-    # Places ActiveRecord-style validations on the content type of the file assigned. The
-    # possible options are:
-    # * +content_type+: Allowed content types.  Can be a single content type or an array.
-    #   Each type can be a String or a Regexp. It should be noted that Internet Explorer uploads
-    #   files with content_types that you may not expect. For example, JPEG images are given
-    #   image/pjpeg and PNGs are image/x-png, so keep that in mind when determining how you match.
-    #   Allows all by default.
-    # * +message+: The message to display when the uploaded file has an invalid content type.
+    # Places ActiveRecord-style validations on the content type of the file
+    # assigned. The possible options are: 
+    # * +content_type+: Allowed content types.  Can be a single content type 
+    #   or an array.  Each type can be a String or a Regexp. It should be 
+    #   noted that Internet Explorer upload files with content_types that you 
+    #   may not expect. For example, JPEG images are given image/pjpeg and 
+    #   PNGs are image/x-png, so keep that in mind when determining how you 
+    #   match.  Allows all by default.
+    # * +message+: The message to display when the uploaded file has an invalid
+    #   content type.
     def validates_attachment_content_type name, options = {}
-      attachment_definitions[name][:validations] << lambda do |attachment, instance|
+      attachment_definitions[name][:validations][:content_type] = lambda do |attachment, instance|
         valid_types = [options[:content_type]].flatten
         
-        unless attachment.original_filename.nil?
-          unless options[:content_type].blank?
-            content_type = instance[:"#{name}_content_type"]
+        unless attachment.original_filename.blank?
+          unless valid_types.blank?
+            content_type = attachment.instance_read(:content_type)
             unless valid_types.any?{|t| t === content_type }
               options[:message] || "is not one of the allowed file types."
             end
@@ -217,17 +268,17 @@ module Paperclip
       end
     end
 
-    # Returns the attachment definitions defined by each call to has_attached_file.
+    # Returns the attachment definitions defined by each call to
+    # has_attached_file.
     def attachment_definitions
       read_inheritable_attribute(:attachment_definitions)
     end
-
   end
 
   module InstanceMethods #:nodoc:
     def attachment_for name
-      @attachments ||= {}
-      @attachments[name] ||= Attachment.new(name, self, self.class.attachment_definitions[name])
+      @_paperclip_attachments ||= {}
+      @_paperclip_attachments[name] ||= Attachment.new(name, self, self.class.attachment_definitions[name])
     end
     
     def each_attachment

@@ -15,7 +15,7 @@ module Paperclip
     #   make a symlink to the capistrano-created system directory from inside your app's 
     #   public directory.
     #   See Paperclip::Attachment#interpolate for more information on variable interpolaton.
-    #     :path => "/var/app/attachments/:class/:id/:style/:filename"
+    #     :path => "/var/app/attachments/:class/:id/:style/:basename.:extension"
     module Filesystem
       def self.extended base
       end
@@ -31,18 +31,18 @@ module Paperclip
       # Returns representation of the data of the file assigned to the given
       # style, in the format most representative of the current storage.
       def to_file style = default_style
-        @queued_for_write[style] || (File.new(path(style)) if exists?(style))
+        @queued_for_write[style] || (File.new(path(style), 'rb') if exists?(style))
       end
       alias_method :to_io, :to_file
 
       def flush_writes #:nodoc:
         logger.info("[paperclip] Writing files for #{name}")
         @queued_for_write.each do |style, file|
+          file.close
           FileUtils.mkdir_p(File.dirname(path(style)))
           logger.info("[paperclip] -> #{path(style)}")
-          result = file.stream_to(path(style))
-          file.close
-          result.close
+          FileUtils.mv(file.path, path(style))
+          FileUtils.chmod(0644, path(style))
         end
         @queued_for_write = {}
       end
@@ -55,6 +55,14 @@ module Paperclip
             FileUtils.rm(path) if File.exist?(path)
           rescue Errno::ENOENT => e
             # ignore file-not-found, let everything else pass
+          end
+          begin
+            while(true)
+              path = File.dirname(path)
+              FileUtils.rmdir(path)
+            end
+          rescue Errno::ENOTEMPTY, Errno::ENOENT, Errno::EINVAL, Errno::ENOTDIR
+            # Stop trying to remove parent directories
           end
         end
         @queued_for_delete = []
@@ -91,6 +99,7 @@ module Paperclip
     # * +s3_protocol+: The protocol for the URLs generated to your S3 assets. Can be either 
     #   'http' or 'https'. Defaults to 'http' when your :s3_permissions are 'public-read' (the
     #   default), and 'https' when your :s3_permissions are anything else.
+    # * +s3_headers+: A hash of headers such as {'Expires' => 1.year.from_now.httpdate}
     # * +bucket+: This is the name of the S3 bucket that will store your files. Remember
     #   that the bucket must be unique across all of Amazon S3. If the bucket does not exist
     #   Paperclip will attempt to create it. The bucket name will not be interpolated.
@@ -113,6 +122,7 @@ module Paperclip
           @s3_options     = @options[:s3_options] || {}
           @s3_permissions = @options[:s3_permissions] || 'public-read'
           @s3_protocol    = @options[:s3_protocol] || (@s3_permissions == 'public-read' ? 'http' : 'https')
+          @s3_headers     = @options[:s3_headers] || {}
           @url            = ":s3_path_url" unless @url.to_s.match(/^:s3.*url$/)
         end
         base.class.interpolations[:s3_path_url] = lambda do |attachment, style|
@@ -165,7 +175,7 @@ module Paperclip
             logger.info("[paperclip] -> #{path(style)}")
             key = s3_bucket.key(path(style))
             key.data = file
-            key.put(nil, @s3_permissions)
+            key.put(nil, @s3_permissions, {'Content-type' => instance_read(:content_type)}.merge(@s3_headers))
           rescue RightAws::AwsError => e
             raise
           end
