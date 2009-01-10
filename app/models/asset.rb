@@ -58,7 +58,7 @@ class Asset < ActiveRecord::Base
     thumbnails = {}
   end
   thumbnails[:icon] = ['42x42#', :png]
-  thumbnails[:thumbnail] = '100x100>'
+  thumbnails[:thumbnail] = ['100x100>', :png]
   
   has_attached_file :asset,
                     :styles => thumbnails,
@@ -88,7 +88,7 @@ class Asset < ActiveRecord::Base
       self.asset.url
     else
       if self.pdf?
-        "/images/assets/pdf_#{size.to_s}.png"
+        self.asset.url(size.to_sym)
       elsif self.movie?
         "/images/assets/movie_#{size.to_s}.png"
       elsif self.audio?
