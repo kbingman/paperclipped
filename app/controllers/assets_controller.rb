@@ -106,7 +106,7 @@ class AssetsController < ApplicationController
     @asset = Asset.find(params[:id])
     # This is a temporary measure! It is not very RESTful, but I like the confirm page... 
     if request.post?
-      session[:bucket].delete(@asset.asset.url) if session[:bucket].key?(@asset.asset.url)
+      session[:bucket].delete(@asset.asset.url) if session[:bucket] && session[:bucket].key?(@asset.asset.url)
       @asset.destroy
       redirect_to assets_path
     end 
