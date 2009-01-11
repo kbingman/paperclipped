@@ -127,7 +127,7 @@ module AssetTags
     options = tag.attr.dup
     asset = find_asset(tag, options)
     size = options['size'] ? options.delete('size') : 'original'
-    text = options['text'] || options['title']
+    text = options['text'] || asset.title
     anchor = options['anchor'] ? "##{options.delete('anchor')}" : ''
     attributes = options.inject('') { |s, (k, v)| s << %{#{k.downcase}="#{v}" } }.strip
     attributes = " #{attributes}" unless attributes.empty?
