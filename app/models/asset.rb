@@ -74,7 +74,7 @@ class Asset < ActiveRecord::Base
   
   validates_attachment_presence :asset, :message => "You must choose a file to upload!"
   validates_attachment_content_type :asset, 
-    :content_type => Radiant::Config["assets.content_types"].split(', ') if Radiant::Config.table_exists? && Radiant::Config["assets.content_types"]
+    :content_type => Radiant::Config["assets.content_types"].split(', ') if Radiant::Config.table_exists? && Radiant::Config["assets.content_types"] && Radiant::Config["assets.skip_filetype_validation"] == nil
   validates_attachment_size :asset, 
     :less_than => Radiant::Config["assets.max_asset_size"].to_i.megabytes if Radiant::Config.table_exists? && Radiant::Config["assets.max_asset_size"]
     
