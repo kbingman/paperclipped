@@ -19,6 +19,11 @@ class AssetsController < ApplicationController
         @asset.pages << @page
       end
     end
+    
+    after :update do
+      ResponseCache.instance.clear
+    end
+    
     response_for :update do |format|
       format.html { 
         flash[:notice] = "Asset successfully updated."
