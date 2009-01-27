@@ -25,7 +25,7 @@ namespace :radiant do
         
       end
       
-      desc "Exports assets from database"
+      desc "Exports assets from database to assets directory"
       task :export => :environment do
         asset_path = File.join(RAILS_ROOT, "assets")
         mkdir_p asset_path
@@ -36,7 +36,7 @@ namespace :radiant do
         puts "Done."
       end
 
-      desc "Imports assets to database"
+      desc "Imports assets to database from assets directory"
       task :import => :environment do
         asset_path = File.join(RAILS_ROOT, "assets")
         if File.exist?(asset_path) && File.stat(asset_path).directory?
