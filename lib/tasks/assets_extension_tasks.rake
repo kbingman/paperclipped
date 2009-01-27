@@ -25,6 +25,31 @@ namespace :radiant do
         
       end
       
+      desc "Exports assets from database"
+      task :export => :environment do
+        asset_path = File.join(RAILS_ROOT, "assets")
+        mkdir_p asset_path
+        Asset.find(:all).each do |asset|
+          puts "Exporting #{asset.asset_file_name}"
+          cp asset.asset.path(:normal), File.join(asset_path, asset.asset_file_name)
+        end
+        puts "Done."
+      end
+
+      desc "Imports assets to database"
+      task :import => :environment do
+        asset_path = File.join(RAILS_ROOT, "assets")
+        if File.exist?(asset_path) && File.stat(asset_path).directory?
+          Dir.glob("#{asset_path}/*").each do |file_with_path|
+            if File.stat(file_with_path).file?
+              new_asset = File.new(file_with_path) 
+              puts "Creating #{File.basename(file_with_path)}"
+              Asset.create :asset => new_asset
+            end
+          end
+        end
+      end
+      
       desc "Migrates page attachments from the original page attachments extension into new Assets"
       task :migrate_from_page_attachments => :environment do
         puts "This task can clean up traces of the page_attachments (think table records and files currently in /public/page_attachments).
