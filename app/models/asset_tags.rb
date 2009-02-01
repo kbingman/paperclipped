@@ -65,7 +65,7 @@ module AssetTags
   }
   tag 'assets:if_content_type' do |tag|
     options = tag.attr.dup
-    regexp = build_regexp_for(tag,options)
+    regexp = build_regexp_for(options)
     asset_content_type = tag.locals.asset.asset_content_type
     tag.expand unless asset_content_type.match(regexp).nil?
   end
@@ -165,13 +165,13 @@ module AssetTags
       tag.locals.asset || Asset.find_by_title(title) || Asset.find(id)
     end
     
-    def build_regexp_for(tag, options)
-      raise TagError, "'matches' attribute required" unless matches = options.delete('matches')
-      ignore_case = options['ignore_case'] && options['ignore_case'] == 'false' ? nil : true
+    def build_regexp_for(options)
+      raise TagError, "'matches' attribute required" unless matches = options['matches']
+      ignore_case = options['ignore_case'] && options.delete('ignore_case') == 'false' ? nil : true
       begin
-        regexp = Regexp.new(tag.attr['matches'], ignore_case)
+        regexp = Regexp.new(options.delete('matches'), ignore_case)
       rescue RegexpError => e
-        raise TagError.new("Malformed regular expression in `#{attribute_name}' argument of `#{tag.name}' tag: #{e.message}")
+        raise TagError.new("Malformed regular expression in `matches' argument: #{e.message}")
       end
       regexp
     end
