@@ -18,14 +18,17 @@ module AssetTags
   desc %{
     Cycles through all assets attached to the current page.  
     This tag does not require the title atttribute, nor do any of its children.
+    Use the `limit' attribute to render a specific number of assets.
     
     *Usage:* 
-    <pre><code><r:assets:each>...</r:assets:each></code></pre>
+    <pre><code><r:assets:each [limit="5"]>...</r:assets:each></code></pre>
   }    
   tag 'assets:each' do |tag|
+    options = tag.attr.dup
     result = []
+    limit = options['limit'] ? options.delete('limit') : nil
     attachments = tag.locals.page.page_attachments
-    tag.locals.assets = attachments
+    attachments = attachments.find(:all, :limit => limit) if limit
     attachments.each do |attachment|
       tag.locals.asset = attachment.asset
       result << tag.expand
@@ -65,7 +68,9 @@ module AssetTags
   }
   tag 'assets:if_content_type' do |tag|
     options = tag.attr.dup
-    regexp = build_regexp_for(options)
+    # XXX build_regexp_for comes from StandardTags
+    # XXX its cool if I use it, right?
+    regexp = build_regexp_for(tag,options)
     asset_content_type = tag.locals.asset.asset_content_type
     tag.expand unless asset_content_type.match(regexp).nil?
   end
@@ -165,19 +170,4 @@ module AssetTags
       tag.locals.asset || Asset.find_by_title(title) || Asset.find(id)
     end
     
-    def build_regexp_for(options)
-      raise TagError, "'matches' attribute required" unless matches = options['matches']
-      ignore_case = options['ignore_case'] && options.delete('ignore_case') == 'false' ? nil : true
-      begin
-        regexp = Regexp.new(options.delete('matches'), ignore_case)
-      rescue RegexpError => e
-        raise TagError.new("Malformed regular expression in `matches' argument: #{e.message}")
-      end
-      regexp
-    end
- 
-  
-  
-  
-  
 end
