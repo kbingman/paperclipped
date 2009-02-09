@@ -31,7 +31,7 @@ namespace :radiant do
         mkdir_p asset_path
         Asset.find(:all).each do |asset|
           puts "Exporting #{asset.asset_file_name}"
-          cp asset.asset.path(:normal), File.join(asset_path, asset.asset_file_name)
+          cp asset.asset.path, File.join(asset_path, asset.asset_file_name)
         end
         puts "Done."
       end
