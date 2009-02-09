@@ -18,14 +18,17 @@ module AssetTags
   desc %{
     Cycles through all assets attached to the current page.  
     This tag does not require the title atttribute, nor do any of its children.
+    Use the `limit' attribute to render a specific number of assets.
     
     *Usage:* 
-    <pre><code><r:assets:each>...</r:assets:each></code></pre>
+    <pre><code><r:assets:each [limit="5"]>...</r:assets:each></code></pre>
   }    
   tag 'assets:each' do |tag|
+    options = tag.attr.dup
     result = []
+    limit = options['limit'] ? options.delete('limit') : nil
     attachments = tag.locals.page.page_attachments
-    tag.locals.assets = attachments
+    attachments = attachments.find(:all, :limit => limit) if limit
     attachments.each do |attachment|
       tag.locals.asset = attachment.asset
       result << tag.expand
@@ -54,6 +57,23 @@ module AssetTags
        tag.expand
      end
    end
+
+  desc %{
+    Renders the containing elements only if the asset's content type matches the regular expression given in the matches attribute.
+    The 'title' attribute is required on the parent tag unless this tag is used in assets:each.
+    If the 'ignore_case' attribute is set to false, the match is case sensitive. By default, 'ignore_case' is set to true.
+
+    *Usage:* 
+    <pre><code><r:assets:each:if_content_type matches="regexp" [ignore_case=true|false"]>...</r:assets:each:if_content_type></code></pre>
+  }
+  tag 'assets:if_content_type' do |tag|
+    options = tag.attr.dup
+    # XXX build_regexp_for comes from StandardTags
+    # XXX its cool if I use it, right?
+    regexp = build_regexp_for(tag,options)
+    asset_content_type = tag.locals.asset.asset_content_type
+    tag.expand unless asset_content_type.match(regexp).nil?
+  end
   
   [:title, :caption, :asset_file_name, :asset_content_type, :asset_file_size, :id].each do |method|
     desc %{
@@ -150,8 +170,4 @@ module AssetTags
       tag.locals.asset || Asset.find_by_title(title) || Asset.find(id)
     end
     
-  
-  
-  
-  
 end
