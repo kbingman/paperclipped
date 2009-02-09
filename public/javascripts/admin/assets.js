@@ -22,8 +22,11 @@ document.observe("dom:loaded", function() {
       	box.focus();
       }
     });
-  });
-  new Draggable('asset-bucket', { starteffect: false, endeffect: false });
+  });      
+  if($('#asset-bucket')){
+    new Draggable('asset-bucket', { starteffect: false, endeffect: false });
+  }
+  
 });
 
 var Asset = {};
