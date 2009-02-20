@@ -33,7 +33,7 @@ class AssetsController < ApplicationController
     response_for :create do |format|
       format.html { 
         flash[:notice] = "Asset successfully uploaded."
-        redirect_to(@page ? page_edit_url(@page) : (params[:continue] ? edit_asset_path(@asset) : assets_path)) 
+        redirect_to(@page ? edit_admin_page_url(@page) : (params[:continue] ? edit_asset_path(@asset) : assets_path)) 
       }
     end
      
