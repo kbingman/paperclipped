@@ -28,7 +28,7 @@ module AssetTags
     result = []
     limit = options['limit'] ? options.delete('limit') : nil
     offset = options['offset'] ? options.delete('offset') : :nil
-    assets = tag.locals.page.assets.find(:all, :limit => limit, :offset => offset)
+    assets = tag.locals.page.assets.find(:all, :limit => limit, :offset => offset, :order => 'page_attachments.position')
     assets.each do |asset|
       tag.locals.asset = asset
       result << tag.expand
@@ -58,12 +58,21 @@ module AssetTags
      end
    end
    
+   desc %{
+     Renders the contained elements only if the current contextual page has one or
+     more assets. The @min_count@ attribute specifies the minimum number of required
+     assets.
+
+     *Usage:*
+     <pre><code><r:if_assets [min_count="n"]>...</r:if_assets></code></pre>
+   }
    tag 'if_assets' do |tag|
      count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 0
      assets = tag.locals.page.assets.count
      tag.expand if assets >= count
    end
    
+   desc %{The opposite of @<r:if_attachments/>@.}
    tag 'unless_assets' do |tag|
      count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 0
      assets = tag.locals.page.assets.count
