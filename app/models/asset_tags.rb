@@ -27,10 +27,10 @@ module AssetTags
     options = tag.attr.dup
     result = []
     limit = options['limit'] ? options.delete('limit') : nil
-    attachments = tag.locals.page.page_attachments
-    attachments = attachments.find(:all, :limit => limit) if limit
-    attachments.each do |attachment|
-      tag.locals.asset = attachment.asset
+    offset = options['offset'] ? options.delete('offset') : :nil
+    assets = tag.locals.page.assets.find(:all, :limit => limit, :offset => offset)
+    assets.each do |asset|
+      tag.locals.asset = asset
       result << tag.expand
     end
     result
@@ -56,6 +56,18 @@ module AssetTags
      if asset == attachments.first.asset
        tag.expand
      end
+   end
+   
+   tag 'if_assets' do |tag|
+     count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 0
+     assets = tag.locals.page.assets.count
+     tag.expand if assets >= count
+   end
+   
+   tag 'unless_assets' do |tag|
+     count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 0
+     assets = tag.locals.page.assets.count
+     tag.expand unless assets >= count
    end
 
   desc %{
