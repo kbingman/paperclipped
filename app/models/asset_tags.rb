@@ -1,4 +1,7 @@
 module AssetTags
+  require "rubygems"
+  require "image_size"
+  
   include Radiant::Taggable
   
   class TagError < StandardError; end
@@ -21,7 +24,7 @@ module AssetTags
     Use the `limit' attribute to render a specific number of assets.
     
     *Usage:* 
-    <pre><code><r:assets:each [limit="5"]>...</r:assets:each></code></pre>
+    <pre><code><r:assets:each [limit="5"] [offset="0"]>...</r:assets:each></code></pre>
   }    
   tag 'assets:each' do |tag|
     options = tag.attr.dup
@@ -72,12 +75,69 @@ module AssetTags
      tag.expand if assets >= count
    end
    
-   desc %{The opposite of @<r:if_attachments/>@.}
+   desc %{
+     The opposite of @<r:if_attachments/>@.
+   }
    tag 'unless_assets' do |tag|
      count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 0
      assets = tag.locals.page.assets.count
      tag.expand unless assets >= count
    end
+
+    desc %{
+      Renders the value for a top padding for the image. Put the image in a container with specified height and using this tag you can vertically align the image within it's container.
+
+      *Usage*:
+      <pre><code><r:assets:top_padding container = "140" [size="icon"]/></code></pre>
+
+      *Working Example*:
+      <pre><code>
+        <ul>
+          <r:assets:each>
+            <li style="height:140px">
+              <img style="padding-top:<r:top_padding size='category' container='140' />px" 
+                   src="<r:url />" alt="<r:title />" />
+            </li>
+          </r:assets:each>
+        </ul>
+      </code></pre>
+    }
+    tag "assets:top_padding" do |tag|
+      raise TagError, "'container' attribute required" unless tag.attr['container']
+      options = tag.attr.dup
+      asset = find_asset(tag, options)
+      if asset.image?
+        size = options['size'] ? options.delete('size') : 'original'
+        container = options.delete('container')
+        root = "#{RAILS_ROOT}/public#{asset.thumbnail(size)}"
+        img_height = 0
+        open(root, "rb") do |fh|
+          img_height = ImageSize.new(fh.read).get_height
+        end
+        (container.to_i - img_height.to_i)/2
+      else
+        raise TagError, "Asset is not an image"
+      end
+    end
+   
+    ['height','width'].each do |att|
+      desc %{
+        Renders the #{att} of the asset.
+      }
+      tag "assets:#{att}" do |tag|
+        options = tag.attr.dup
+        asset = find_asset(tag, options)
+        if asset.image?
+          size = options['size'] ? options.delete('size') : 'original'
+          root = "#{RAILS_ROOT}/public#{asset.thumbnail(size)}"
+          open(root, "rb") do |fh|
+            ImageSize.new(fh.read).send("get_#{att}")
+          end
+        else
+          raise TagError, "Asset is not an image"
+        end
+      end
+    end
 
   desc %{
     Renders the containing elements only if the asset's content type matches the regular expression given in the matches attribute.
