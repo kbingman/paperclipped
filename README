@@ -3,6 +3,9 @@ Paperclipped
 
 Paperclip is a new file management plugin from Thoughtbot which has a  few advantages over attachment_fu: it doesn't use RMagick, which uses a lot of RAM and is a bit of overkill for just making thumbnails. Instead it directly uses ImageMagick, making it much easier to install. 
 
+###(Forked)
+
+This version of paperclipped adds UI regions to the admin interface for the benefit of eg. multisite and other admin extensions.
 
 ###Installation
 
