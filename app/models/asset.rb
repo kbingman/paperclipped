@@ -88,7 +88,7 @@ class Asset < ActiveRecord::Base
       self.asset.url
     else
       if self.pdf?
-        self.asset.url(size.to_sym)
+        "/images/assets/pdf_#{size.to_s}.png"
       elsif self.movie?
         "/images/assets/movie_#{size.to_s}.png"
       elsif self.audio?
