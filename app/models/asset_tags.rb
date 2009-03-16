@@ -1,7 +1,4 @@
 module AssetTags
-  require "rubygems"
-  require "image_size"
-  
   include Radiant::Taggable
   
   class TagError < StandardError; end
@@ -129,10 +126,7 @@ module AssetTags
         asset = find_asset(tag, options)
         if asset.image?
           size = options['size'] ? options.delete('size') : 'original'
-          root = "#{RAILS_ROOT}/public#{asset.thumbnail(size)}"
-          open(root, "rb") do |fh|
-            ImageSize.new(fh.read).send("get_#{att}")
-          end
+          asset.send(att, size)
         else
           raise TagError, "Asset is not an image"
         end

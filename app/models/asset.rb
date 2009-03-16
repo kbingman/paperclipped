@@ -131,6 +131,24 @@ class Asset < ActiveRecord::Base
     define_method("#{content}?") { self.class.send("#{content}?", asset_content_type) }
   end
   
+  def dimensions(size='original')
+    @dimensions ||= {}
+    @dimensions[size] ||= image? && begin
+      image_file = "#{RAILS_ROOT}/public#{thumbnail(size)}"
+      image_size = ImageSize.new(open(image_file).read)
+      [image_size.get_width, image_size.get_height]
+    rescue
+      [0, 0]
+    end
+  end
+  
+  def width(size='original')
+    image? && self.dimensions(size)[0]
+  end
+  
+  def height(size='original')
+    image? && self.dimensions(size)[1]
+  end
   
   private
   
