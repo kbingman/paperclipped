@@ -23,7 +23,7 @@ module AssetTags
     Use `extensions` attribute to specify which assets to be rendered.
     
     *Usage:* 
-    <pre><code><r:assets:each [limit=0] [offset=0] [by="position|title|..."] [order="asc|desc"] [extensions="png|pdf|doc"]>...</r:assets:each></code></pre>
+    <pre><code><r:assets:each [limit=0] [offset=0] [order="asc|desc"] [by="position|title|..."] [extensions="png|pdf|doc"]>...</r:assets:each></code></pre>
   }    
   tag 'assets:each' do |tag|
     options = tag.attr.dup
@@ -104,7 +104,7 @@ module AssetTags
       options = tag.attr.dup
       asset = find_asset(tag, options)
       if asset.image?
-        size = options['size'] ? options.delete('size') : 'original'
+        size = options['size'] ? options.delete('size') : 'icon'
         container = options.delete('container')
         root = "#{RAILS_ROOT}/public#{asset.thumbnail(size)}"
         img_height = 0
