@@ -5,7 +5,12 @@ Paperclip is a new file management plugin from Thoughtbot which has a  few advan
 
 ###(Forked)
 
-This version of paperclipped adds UI regions to the admin interface for the benefit of eg. multisite and other admin extensions.
+This version of paperclipped adds UI regions to the admin interface for the benefit of eg. multisite and other admin extensions. It also adds a named_scope for each of the existing asset categories (images, movies, etc), so that you can:
+  
+  @page.assets.images
+  @page.assets.movies
+
+etc. Audio pluralizes badly to audios, but never mind.
 
 ###Installation
 
