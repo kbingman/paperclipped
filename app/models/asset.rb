@@ -50,21 +50,28 @@ class Asset < ActiveRecord::Base
     def types_to_conditions(types)
       types.collect! { |t| '(' + send("#{t}_condition") + ')' }
     end
+    
+    def thumbnail_sizes
+      if Radiant::Config.table_exists? && Radiant::Config["assets.additional_thumbnails"]
+        thumbnails = Radiant::Config["assets.additional_thumbnails"].split(', ').collect{|s| s.split('=')}.inject({}) {|ha, (k, v)| ha[k.to_sym] = v; ha}
+      else
+        thumbnails = {}
+      end
+      thumbnails[:icon] = ['42x42#', :png]
+      thumbnails[:thumbnail] = ['100x100>', :png]
+      thumbnails
+    end
+    
+    def thumbnail_names
+      thumbnail_sizes.keys
+    end
   end
   
   
   order_by 'title'
-  
-  if Radiant::Config.table_exists? && Radiant::Config["assets.additional_thumbnails"]
-    thumbnails = Radiant::Config["assets.additional_thumbnails"].split(', ').collect{|s| s.split('=')}.inject({}) {|ha, (k, v)| ha[k.to_sym] = v; ha}
-  else
-    thumbnails = {}
-  end
-  thumbnails[:icon] = ['42x42#', :png]
-  thumbnails[:thumbnail] = ['100x100>', :png]
-  
+    
   has_attached_file :asset,
-                    :styles => thumbnails,
+                    :styles => thumbnail_sizes,
                     :whiny_thumbnails => false,
                     :url => "/:class/:id/:basename:no_original_style.:extension",
                     :path => ":rails_root/public/:class/:id/:basename:no_original_style.:extension"
@@ -81,11 +88,8 @@ class Asset < ActiveRecord::Base
   validates_attachment_size :asset, 
     :less_than => Radiant::Config["assets.max_asset_size"].to_i.megabytes if Radiant::Config.table_exists? && Radiant::Config["assets.max_asset_size"]
     
-    
   before_save :assign_title
-  
-  
-  
+    
   def thumbnail(size = nil)
     if size == 'original' or size.nil?
       self.asset.url
