@@ -14,6 +14,9 @@ class Asset < ActiveRecord::Base
     'audio%', 'video%', (extra_content_types[:movie] + extra_content_types[:audio] + image_content_types)]).freeze
   cattr_reader *%w(movie audio image other).collect! { |t| "#{t}_condition".to_sym }
   
+  %w(movie audio image other).each do |type|
+    named_scope type.pluralize.intern, :conditions => self.send("#{type}_condition".intern)
+  end
   
   class << self
     def image?(asset_content_type)
