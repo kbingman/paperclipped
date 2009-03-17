@@ -35,6 +35,18 @@ class AssetsController < ApplicationController
         flash[:notice] = "Asset successfully uploaded."
         redirect_to(@page ? edit_admin_page_url(@page) : (params[:continue] ? edit_asset_path(@asset) : assets_path)) 
       }
+      format.js {
+        responds_to_parent do
+          render :update do |page|
+            page.call('Asset.ChooseTabByName', 'page-attachments')
+            page.insert_html :bottom, "attachments", :partial => 'assets/asset', :object => @asset, :locals => {:dom_id => "attachment_#{@asset.id}" }    # can i be bothered to find the attachment id?
+            page.call('Asset.AddAsset', "attachment_#{@asset.id}")
+            # we ought to reinitialise the sortable attachments too
+            page.visual_effect :highlight, "attachment_#{@asset.id}" 
+            page.call('Asset.ResetForm')
+          end
+        end          
+      }
     end
      
   end

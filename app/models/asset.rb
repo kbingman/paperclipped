@@ -50,7 +50,7 @@ class Asset < ActiveRecord::Base
     def types_to_conditions(types)
       types.collect! { |t| '(' + send("#{t}_condition") + ')' }
     end
-    
+            
     def thumbnail_sizes
       if Radiant::Config.table_exists? && Radiant::Config["assets.additional_thumbnails"]
         thumbnails = Radiant::Config["assets.additional_thumbnails"].split(', ').collect{|s| s.split('=')}.inject({}) {|ha, (k, v)| ha[k.to_sym] = v; ha}

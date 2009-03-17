@@ -5,9 +5,9 @@
 
 #asset-tabs
   - if @page && !@page.new_record? 
-    %a.asset-tab.here{ :href => "#bucket" } Bucket
-    %a.asset-tab{ :href => "#page-attachments" } Attached Assets
-    %a.asset-tab{ :href => "#upload-assets" } Upload
+    %a.asset-tab.here{ :href => "#bucket", :id => "tab_bucket" } Bucket
+    %a.asset-tab{ :href => "#page-attachments", :id => "tab_page-attachments" } Attached Assets
+    %a.asset-tab{ :href => "#upload-assets", :id => "tab_upload-assets" } Upload
     // %a.asset-tab{ :href => "#search-assets" } Search
   - else
     %a.asset-tab.here{ :href => "#" } Bucket
