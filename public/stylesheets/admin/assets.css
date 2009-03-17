@@ -88,6 +88,12 @@ table#site-map td.assets, table#site-map th.assets  { text-align: right; border:
 #upload-form .file { padding: 10px 10px 5px; }
 #upload-form .upload-buttons { padding: 0 10px; font-size: 80%; }
 #upload-form label { margin-bottom: 5px; display: block; font-weight: bold; margin-left: 10px;  }
+#upload-form iframe { width: 1px; height: 1px; border: 0; }
+
+#asset-upload .spinner { display: none; width: 16px; height: 16px; background-image: url(/images/admin/spinner.gif);}
+#asset-upload.waiting { color: #666;}
+#asset-upload.waiting .spinner { display: block;}
+#asset-upload.waiting .button { display: none;}
 
 #filesearchform { margin-bottom: 18px; }
 #filesearchform #search p input{ margin: -3px 0 -3px; padding: 1px; }

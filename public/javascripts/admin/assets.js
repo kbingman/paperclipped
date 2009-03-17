@@ -3,11 +3,11 @@ document.observe("dom:loaded", function() {
     Droppables.add(box, {
       accept: 'asset',
       onDrop: function(element) {
-        var link = element.select('a.bucket_link')[0]
+        var link = element.select('a.bucket_link')[0];
         var asset_id = element.id.split('_').last();
         var classes = element.className.split(' ');
         var tag_type = classes[0];
-        var tag = '<r:assets:' + tag_type + ' id="' + asset_id + '" size="original" />'
+        var tag = '<r:assets:' + tag_type + ' id="' + asset_id + '" size="original" />';
         //Form.Element.focus(box);
       	if(!!document.selection){
       		box.focus();
@@ -23,7 +23,7 @@ document.observe("dom:loaded", function() {
       }
     });
   });      
-  if($('asset-bucket')){
+  if($('#asset-bucket')){
     new Draggable('asset-bucket', { starteffect: false, endeffect: false });
   }
   
@@ -34,25 +34,35 @@ var Asset = {};
 Asset.Tabs = Behavior.create({
   onclick: function(e){
     e.stop();
-
-    var pane = $(this.element.href.split('#')[1]);
-    var panes = $('assets').select('.pane');
-    
-    var tabs = $('asset-tabs').select('.asset-tab');
-    tabs.each(function(tab) {tab.removeClassName('here')});
-    
-    this.element.addClassName('here');;
-    panes.each(function(pane) {Element.hide(pane)});
-    Element.show($(pane));
+    Asset.ChooseTab(this.element);
   }
 });
+
+// factored out so that it can be called in an ajax response
+
+Asset.ChooseTab = function (element) {
+  var pane = $(element.href.split('#')[1]);
+  var panes = $('assets').select('.pane');
+  
+  var tabs = $('asset-tabs').select('.asset-tab');
+  tabs.each(function(tab) {tab.removeClassName('here');});
+  
+  element.addClassName('here');;
+  panes.each(function(pane) {Element.hide(pane);});
+  Element.show($(pane));
+}
+
+Asset.ChooseTabByName = function (tabname) {
+  var element = $('tab_' + tabname);
+  Asset.ChooseTab(element);
+}
 
 Asset.ShowBucket = Behavior.create({
   onclick: function(e){
     e.stop();
     var element = $('asset-bucket');
     center(element);
-    element.toggle();
+    element.show();
   }
 });
 
@@ -70,7 +80,7 @@ Asset.FileTypes = Behavior.create({
     var element = this.element;
     var type_id = element.text.downcase();
     var type_check = $(type_id + '-check');
-    var search_form = $('filesearchform')
+    var search_form = $('filesearchform');
     if(element.hasClassName('pressed')) {
       element.removeClassName('pressed');
       type_check.removeAttribute('checked');
@@ -88,11 +98,35 @@ Asset.FileTypes = Behavior.create({
   }
 });
 
+Asset.WaitingForm = Behavior.create({
+  onsubmit: function(e){
+    this.element.addClassName('waiting');
+    return true;
+  }
+});
+
+Asset.ResetForm = function (name) {
+  var element = $('asset-upload');
+  element.removeClassName('waiting');
+  element.reset();
+}
+
+Asset.AddAsset = function (name) {
+  element = $(name); 
+  asset = element.select('.asset')[0];
+  console.log('inserted element is ', element);
+  console.log('contained asset is ', asset);
+  if (asset) {
+    new Draggable(asset, { revert: true });
+  }
+}
+
 Event.addBehavior({
   '#asset-tabs a'     : Asset.Tabs,
   '#close-link a'     : Asset.HideBucket,
   '#show-bucket a'    : Asset.ShowBucket,
-  '#filesearchform a' : Asset.FileTypes
+  '#filesearchform a' : Asset.FileTypes,
+  '#asset-upload'     : Asset.WaitingForm
 });
 
 
