@@ -52,8 +52,8 @@
     %tbody
       - unless @assets.empty?
         - for asset in @assets 
-          - render_region :tbody do |tbody|
-            %tr.node.level-1
+          %tr.node.level-1
+            - render_region :tbody do |tbody|
               - tbody.thumbnail_cell do
                 %td.asset
                   - asset_id = "asset_#{asset.id.to_s}"
