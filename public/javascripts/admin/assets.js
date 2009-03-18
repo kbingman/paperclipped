@@ -23,7 +23,7 @@ document.observe("dom:loaded", function() {
       }
     });
   });      
-  if($('#asset-bucket')){
+  if($('asset-bucket')){
     new Draggable('asset-bucket', { starteffect: false, endeffect: false });
   }
   
@@ -52,7 +52,7 @@ Asset.ShowBucket = Behavior.create({
     e.stop();
     var element = $('asset-bucket');
     center(element);
-    element.show();
+    element.toggle();
   }
 });
 
