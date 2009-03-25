@@ -1,5 +1,5 @@
 document.observe("dom:loaded", function() {
-  if($('#asset-bucket')){
+  if($('#asset-bucket').length > 0){
     new Draggable('asset-bucket', { starteffect: false, endeffect: false });
   }
 });

@@ -41,7 +41,7 @@
       %tr
         - render_region :thead do |thead|
           - thead.thumbnail_header do
-            %th.asset Image
+            %th.asset Ass
           - thead.title_header do
             %th.asset-title Title
           - thead.content_type_header do
@@ -78,16 +78,14 @@
           %td.note{ :colspan => "5" } 
             No Assets
 
-  - render_region :pagination do
-    = will_paginate @assets
+  = will_paginate @assets
 
   %script{ :type => "text/javascript"}
     // <! [CDATA[
     new RuledTable('assets')
     //]  
       
-- render_region :assets_container do
-  = render :partial => 'assets_container'
+= render :partial => 'assets_container'
   
 - render_region :bottom do |bottom|
   - bottom.regenerate do

@@ -98,15 +98,18 @@ class AssetsController < ApplicationController
     @asset = Asset.find(params[:asset])
     @page = Page.find(params[:page])
     @page.assets << @asset unless @page.assets.include?(@asset)
+    ResponseCache.instance.clear
     render :update do |page|
       page[:attachments].replace_html "#{render :partial => 'page_assets', :locals => {:page => @page}}"
     end
+    
   end
   
   def remove_asset    
     @asset = Asset.find(params[:asset])
     @page = Page.find(params[:page])
     @page.assets.delete(@asset)
+    ResponseCache.instance.clear
     render :nothing => true
   end
   
@@ -116,6 +119,7 @@ class AssetsController < ApplicationController
       page_attachment.position = idx+1
       page_attachment.save
     end
+    ResponseCache.instance.clear
     render :nothing => true
   end
   
@@ -125,6 +129,7 @@ class AssetsController < ApplicationController
     if request.post?
       session[:bucket].delete(@asset.asset.url) if session[:bucket] && session[:bucket].key?(@asset.asset.url)
       @asset.destroy
+      ResponseCache.instance.clear
       redirect_to assets_path
     end 
   end
