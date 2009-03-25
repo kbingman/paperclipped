@@ -22,6 +22,11 @@ class PaperclippedExtension < Radiant::Extension
   
   def activate
     require_dependency 'application'
+
+    unless defined? admin.asset
+      Radiant::AdminUI.send :include, AssetsAdminUI
+      admin.asset = Radiant::AdminUI.load_default_asset_regions   # UI is a singleton and already loaded
+    end
     
     %w{page}.each do |view|
       admin.send(view).edit.add :main, "/assets/show_bucket_link", :before => "edit_header"
