@@ -19,6 +19,10 @@ class AssetsController < ApplicationController
         @asset.pages << @page
       end
     end
+
+    after :create_fails do
+
+    end
     
     after :update do
       ResponseCache.instance.clear
@@ -40,15 +44,30 @@ class AssetsController < ApplicationController
           render :update do |page|
             page.call('Asset.ChooseTabByName', 'page-attachments')
             page.insert_html :bottom, "attachments", :partial => 'assets/asset', :object => @asset, :locals => {:dom_id => "attachment_#{@asset.id}" }    # can i be bothered to find the attachment id?
-            page.call('Asset.AddAsset', "attachment_#{@asset.id}")
-            # we ought to reinitialise the sortable attachments too
+            page.call('Asset.AddAsset', "attachment_#{@asset.id}")          # we ought to reinitialise the sortable attachments too
             page.visual_effect :highlight, "attachment_#{@asset.id}" 
             page.call('Asset.ResetForm')
           end
         end          
       }
     end
-     
+    response_for :create_fails do |format|
+      format.html { 
+        flash[:error] = "Asset not uploaded."
+        render :action => 'new'
+      }
+      format.js {
+        responds_to_parent do
+          render :update do |page|
+            page.call('Asset.ClearErrors')
+            page.insert_html :top, "asset-upload", :partial => 'assets/errors'
+            page.call('Asset.ChooseTabByName', 'upload-assets')
+            page.visual_effect :highlight, "asset_errors"
+            page.call('Asset.ReactivateForm');
+          end
+        end          
+      }
+    end
   end
   
   def regenerate_thumbnails

@@ -94,6 +94,11 @@ table#site-map td.assets, table#site-map th.assets  { text-align: right; border:
 #asset-upload.waiting { color: #666;}
 #asset-upload.waiting .spinner { display: block;}
 #asset-upload.waiting .button { display: none;}
+#asset-upload p#asset_errors { 
+  color: #c00;
+  background: white;
+  margin: 6px 0 4px 0;
+}
 
 #filesearchform { margin-bottom: 18px; }
 #filesearchform #search p input{ margin: -3px 0 -3px; padding: 1px; }
