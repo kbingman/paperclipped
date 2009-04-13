@@ -7,10 +7,7 @@ Paperclip is a new file management plugin from Thoughtbot which has a  few advan
 
 This version of paperclipped adds:
 
-* inline file uploads in the bucket
-* UI regions to the admin interface for the benefit of eg. multisite and other admin extensions
-* named_scope for each of the existing asset categories (images, movies, etc), so that you can get @page.assets.images (audio pluralizes badly to audios, but never mind)
-* an Asset.thumbnail_sizes method that other extensions can use to display the size options
+* error reports if inline file uploads fail (eg they exceed the file size limit)
 
 ###Installation
 
