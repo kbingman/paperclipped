@@ -157,6 +157,40 @@ class Asset < ActiveRecord::Base
     image? && self.dimensions(size)[1]
   end
   
+  def self.search(search, filter, page)  
+    unless search.blank?
+
+      search_cond_sql = []
+      search_cond_sql << 'LOWER(asset_file_name) LIKE (:term)'
+      search_cond_sql << 'LOWER(title) LIKE (:term)'
+      search_cond_sql << 'LOWER(caption) LIKE (:term)'
+
+      cond_sql = search_cond_sql.join(" or ")
+    
+      @conditions = [cond_sql, {:term => "%#{search.downcase}%" }]
+    else
+      @conditions = []
+    end
+    
+    options = { :conditions => @conditions,
+                :order => 'created_at DESC',
+                :page => page,
+                :per_page => 10 }
+    
+    @file_types = filter.blank? ? [] : filter.keys
+    if not @file_types.empty?
+      options[:total_entries] = count_by_conditions
+      Asset.paginate_by_content_types(@file_types, :all, options )
+    else
+      Asset.paginate(:all, options)
+    end
+  end
+  
+  def self.count_by_conditions()
+    type_conditions = @file_types.blank? ? nil : Asset.types_to_conditions(@file_types.dup).join(" OR ")
+    @count_by_conditions ||= @conditions.empty? ? Asset.count(:all, :conditions => type_conditions) : Asset.count(:all, :conditions => @conditions)
+  end  
+  
   private
   
     def assign_title

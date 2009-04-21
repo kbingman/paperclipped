@@ -156,38 +156,7 @@ class AssetsController < ApplicationController
   protected
   
     def current_objects
-      unless params['search'].blank?
-        term = params['search'].downcase
-
-        search_cond_sql = []
-        cond_params = {}
-      
-        search_cond_sql << 'LOWER(asset_file_name) LIKE (:term)'
-        search_cond_sql << 'LOWER(title) LIKE (:term)'
-        search_cond_sql << 'LOWER(caption) LIKE (:term)'
-
-        cond_sql = search_cond_sql.join(" or ")
-      
-        cond_params[:term] = "%#{term}%"
-      
-        @conditions = [cond_sql, cond_params]
-      else
-        @conditions = []
-      end
-      
-      @file_types = params[:filter].blank? ? [] : params[:filter].keys
-
-      if not @file_types.empty?
-        Asset.paginate_by_content_types(@file_types, :all, :conditions => @conditions, :order => 'created_at DESC', 
-          :page => params[:page], :per_page => 10, :total_entries => count_by_conditions)
-      else
-        Asset.paginate(:all, :conditions => @conditions, :order => 'created_at DESC', :page => params[:page], :per_page => 10)
-      end
-    end
-    
-    def count_by_conditions
-      type_conditions = @file_types.blank? ? nil : Asset.types_to_conditions(@file_types.dup).join(" OR ")
-      @count_by_conditions ||= @conditions.empty? ? Asset.count(:all, :conditions => type_conditions) : Asset.count(:all, :conditions => @conditions)
+      Asset.search(params['search'], params['filter'], params['page'])
     end
 
 end
