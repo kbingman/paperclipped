@@ -111,7 +111,7 @@ The path setting, along with a new <code>url</code> setting can be used with the
 
 ###Migrating from the page_attachments extension
 
-If you're moving from page_attachments to paperclipped, here's how to migrate smoothly;
+If you're moving from page_attachments to paperclipped, here's how to migrate smoothly:
 
 First, remove or disable the page_attachments extension, and install the paperclipped extension.
 For example:
