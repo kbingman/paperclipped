@@ -81,6 +81,7 @@ class Asset < ActiveRecord::Base
                     :bucket => Radiant::Config["assets.s3.bucket"],
                     :url => Radiant::Config["assets.url"] ? Radiant::Config["assets.url"] : "/:class/:id/:basename:no_original_style.:extension", 
                     :path => Radiant::Config["assets.path"] ? Radiant::Config["assets.path"] : ":rails_root/public/:class/:id/:basename:no_original_style.:extension"
+
                                  
   has_many :page_attachments, :dependent => :destroy
   has_many :pages, :through => :page_attachments
@@ -114,6 +115,7 @@ class Asset < ActiveRecord::Base
     end
   end
   
+<<<<<<< HEAD:app/models/asset.rb
   def generate_style(name, args={}) 
     size = args[:size] 
     format = args[:format] || :jpg
@@ -123,6 +125,23 @@ class Asset < ActiveRecord::Base
       self.asset.reprocess!
     else
       return false
+=======
+  def generate_thumbnail(name, args)
+    path = File.join(RAILS_ROOT, 'public', self.asset(:original))
+    self.asset do 
+      path = File.join(RAILS_ROOT, 'public', self.asset(:original))
+      begin
+        dimensions, format = args
+        dimensions = dimensions.call(instance) if dimensions.respond_to? :call
+        @queued_for_write[name] = Paperclip::Thumbnail.make(File.new(path), 
+                                                 dimensions,
+                                                 format, 
+                                                 @whiny_thumnails)
+      rescue PaperclipError => e
+        @errors << e.message if @whiny_thumbnails
+      end
+      attachment.save
+>>>>>>> c0219823a541f30d617d197809a960d009068ea8:app/models/asset.rb
     end
   end
   
