@@ -1,0 +1,14 @@
+- unless @page.assets.empty?
+  - @page.page_attachments.each do |a|
+    = render :partial => 'assets/asset', :object => a.asset, :locals => { :dom_id => "attachment_#{a.id}" }
+- else
+  %li
+    %p.note You have no attached assets.
+    
+%script{ :type => "text/javascript" }
+  $$('#assets .asset').each(function(element){
+  new Draggable(element, { revert: true });
+  element.addClassName('move');
+  });
+
+= sortable_element 'attachments', :url => reorder_assets_url(@page), :constraint => 'horizontal', :handle => 'reorder', :ghosting => false, :complete => visual_effect(:highlight, 'assets')
