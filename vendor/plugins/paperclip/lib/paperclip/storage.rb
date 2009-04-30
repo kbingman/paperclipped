@@ -175,7 +175,7 @@ module Paperclip
       end
       
       def exists?(style = default_style)
-        s3_bucket.key(path(style)) ? true : false
+        s3_bucket.key(path(style)).exists? ? true : false
       end
 
       def s3_protocol

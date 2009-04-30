@@ -5,7 +5,7 @@ include UrlAdditions
 class PaperclippedExtension < Radiant::Extension
   version "1.0"
   description "Assets extension based on the lightweight Paperclip plugin."
-  url "http://github.com/thoughtbot/paperclip/tree/master"
+  url "http://kbingman.com/assets"
   
   define_routes do |map|
     map.resources :assets, :path_prefix => "/admin"

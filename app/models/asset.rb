@@ -118,11 +118,11 @@ class Asset < ActiveRecord::Base
     size = args[:size] 
     format = args[:format] || :jpg
     asset = self.asset
-    if !asset.exists?(name.to_sym)
+    if asset.exists?(name.to_sym)
+      return false
+    else
       self.asset.styles[name.to_sym] = {:geometry => size, :format => format, :whiny => true, :convert_options=>"", :processors=>[:thumbnail]} 
       self.asset.reprocess!
-    else
-      return false
     end
   end
   
