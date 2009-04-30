@@ -89,25 +89,8 @@ Also, for vertical centering of images, you have the handy `<r:assets:top_paddin
       </r:assets:each>
     </ul>
    
-    
-###Using Amazon s3
-Everything works as before, but now if you want to add S3 support, you simply set the storage setting to "s3". 
 
-<pre><code>Radiant::Config[assets.storage] = "s3"</code></pre>
- 
-Then add 3 new settings with your Amazon credentials, either in the console or with the [Settings](http://github.com/Squeegy/radiant-settings/tree/master) extension:
 
-<pre><code>Radiant::Config[assets.s3.bucket] = "my_supercool_bucket"
-Radiant::Config[assets.s3.key] = "123456"
-Radiant::Config[assets.s3.secret] = "123456789ABCDEF"
-</code></pre>
-
-and finally the path you want to use within your bucket, which uses the same notation as the Paperclip plugin.
-
-<pre><code>Radiant::Config[assets.path] = :class/:id/:basename_:style.:extension 
-</code></pre>
-
-The path setting, along with a new <code>url</code> setting can be used with the file system to customize both the path and url of your assets.
 
 ###Migrating from the page_attachments extension
 
@@ -116,16 +99,33 @@ If you're moving from page_attachments to paperclipped, here's how to migrate sm
 First, remove or disable the page_attachments extension, and install the paperclipped extension.
 For example:
 
-<pre><code>rake ray:dis name=page_attachments
-rake ray:assets
-</code></pre>
+    rake ray:dis name=page_attachments
+    rake ray:assets
     
-  
 The migration has now copied your original `page_attachments` table to `old_page_attachments`.
 
-<pre><code>rake radiant:extensions:paperclipped:migrate_from_page_attachments
-</code></pre>
+    rake radiant:extensions:paperclipped:migrate_from_page_attachments
   
 This rake task will create paperclipped-style attachments for all `OldPageAttachments`. It will also ask you if you want to clean up the old table and thumbnails in `/public/page_attachments`.
 
 Done!
+
+
+###Using Amazon s3
+Everything works as before, but now if you want to add S3 support, you simply set the storage setting to "s3". 
+
+    Radiant::Config[assets.storage] = "s3"
+
+Then add 3 new settings with your Amazon credentials, either in the console or with the [Settings](http://github.com/Squeegy/radiant-settings/tree/master) extension:
+
+    Radiant::Config[assets.s3.bucket] = "my_supercool_bucket"
+    Radiant::Config[assets.s3.key] = "123456"
+    Radiant::Config[assets.s3.secret] = "123456789ABCDEF"
+
+and finally the path you want to use within your bucket, which uses the same notation as the Paperclip plugin.
+
+<pre><code>Radiant::Config[assets.path] = :class/:id/:basename_:style.:extension 
+</code></pre>
+
+The path setting, along with a new <code>url</code> setting can also be used with the file system to customize both the path and url of your assets.
+
