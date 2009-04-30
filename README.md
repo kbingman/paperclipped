@@ -68,8 +68,7 @@ Another important tag is the <code><r:assets:each>...</r:assets:each></code>. If
 * `order` and `by` lets you control sorting;
 * `extensions` allows you to filter assets by file extensions; you can specify multiple extensions separated by `|`.
 
-<code><pre>`<r:if_assets [min_count="0"]>` and `<r:unless_assets [min_count="0"]>` 
-</code></pre>
+`<r:if_assets [min_count="0"]>` and `<r:unless_assets [min_count="0"]>` 
   
 conditional tags let you optionally render content based on the existance of tags. They accept the same options as `<r:assets:each>`.
 
@@ -79,7 +78,6 @@ You can access sizes of image assets for various versions with the tags `<r:asse
 
 Also, for vertical centering of images, you have the handy `<r:assets:top_padding container="<container height>" [size="icon"]/>` tag. Working example:
   
-
     <ul>
       <r:assets:each>
         <li style="height:140px">
@@ -88,9 +86,6 @@ Also, for vertical centering of images, you have the handy `<r:assets:top_paddin
         </li>
       </r:assets:each>
     </ul>
-   
-
-
 
 ###Migrating from the page_attachments extension
 
