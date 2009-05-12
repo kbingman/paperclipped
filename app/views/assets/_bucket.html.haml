@@ -1,20 +1,10 @@
 %ul#bucket_list
   - if session[:bucket]
     - session[:bucket].each do |url, info| 
-      - dom_id = "bucket_#{info[:id]}"
-      %li
-        - asset_type = info[:type]
-        %div{ :class => "#{asset_type} asset", :id => dom_id }
-          = link_to image_tag(info[:thumbnail]), url, :onclick => "return false;", :title => info[:title], :class => "bucket_link"
-        .info{ :id => "#{dom_id}_info" }
-          = link_to "edit", edit_asset_url(info[:id]), :id => "edit_asset", :title => "Edit #{info[:title]}"
-          - if @page && !@page.new_record?
-            
-            = link_to_remote "add", :html => { :id => "add_asset", :title => "Attach to page" }, :url => attach_page_asset_url(:asset => info[:id], :page => @page.id), |
-                                             :after => "Element.highlight('assets');" |
-
+      = render :partial => 'assets/bucket_asset', :locals => { :asset_url => url, :asset_id => info[:id], :asset_type => info[:type], :asset_title => info[:title], :asset_thumbnail =>info[:thumbnail], :page => @page }
   - else
     %li
       %p.note Your bucket is empty
       
+ 
 

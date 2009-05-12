@@ -1,4 +1,4 @@
-require_dependency 'application'
+# require_dependency 'application'
 require File.dirname(__FILE__) + '/lib/url_additions'
 include UrlAdditions
 
@@ -21,7 +21,7 @@ class PaperclippedExtension < Radiant::Extension
   end
   
   def activate
-    require_dependency 'application'
+    # require_dependency 'application'
 
     Radiant::AdminUI.send :include, AssetsAdminUI unless defined? admin.asset # UI is a singleton and already loaded
     admin.asset = Radiant::AdminUI.load_default_asset_regions

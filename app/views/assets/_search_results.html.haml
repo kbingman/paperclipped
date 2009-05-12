@@ -1,18 +1,16 @@
 %ul#search_list
   - unless @assets.empty?
     - @assets.each do |asset| 
-      - dom_id = "asset_#{asset.id}"
-      %li.asset{ :id => dom_id }
-        = link_to image_tag(asset.thumbnail(:thumbnail)), asset.thumbnail, :onclick => "return false;", :title => asset.title, :class => "bucket_link"
-        .info{ :id => "#{dom_id}_info", :style => "display: none" }
-          %strong
-            = link_to asset.title, edit_asset_url(asset)
-          %br
-          = link_to "Original URL", asset.thumbnail
-          %br
-          = link_to "Thumbnail", asset.thumbnail(:thumbnail)
-          %br
-          = link_to_remote "Attach image", :url => attach_page_asset_url(:asset => asset.id, :page => @asset_page.id),:after => "Effect.Fade('#{dom_id}_info', { duration: 0.3 }); Element.highlight('assets');" 
+      =# render :partial => 'asset', :locals => { :asset => asset, :page => @page }
+      = render :partial => 'assets/bucket_asset', :locals => { :asset_url => asset.asset.url, :asset_id => asset.id, :asset_type => 'image', :asset_title => asset.title, :asset_thumbnail => asset.thumbnail(:thumbnail), :page => @page }
+
   - else
     %li
       %p.note There were no assets found
+      
+%script
+  Asset.MakeDroppables();
+  Asset.MakeDraggables();
+  Event.addBehavior({ '.asset a' : Asset.DisableLinks, 'a.add_asset' : Asset.AddToPage });
+
+  
