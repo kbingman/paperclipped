@@ -2,6 +2,7 @@ document.observe("dom:loaded", function() {
   if($('asset-bucket')){
     new Draggable('asset-bucket', { starteffect: false, endeffect: false });
   }
+  Asset.ChooseTabByName('page-attachments');
 });
 
 var Asset = {};
@@ -33,6 +34,33 @@ Asset.ChooseTabByName = function (tabname) {
 }
 
 // factored out so that it can be called after new page part creation
+
+Asset.MakeDraggables = function () { 
+  $$('div.asset').each(function(element){
+    new Draggable(element, { revert: true });
+    element.addClassName('move');
+  });
+}
+
+Asset.DisableLinks = Behavior.create({
+  onclick: function(e){
+    e.stop();
+  }
+});
+
+Asset.AddToPage = Behavior.create({
+  onclick: function(e){
+    e.stop();
+    url = this.element.href;
+    new Ajax.Updater('attachments', url, {
+      asynchronous : true, 
+      evalScripts  : true, 
+      method       : 'get'
+      // onComplete   : Element.highlight('page-attachments')
+    });
+    
+  }
+});
 
 Asset.MakeDroppables = function () {
   $$('.textarea').each(function(box){
@@ -113,10 +141,6 @@ Asset.WaitingForm = Behavior.create({
   }
 });
 
-Asset.ReactivateForm = function () {
-  $('asset-upload').removeClassName('waiting');
-}
-
 Asset.ResetForm = function (name) {
   var element = $('asset-upload');
   element.removeClassName('waiting');
@@ -126,14 +150,11 @@ Asset.ResetForm = function (name) {
 Asset.AddAsset = function (name) {
   element = $(name); 
   asset = element.select('.asset')[0];
+  console.log('inserted element is ', element);
+  console.log('contained asset is ', asset);
   if (asset) {
     new Draggable(asset, { revert: true });
   }
-}
-
-Asset.ClearErrors = function () {
-  errorblock = $('asset_errors');
-  if (errorblock) errorblock.remove();
 }
 
 Event.addBehavior({
@@ -141,5 +162,7 @@ Event.addBehavior({
   '#close-link a'     : Asset.HideBucket,
   '#show-bucket a'    : Asset.ShowBucket,
   '#filesearchform a' : Asset.FileTypes,
-  '#asset-upload'     : Asset.WaitingForm
+  '#asset-upload'     : Asset.WaitingForm,
+  'div.asset a'       : Asset.DisableLinks,
+  'a.add_asset'       : Asset.AddToPage
 });
