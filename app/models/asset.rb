@@ -59,7 +59,7 @@ class Asset < ActiveRecord::Base
   has_attached_file :asset,
                     :styles => thumbnail_sizes,
                     :whiny_thumbnails => false,
-                    :storage => Radiant::Config["assets.storage"].downcase == "s3" ? :s3 : :filesystem, 
+                    :storage => Radiant::Config["assets.storage"] == "s3" ? :s3 : :filesystem, 
                     :s3_credentials => {
                       :access_key_id => Radiant::Config["assets.s3.key"],
                       :secret_access_key => Radiant::Config["assets.s3.secret"]
