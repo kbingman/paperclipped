@@ -3,7 +3,7 @@ Paperclipped
 
 ## IMPORTANT!
 
-This version of Paperclipped requires Radiant 0.8.0 RC1 or higher. Changes in the caching system and the updgrade to Rails 2.3.2 break the extension. If you want to use Paperclipped with 0.7.1 please use the tagged version marked 0.7.1.
+This version of Paperclipped requires Radiant 0.8.0 RC1 or higher. Changes in the caching system and the updgrade to Rails 2.3.2 break the previous versions of the extension. If you want to use Paperclipped with 0.7.1 please use the tagged version marked 0.7.1.
 
 Paperclip is a new file management plugin from Thoughtbot which has a  few advantages over attachment_fu: it doesn't use RMagick, which uses a lot of RAM and is a bit of overkill for just making thumbnails. Instead it directly uses ImageMagick, making it much easier to install. 
 
