@@ -12,6 +12,7 @@
             %label{ :for => "asset_caption" } Caption
           %td.field
             = f.text_field :caption, :class => 'textbox', :maxlength => 255 
+        = render_region :extended_metadata
     %p
       %small
         %a{ :id => "more-extended-metadata", :href => "#", :onclick => "#{toggle_javascript_for('extended-metadata')}; return false;" } More

@@ -28,8 +28,13 @@
           = save_model_button(@asset)
           = save_model_and_continue_editing_button(@asset)
           or
+          = link_to_remote 'Add asset to Bucket', :url => add_bucket_url(:id => @asset)
+          or
           = link_to "Cancel", assets_url
-
+          
+  - main.assets_container do
+    = render :partial => 'assets_container'
+    
   - main.edit_regenerate do
     - if current_user.admin? or current_user.developer?
       %p 

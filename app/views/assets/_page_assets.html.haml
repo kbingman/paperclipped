@@ -6,9 +6,6 @@
     %p.note You have no attached assets.
     
 %script{ :type => "text/javascript" }
-  $$('#assets .asset').each(function(element){
-  new Draggable(element, { revert: true });
-  element.addClassName('move');
-  });
+  Asset.MakeDraggables();
 
 = sortable_element 'attachments', :url => reorder_assets_url(@page), :constraint => 'horizontal', :handle => 'reorder', :ghosting => false, :complete => visual_effect(:highlight, 'assets')

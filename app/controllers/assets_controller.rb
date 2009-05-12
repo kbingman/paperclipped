@@ -9,10 +9,24 @@ class AssetsController < ApplicationController
           @asset_page = Page.find(params[:asset_page])
           render :partial => 'assets/search_results.html.haml', :layout => false
         else
-          render :partial => 'assets/asset_table.html.haml', :layout => false
+          render :partial => 'assets/asset_table.html.haml', :locals => { :assets => @assets }, :layout => false
         end
       }
     end
+    
+    before :index do
+      @template_name = 'index'
+      if params[:asset_page]
+        @page = Page.find(params[:asset_page])
+      end
+    end
+    before :edit do
+      @template_name = 'edit'
+    end
+    before :new do
+      @template_name = 'edit'
+    end
+    
     after :create do
       if params[:page]
         @page = Page.find(params[:page])
@@ -25,9 +39,9 @@ class AssetsController < ApplicationController
     end
     
     after :update do
-      ResponseCache.instance.clear
+      clear_model_cache
     end
-    
+        
     response_for :update do |format|
       format.html { 
         flash[:notice] = "Asset successfully updated."
@@ -44,7 +58,7 @@ class AssetsController < ApplicationController
           render :update do |page|
             page.call('Asset.ChooseTabByName', 'page-attachments')
             page.insert_html :bottom, "attachments", :partial => 'assets/asset', :object => @asset, :locals => {:dom_id => "attachment_#{@asset.id}" }    # can i be bothered to find the attachment id?
-            page.call('Asset.AddAsset', "attachment_#{@asset.id}")          # we ought to reinitialise the sortable attachments too
+            page.call('Asset.AddAsset', "attachment_#{@asset.id}")  # we ought to reinitialise the sortable attachments too
             page.visual_effect :highlight, "attachment_#{@asset.id}" 
             page.call('Asset.ResetForm')
           end
@@ -117,10 +131,11 @@ class AssetsController < ApplicationController
     @asset = Asset.find(params[:asset])
     @page = Page.find(params[:page])
     @page.assets << @asset unless @page.assets.include?(@asset)
-    ResponseCache.instance.clear
-    render :update do |page|
-      page[:attachments].replace_html "#{render :partial => 'page_assets', :locals => {:page => @page}}"
-    end
+    clear_model_cache
+    render :partial => 'page_assets', :locals => { :page => @page }
+    # render :update do |page|
+    #   page[:attachments].replace_html "#{render :partial => 'page_assets', :locals => {:page => @page}}"
+    # end
     
   end
   
@@ -128,7 +143,7 @@ class AssetsController < ApplicationController
     @asset = Asset.find(params[:asset])
     @page = Page.find(params[:page])
     @page.assets.delete(@asset)
-    ResponseCache.instance.clear
+    clear_model_cache
     render :nothing => true
   end
   
@@ -138,17 +153,16 @@ class AssetsController < ApplicationController
       page_attachment.position = idx+1
       page_attachment.save
     end
-    ResponseCache.instance.clear
+    clear_model_cache
     render :nothing => true
   end
   
   def remove 
     @asset = Asset.find(params[:id])
-    # This is a temporary measure! It is not very RESTful, but I like the confirm page... 
     if request.post?
       session[:bucket].delete(@asset.asset.url) if session[:bucket] && session[:bucket].key?(@asset.asset.url)
       @asset.destroy
-      ResponseCache.instance.clear
+      clear_model_cache
       redirect_to assets_path
     end 
   end
@@ -156,7 +170,11 @@ class AssetsController < ApplicationController
   protected
   
     def current_objects
-      Asset.search(params['search'], params['filter'], params['page'])
+      Asset.search(params[:search], params[:filter], params[:page])
+    end
+    
+    def clear_model_cache
+      Radiant::Cache.clear if defined?(Radiant::Cache)
     end
 
 end

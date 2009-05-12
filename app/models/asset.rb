@@ -1,22 +1,4 @@
 class Asset < ActiveRecord::Base
-  # used for extra mime types that dont follow the convention
-  @@image_content_types = ['image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/jpg']
-  @@extra_content_types = { :audio => ['application/ogg'], :movie => ['application/x-shockwave-flash'], :pdf => ['application/pdf'] }.freeze
-  cattr_reader :extra_content_types, :image_content_types
-
-  # use #send due to a ruby 1.8.2 issue
-  @@image_condition = send(:sanitize_sql, ['asset_content_type IN (?)', image_content_types]).freeze
-  @@movie_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'video%', extra_content_types[:movie]]).freeze
-  @@audio_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'audio%', extra_content_types[:audio]]).freeze
-  
-  @@other_condition = send(:sanitize_sql, [
-    'asset_content_type NOT LIKE ? AND asset_content_type NOT LIKE ? AND asset_content_type NOT IN (?)',
-    'audio%', 'video%', (extra_content_types[:movie] + extra_content_types[:audio] + image_content_types)]).freeze
-  cattr_reader *%w(movie audio image other).collect! { |t| "#{t}_condition".to_sym }
-  
-  %w(movie audio image other).each do |type|
-    named_scope type.pluralize.intern, :conditions => self.send("#{type}_condition".intern)
-  end
   
   class << self
     def image?(asset_content_type)
@@ -50,10 +32,10 @@ class Asset < ActiveRecord::Base
     def types_to_conditions(types)
       types.collect! { |t| '(' + send("#{t}_condition") + ')' }
     end
-            
+    
     def thumbnail_sizes
       if Radiant::Config.table_exists? && Radiant::Config["assets.additional_thumbnails"]
-        thumbnails = Radiant::Config["assets.additional_thumbnails"].split(', ').collect{|s| s.split('=')}.inject({}) {|ha, (k, v)| ha[k.to_sym] = v; ha}
+        thumbnails = additional_thumbnails
       else
         thumbnails = {}
       end
@@ -61,19 +43,23 @@ class Asset < ActiveRecord::Base
       thumbnails[:thumbnail] = ['100x100>', :png]
       thumbnails
     end
-    
+
     def thumbnail_names
       thumbnail_sizes.keys
     end
+    
+    private
+      def additional_thumbnails
+        Radiant::Config["assets.additional_thumbnails"].gsub(' ','').split(',').collect{|s| s.split('=')}.inject({}) {|ha, (k, v)| ha[k.to_sym] = v; ha}
+      end
   end
   
-  
-  order_by 'title'
+  # order_by 'title'
     
   has_attached_file :asset,
                     :styles => thumbnail_sizes,
                     :whiny_thumbnails => false,
-                    :storage => Radiant::Config["assets.storage"] == "s3" ? :s3 : :filesystem, 
+                    :storage => Radiant::Config["assets.storage"].downcase == "s3" ? :s3 : :filesystem, 
                     :s3_credentials => {
                       :access_key_id => Radiant::Config["assets.s3.key"],
                       :secret_access_key => Radiant::Config["assets.s3.secret"]
@@ -90,27 +76,20 @@ class Asset < ActiveRecord::Base
   
   validates_attachment_presence :asset, :message => "You must choose a file to upload!"
   validates_attachment_content_type :asset, 
-    :content_type => Radiant::Config["assets.content_types"].split(', ') if Radiant::Config.table_exists? && Radiant::Config["assets.content_types"] && Radiant::Config["assets.skip_filetype_validation"] == nil
+    :content_type => Radiant::Config["assets.content_types"].gsub(' ','').split(',') if Radiant::Config.table_exists? && Radiant::Config["assets.content_types"] && Radiant::Config["assets.skip_filetype_validation"] == nil
   validates_attachment_size :asset, 
     :less_than => Radiant::Config["assets.max_asset_size"].to_i.megabytes if Radiant::Config.table_exists? && Radiant::Config["assets.max_asset_size"]
     
   before_save :assign_title
     
-  def thumbnail(size = nil)
-    if size == 'original' or size.nil?
-      self.asset.url
+  def thumbnail(size='original')
+    case 
+      when self.pdf?   : "/images/assets/pdf_#{size.to_s}.png"
+      when self.movie? : "/images/assets/movie_#{size.to_s}.png"
+      when self.audio? : "/images/assets/audio_#{size.to_s}.png"
+      when self.other? : "/images/assets/doc_#{size.to_s}.png"
     else
-      if self.pdf?
-        "/images/assets/pdf_#{size.to_s}.png"
-      elsif self.movie?
-        "/images/assets/movie_#{size.to_s}.png"
-      elsif self.audio?
-        "/images/assets/audio_#{size.to_s}.png"
-      elsif self.other?
-        "/images/assets/doc_#{size.to_s}.png"
-      else
-        self.asset.url(size.to_sym)
-      end
+      self.asset.url(size.to_sym)
     end
   end
   
@@ -118,10 +97,8 @@ class Asset < ActiveRecord::Base
     size = args[:size] 
     format = args[:format] || :jpg
     asset = self.asset
-    if asset.exists?(name.to_sym)
-      return false
-    else
-      self.asset.styles[name.to_sym] = {:geometry => size, :format => format, :whiny => true, :convert_options=>"", :processors=>[:thumbnail]} 
+    unless asset.exists?(name.to_sym)
+      self.asset.styles[name.to_sym] = { :geometry => size, :format => format, :whiny => true, :convert_options => "", :processors => [:thumbnail] } 
       self.asset.reprocess!
     end
   end
@@ -141,7 +118,7 @@ class Asset < ActiveRecord::Base
   def dimensions(size='original')
     @dimensions ||= {}
     @dimensions[size] ||= image? && begin
-      image_file = "#{RAILS_ROOT}/public#{thumbnail(size)}"
+      image_file = self.path(size)
       image_size = ImageSize.new(open(image_file).read)
       [image_size.get_width, image_size.get_height]
     rescue
@@ -191,13 +168,31 @@ class Asset < ActiveRecord::Base
     @count_by_conditions ||= @conditions.empty? ? Asset.count(:all, :conditions => type_conditions) : Asset.count(:all, :conditions => @conditions)
   end  
   
+  # used for extra mime types that do not follow the convention
+  @@image_content_types = ['image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/jpg']
+  @@extra_content_types = { :audio => ['application/ogg'], 
+                            :movie => ['application/x-shockwave-flash'], 
+                            :pdf => ['application/pdf'] }.freeze
+  cattr_reader :extra_content_types, :image_content_types
+
+  # use #send due to a ruby 1.8.2 issue
+  @@image_condition = send(:sanitize_sql, ['asset_content_type IN (?)', image_content_types]).freeze
+  @@movie_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'video%', extra_content_types[:movie]]).freeze
+  @@audio_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'audio%', extra_content_types[:audio]]).freeze
+  
+  @@other_condition = send(:sanitize_sql, [
+    'asset_content_type NOT LIKE ? AND asset_content_type NOT LIKE ? AND asset_content_type NOT IN (?)',
+    'audio%', 'video%', (extra_content_types[:movie] + extra_content_types[:audio] + image_content_types)]).freeze
+  cattr_reader *%w(movie audio image other).collect! { |t| "#{t}_condition".to_sym }
+  
+  %w(movie audio image other).each do |type|
+    named_scope type.pluralize.intern, :conditions => self.send("#{type}_condition".intern)
+  end
+  
   private
   
     def assign_title
       self.title = basename if title.blank?
     end
     
-    def additional_thumbnails
-      Radiant::Config["assets.additional_thumbnails"].split(',').collect{|s| s.split('=')}.inject({}) {|ha, (k.to_sym, v)| ha[k] = v; ha}
-    end
 end

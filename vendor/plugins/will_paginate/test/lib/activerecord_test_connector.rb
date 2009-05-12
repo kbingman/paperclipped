@@ -16,16 +16,20 @@ class ActiveRecordTestConnector
     unless self.connected || !self.able_to_connect
       setup_connection
       load_schema
-      Dependencies.load_paths.unshift FIXTURES_PATH
+      add_load_path FIXTURES_PATH
       self.connected = true
     end
   rescue Exception => e  # errors from ActiveRecord setup
-    $stderr.puts "\nSkipping ActiveRecord tests: #{e}"
-    $stderr.puts "Install SQLite3 to run the full test suite for will_paginate.\n\n"
+    $stderr.puts "\nSkipping ActiveRecord tests: #{e}\n\n"
     self.able_to_connect = false
   end
 
   private
+  
+  def self.add_load_path(path)
+    dep = defined?(ActiveSupport::Dependencies) ? ActiveSupport::Dependencies : ::Dependencies
+    dep.load_paths.unshift path
+  end
 
   def self.setup_connection
     db = ENV['DB'].blank?? 'sqlite3' : ENV['DB']
@@ -36,6 +40,8 @@ class ActiveRecordTestConnector
     
     ActiveRecord::Base.logger = Logger.new(STDOUT) if $0 == 'irb'
     puts "using #{configuration['adapter']} adapter" unless ENV['DB'].blank?
+    
+    gem 'sqlite3-ruby' if 'sqlite3' == db
     
     ActiveRecord::Base.establish_connection(configuration)
     ActiveRecord::Base.configurations = { db => configuration }
