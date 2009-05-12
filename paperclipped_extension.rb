@@ -37,7 +37,7 @@ class PaperclippedExtension < Radiant::Extension
     }
 
     # connect UserActionObserver with my models 
-    UserActionObserver.instance.send :add_observer!, Asset 
+    # UserActionObserver.instance.send :add_observer!, Asset 
     
     # This is just needed for testing if you are using mod_rails
     if Radiant::Config.table_exists? && Radiant::Config["assets.image_magick_path"]

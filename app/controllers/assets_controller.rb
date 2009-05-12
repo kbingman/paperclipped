@@ -1,4 +1,5 @@
 class AssetsController < ApplicationController
+  helper :assets
   
   make_resourceful do 
     actions :all
