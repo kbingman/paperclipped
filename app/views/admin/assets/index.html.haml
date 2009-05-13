@@ -11,11 +11,11 @@
       Click on a asset name below to edit it or click <code>Remove</code> to delete it.
 
   - preamble.new_button do
-    %p= link_to image_tag('assets/new-asset.png', :alt => 'New Asset'), new_asset_path
+    %p= link_to image_tag('assets/new-asset.png', :alt => 'New Asset'), new_admin_asset_path
 
   - preamble.filters do
     %p
-      - form_tag(assets_url,:id => 'filesearchform', :method => 'get') do
+      - form_tag(admin_assets_path,:id => 'filesearchform', :method => 'get') do
         %span
           = link_to "Images", "#"
         %span
@@ -46,5 +46,5 @@
     - if current_user.admin?
       %p 
         You can regenerate all thumbnails here. Beware that this will take a while and consume considerable resources on your server. 
-      - form_tag refresh_assets_path do
+      - form_tag refresh_admin_assets_path do
         %input.button{ :type => "submit", :value => "Regenerate" }

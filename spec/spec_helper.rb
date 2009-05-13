@@ -4,8 +4,9 @@ unless defined? RADIANT_ROOT
   require "#{File.expand_path(File.dirname(__FILE__) + "/../../../../")}/config/environment"
 end
 
-
 require 'spec/rails'
+
+require File.expand_path(File.dirname(__FILE__) + "/blueprints")
 
 Spec::Runner.configure do |config|
   # config.use_transactional_fixtures = true

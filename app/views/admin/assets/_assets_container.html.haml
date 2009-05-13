@@ -28,7 +28,7 @@
             %span#clear-bucket
               = link_to_remote('Clear Bucket', {:url => clear_bucket_url} )
         - bucket_pane.bucket do 
-          = render :partial => "assets/bucket"
+          = render :partial => "admin/assets/bucket"
         - bucket_pane.bucket_bottom do 
           .clear
 
@@ -43,26 +43,27 @@
                 Attached assets. These can be inserted with drag and drop 
                 or shown with the <code>&lt;r:assets:each /&gt;</code> tag.
             %ul#attachments
-              = render :partial => "assets/page_assets" 
+              = render :partial => "admin/assets/page_assets" 
             .clear
       
         - asset_panes.upload do
           #upload-assets.pane
             %p
               %span.note Assets uploaded here will be automatically associated with this page.
-            = render :partial => "assets/upload_to_page"
+            = render :partial => "admin/assets/upload_to_page"
             .clear
           
         - asset_panes.search do
           #search-assets.pane
-            %p
-              %label.note{ :for => 'search' } Search for assets 
-              %input{ :type => "hidden", :name => "search", :value => @page.id }
-              %input{ :type => "search", :id => "search", :name => "search" }
-              = submit_tag "Search"
+            - form_tag do
+              %p
+                %label.note{ :for => 'search' } Search for assets 
+                %input{ :type => "hidden", :name => "search", :value => @page.id }
+                %input{ :type => "search", :id => "search", :name => "search" }
+                = submit_tag "Search"
             #search-results
             .clear
-            = observe_field 'search',  :frequency => 1, :update => 'search-results', :url =>  assets_path(:asset_page => @page), :method => 'get', :with => "'search=' + escape(value)"
+            = observe_field 'search',  :frequency => 1, :update => 'search-results', :url =>  admin_assets_path(:asset_page => @page), :method => 'get', :with => "'search=' + escape(value)"
 
 
     

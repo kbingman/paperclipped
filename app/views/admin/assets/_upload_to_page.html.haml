@@ -1,5 +1,5 @@
 #upload-form
-  - form_for :asset, :url => formatted_assets_path(:page => @page, :format => 'js'), :html => { :id => 'asset-upload', :method => "post", :multipart => true, :target => 'ulframe' } do |form|
+  - form_for :asset, :url => admin_assets_path(:page => @page, :format => 'js'), :html => { :id => 'asset-upload', :method => "post", :multipart => true, :target => 'ulframe' } do |form|
     %div.file
       %label.upload Choose a file to upload
       = form.file_field :asset, :class => "", :style => "width: 100%"

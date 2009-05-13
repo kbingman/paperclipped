@@ -19,10 +19,10 @@
             - tbody.thumbnail_cell do
               %td.asset
                 - asset_id = "asset_#{asset.id.to_s}"
-                = link_to image_tag(asset.thumbnail(:icon)), edit_asset_url(:id => asset), :class => 'icon'
+                = link_to image_tag(asset.thumbnail(:icon)), edit_admin_asset_path(asset), :class => 'icon'
             - tbody.title_cell do
               %td.asset-title
-                = link_to asset.title, edit_asset_url(:id => asset.id) 
+                = link_to asset.title, edit_admin_asset_path(asset) 
                 &nbsp;
                 %span.caption
                   = asset.caption
@@ -34,7 +34,7 @@
                 = link_to_remote(image_tag('assets/add-to-bucket.png', :alt => 'Add to Bucket'), :url => add_bucket_url(:id => asset))
             - tbody.remove_cell do
               %td.remove
-                = link_to image_tag('admin/remove.png', :alt => 'Remove Asset'), remove_asset_url(:id => asset)
+                = link_to image_tag('admin/remove.png', :alt => 'Remove Asset'), remove_admin_asset_path(asset)
     - else
       %tr
         %td.note{ :colspan => "5" } 

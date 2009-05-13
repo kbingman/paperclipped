@@ -1,4 +1,4 @@
-class AssetsController < ApplicationController
+class Admin::AssetsController < ApplicationController
   helper :assets
   
   make_resourceful do 
@@ -8,9 +8,9 @@ class AssetsController < ApplicationController
       format.js {
         if params[:asset_page]
           @asset_page = Page.find(params[:asset_page])
-          render :partial => 'assets/search_results.html.haml', :layout => false
+          render :partial => 'admin/assets/search_results.html.haml', :layout => false
         else
-          render :partial => 'assets/asset_table.html.haml', :locals => { :assets => @assets }, :layout => false
+          render :partial => 'admin/assets/asset_table.html.haml', :locals => { :assets => @assets }, :layout => false
         end
       }
     end
@@ -46,13 +46,13 @@ class AssetsController < ApplicationController
     response_for :update do |format|
       format.html { 
         flash[:notice] = "Asset successfully updated."
-        redirect_to(params[:continue] ? edit_asset_path(@asset) : assets_path) 
+        redirect_to(params[:continue] ? edit_admin_asset_path(@asset) : assets_path) 
       }
     end
     response_for :create do |format|
       format.html { 
         flash[:notice] = "Asset successfully uploaded."
-        redirect_to(@page ? edit_admin_page_url(@page) : (params[:continue] ? edit_asset_path(@asset) : assets_path)) 
+        redirect_to(@page ? edit_admin_page_path(@page) : (params[:continue] ? edit_admin_asset_path(@asset) : admin_assets_path)) 
       }
       format.js {
         responds_to_parent do
@@ -85,7 +85,7 @@ class AssetsController < ApplicationController
     end
   end
   
-  def regenerate_thumbnails
+  def refresh
     if request.post? 
       unless params[:id]
         @assets = Asset.find(:all)
@@ -100,7 +100,7 @@ class AssetsController < ApplicationController
         @asset.asset.reprocess!
         @asset.save
         flash[:notice] = "Thumbnails successfully refreshed."
-        redirect_to edit_asset_path(@asset)
+        redirect_to edit_admin_asset_path(@asset)
       end
     else
       render "Do not access this url directly"

@@ -6,7 +6,7 @@
     %h1= "Edit Asset"
   
   - main.edit_form do
-    - form_for :asset, :url => asset_path(@asset), :html => { :method => "put", :multipart => true } do |f|
+    - form_for :asset, :url => admin_asset_path(@asset), :html => { :method => "put", :multipart => true } do |f|
       .form-area
         = render :partial => "form", :locals => { :f => f }
   
@@ -28,9 +28,9 @@
           = save_model_button(@asset)
           = save_model_and_continue_editing_button(@asset)
           or
-          = link_to_remote 'Add asset to Bucket', :url => add_bucket_url(:id => @asset)
+          = link_to_remote 'Add asset to Bucket', :url => add_bucket_path(:id => @asset)
           or
-          = link_to "Cancel", assets_url
+          = link_to "Cancel", admin_assets_path
           
   - main.assets_container do
     = render :partial => 'assets_container'
@@ -40,8 +40,9 @@
       %p 
         You can regenerate the asset thumbnails here. Beware that this will take a while and consume considerable resources on your server. 
 
-      - form_tag refresh_assets_path(@asset) do
+      - form_tag refresh_admin_assets_path do
         %p.asset-buttons
+          %input{ :type => "hidden", :name => "id", :value => @asset.id }
           %input.button{ :type => "submit", :value => "Regenerate" }
 
 

@@ -1,6 +1,6 @@
 - unless @page.assets.empty?
   - @page.page_attachments.each do |a|
-    = render :partial => 'assets/asset', :object => a.asset, :locals => { :dom_id => "attachment_#{a.id}" }
+    = render :partial => 'admin/assets/asset', :object => a.asset, :locals => { :dom_id => "attachment_#{a.id}" }
 - else
   %li
     %p.note You have no attached assets.
