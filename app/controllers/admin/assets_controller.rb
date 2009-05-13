@@ -160,12 +160,14 @@ class Admin::AssetsController < ApplicationController
   
   def remove 
     @asset = Asset.find(params[:id])
-    if request.post?
-      session[:bucket].delete(@asset.asset.url) if session[:bucket] && session[:bucket].key?(@asset.asset.url)
-      @asset.destroy
-      clear_model_cache
-      redirect_to assets_path
-    end 
+  end
+  
+  def destroy
+    @asset = Asset.find(params[:id])
+    session[:bucket].delete(@asset.asset.url) if session[:bucket] && session[:bucket].key?(@asset.asset.url)
+    @asset.destroy
+    clear_model_cache
+    redirect_to admin_assets_path
   end
   
   protected

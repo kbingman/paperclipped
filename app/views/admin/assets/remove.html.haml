@@ -16,7 +16,7 @@
         = @asset.title
 
 
-- form_tag do
+- form_for [:admin, @asset], :html => { :method => 'delete' } do
   %p.buttons
     %input.button{ :type => "submit", :value => "Delete Asset" }
     or
