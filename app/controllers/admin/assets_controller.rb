@@ -46,7 +46,7 @@ class Admin::AssetsController < ApplicationController
     response_for :update do |format|
       format.html { 
         flash[:notice] = "Asset successfully updated."
-        redirect_to(params[:continue] ? edit_admin_asset_path(@asset) : assets_path) 
+        redirect_to(params[:continue] ? edit_admin_asset_path(@asset) : admin_assets_path) 
       }
     end
     response_for :create do |format|
@@ -94,7 +94,7 @@ class Admin::AssetsController < ApplicationController
           asset.save
         end
         flash[:notice] = "Thumbnails successfully refreshed."
-        redirect_to assets_path
+        redirect_to admin_assets_path
       else
         @asset = Asset.find(params[:id])
         @asset.asset.reprocess!
