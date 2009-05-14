@@ -1,113 +1,43 @@
-class Admin::AssetsController < ApplicationController
-  helper :assets
-  
-  make_resourceful do 
-    actions :all
-    response_for :index do |format|
+class Admin::AssetsController < Admin::ResourceController
+    
+  def index 
+    @assets = Asset.search(params[:search], params[:filter], params[:page])
+    @page = Page.find(params[:asset_page]) if params[:asset_page]
+
+    respond_to do |format|
       format.html { render }
       format.js {
-        if params[:asset_page]
-          @asset_page = Page.find(params[:asset_page])
+        @template_name = 'index'
+        if !@page.nil?
           render :partial => 'admin/assets/search_results.html.haml', :layout => false
         else
           render :partial => 'admin/assets/asset_table.html.haml', :locals => { :assets => @assets }, :layout => false
         end
       }
     end
-    
-    before :index do
-      @template_name = 'index'
-      if params[:asset_page]
-        @page = Page.find(params[:asset_page])
-      end
-    end
-    before :edit do
-      @template_name = 'edit'
-    end
-    before :new do
-      @template_name = 'edit'
-    end
-    
-    after :create do
-      if params[:page]
-        @page = Page.find(params[:page])
-        @asset.pages << @page
-      end
-    end
-
-    after :create_fails do
-
-    end
-    
-    after :update do
-      clear_model_cache
-    end
-        
-    response_for :update do |format|
-      format.html { 
-        flash[:notice] = "Asset successfully updated."
-        redirect_to(params[:continue] ? edit_admin_asset_path(@asset) : admin_assets_path) 
-      }
-    end
-    response_for :create do |format|
-      format.html { 
-        flash[:notice] = "Asset successfully uploaded."
-        redirect_to(@page ? edit_admin_page_path(@page) : (params[:continue] ? edit_admin_asset_path(@asset) : admin_assets_path)) 
-      }
-      format.js {
-        responds_to_parent do
-          render :update do |page|
-            page.call('Asset.ChooseTabByName', 'page-attachments')
-            page.insert_html :bottom, "attachments", :partial => 'assets/asset', :object => @asset, :locals => {:dom_id => "attachment_#{@asset.id}" }    # can i be bothered to find the attachment id?
-            page.call('Asset.AddAsset', "attachment_#{@asset.id}")  # we ought to reinitialise the sortable attachments too
-            page.visual_effect :highlight, "attachment_#{@asset.id}" 
-            page.call('Asset.ResetForm')
-          end
-        end          
-      }
-    end
-    response_for :create_fails do |format|
-      format.html { 
-        flash[:error] = "Asset not uploaded."
-        render :action => 'new'
-      }
-      format.js {
-        responds_to_parent do
-          render :update do |page|
-            page.call('Asset.ClearErrors')
-            page.insert_html :top, "asset-upload", :partial => 'assets/errors'
-            page.call('Asset.ChooseTabByName', 'upload-assets')
-            page.visual_effect :highlight, "asset_errors"
-            page.call('Asset.ReactivateForm');
-          end
-        end          
-      }
-    end
   end
+    
   
+  # Refreshes the paperclip thumbnails
   def refresh
-    if request.post? 
-      unless params[:id]
-        @assets = Asset.find(:all)
-        @assets.each do |asset|
-          asset.asset.reprocess!
-          asset.save
-        end
-        flash[:notice] = "Thumbnails successfully refreshed."
-        redirect_to admin_assets_path
-      else
-        @asset = Asset.find(params[:id])
-        @asset.asset.reprocess!
-        @asset.save
-        flash[:notice] = "Thumbnails successfully refreshed."
-        redirect_to edit_admin_asset_path(@asset)
+    unless params[:id]
+      @assets = Asset.find(:all)
+      @assets.each do |asset|
+        asset.asset.reprocess!
       end
+      flash[:notice] = "Thumbnails successfully refreshed."
+      redirect_to admin_assets_path
     else
-      render "Do not access this url directly"
+      @asset = Asset.find(params[:id])
+      @asset.asset.reprocess!
+      flash[:notice] = "Thumbnail successfully refreshed."
+      redirect_to edit_admin_asset_path(@asset)
     end
-    
   end
   
+  
+  # Bucket related actions. These may need to be spun out into a seperate controller
+  # update?
   def add_bucket
     @asset = Asset.find(params[:id])
     if (session[:bucket] ||= {}).key?(@asset.asset.url)
@@ -128,6 +58,7 @@ class Admin::AssetsController < ApplicationController
     end
   end
   
+  # Attaches an asset to the current page
   def attach_asset
     @asset = Asset.find(params[:asset])
     @page = Page.find(params[:page])
@@ -137,9 +68,9 @@ class Admin::AssetsController < ApplicationController
     # render :update do |page|
     #   page[:attachments].replace_html "#{render :partial => 'page_assets', :locals => {:page => @page}}"
     # end
-    
   end
   
+  # Removes asset from the current page
   def remove_asset    
     @asset = Asset.find(params[:asset])
     @page = Page.find(params[:page])
@@ -158,26 +89,4 @@ class Admin::AssetsController < ApplicationController
     render :nothing => true
   end
   
-  def remove 
-    @asset = Asset.find(params[:id])
-  end
-  
-  def destroy
-    @asset = Asset.find(params[:id])
-    session[:bucket].delete(@asset.asset.url) if session[:bucket] && session[:bucket].key?(@asset.asset.url)
-    @asset.destroy
-    clear_model_cache
-    redirect_to admin_assets_path
-  end
-  
-  protected
-  
-    def current_objects
-      Asset.search(params[:search], params[:filter], params[:page])
-    end
-    
-    def clear_model_cache
-      Radiant::Cache.clear if defined?(Radiant::Cache)
-    end
-
 end
