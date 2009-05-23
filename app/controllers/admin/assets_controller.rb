@@ -1,4 +1,5 @@
 class Admin::AssetsController < Admin::ResourceController
+  skip_before_filter :verify_authenticity_token, :only => :create
     
   def index 
     @assets = Asset.search(params[:search], params[:filter], params[:page])
@@ -14,6 +15,35 @@ class Admin::AssetsController < Admin::ResourceController
           render :partial => 'admin/assets/asset_table.html.haml', :locals => { :assets => @assets }, :layout => false
         end
       }
+    end
+  end
+  
+  def create
+    @asset = Asset.new(params[:asset])
+    if @asset.save
+      if params[:page]
+        @page = Page.find(params[:page])
+        @asset.pages << @page
+      end
+      
+      respond_to do |format|
+        format.html { 
+          flash[:notice] = "Asset successfully uploaded."
+          redirect_to(@page ? edit_admin_page_path(@page) : (params[:continue] ? edit_admin_asset_path(@asset) : admin_assets_path)) 
+        }
+        format.js {
+          responds_to_parent do
+            render :update do |page|
+              @attachment = PageAttachment.find(:first, :conditions => { :page_id => @page.id, :asset_id => @asset.id })
+              page.call('Asset.ChooseTabByName', 'page-attachments')
+              page.insert_html :bottom, "attachments", :partial => 'admin/assets/asset', :locals => {:attachment => @attachment } 
+              page.call('Asset.AddAsset', "attachment_#{@attachment.id}")  # we ought to reinitialise the sortable attachments too
+              page.visual_effect :highlight, "attachment_#{@attachment.id}" 
+              page.call('Asset.ResetForm')
+            end
+          end
+        } 
+      end
     end
   end
     
