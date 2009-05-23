@@ -104,12 +104,13 @@ Radiant::Config[assets.s3.secret] = "123456789ABCDEF"
 
 and finally the path you want to use within your bucket, which uses the same notation as the Paperclip plugin.
 
-<pre><code>Radiant::Config[assets.s3.path] = :class/:id/:basename_:style.:extension 
+<pre><code>Radiant::Config[assets.path] = :class/:id/:basename_:style.:extension 
 </code></pre>
 
 The path setting, along with a new <code>url</code> setting can be used with the file system to customize both the path and url of your assets.
 
-###Migrating from the page_attachments extension
+
+### Migrating from the page_attachments extension
 
 If you're moving from page_attachments to paperclipped, here's how to migrate smoothly:
 
