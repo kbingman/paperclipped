@@ -67,7 +67,7 @@ module AssetTags
      <pre><code><r:if_assets [min_count="n"] [extensions="pdf|jpg"]>...</r:if_assets></code></pre>
    }
    tag 'if_assets' do |tag|
-     count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 0
+     count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 1
      assets = tag.locals.page.assets.count(:conditions => assets_find_options(tag)[:conditions])
      tag.expand if assets >= count
    end
@@ -76,7 +76,7 @@ module AssetTags
      The opposite of @<r:if_attachments/>@.
    }
    tag 'unless_assets' do |tag|
-     count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 0
+     count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 1
      assets = tag.locals.page.assets.count(:conditions => assets_find_options(tag)[:conditions])
      tag.expand unless assets >= count
    end
