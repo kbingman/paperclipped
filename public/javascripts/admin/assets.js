@@ -152,8 +152,10 @@ Asset.ResetForm = function (name) {
 Asset.AddAsset = function (name) {
   element = $(name); 
   asset = element.select('.asset')[0];
-  console.log('inserted element is ', element);
-  console.log('contained asset is ', asset);
+  if (window.console && window.console.log) {
+    console.log('inserted element is ', element);
+    console.log('contained asset is ', asset);
+  }
   if (asset) {
     new Draggable(asset, { revert: true });
   }
