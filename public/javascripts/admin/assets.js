@@ -2,7 +2,9 @@ document.observe("dom:loaded", function() {
   if($('asset-bucket')){
     new Draggable('asset-bucket', { starteffect: false, endeffect: false });
   }
-  Asset.ChooseTabByName('page-attachments');
+  if($('page-attachments')){
+    Asset.ChooseTabByName('page-attachments');
+  }
 });
 
 var Asset = {};
