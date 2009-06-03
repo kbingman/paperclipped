@@ -29,15 +29,6 @@ module AssetsAdminUI
               index.paginate
             end
             asset.remove = asset.index
-            page.edit = Radiant::AdminUI::RegionSet.new do |edit|
-              edit.main.concat %w{edit_header edit_form edit_popups }
-              edit.form.concat %w{edit_title edit_extended_metadata edit_page_parts}
-              edit.form_bottom.concat %w{edit_buttons}
-              edit.parts_bottom.concat %w{edit_layout_and_type edit_timestamp}
-              edit.asset_tabs.concat %w{attachment_tab upload_tab bucket_tab search_tab}
-              edit.bucket_pane.concat %w{bucket_notes bucket bucket_bottom}
-              edit.asset_panes.concat %w{page_attachments upload search}
-            end
           end
         end
       

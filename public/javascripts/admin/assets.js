@@ -2,7 +2,9 @@ document.observe("dom:loaded", function() {
   if($('asset-bucket')){
     new Draggable('asset-bucket', { starteffect: false, endeffect: false });
   }
-  Asset.ChooseTabByName('page-attachments');
+  if($('page-attachments')){
+    Asset.ChooseTabByName('page-attachments');
+  }
 });
 
 var Asset = {};
@@ -153,8 +155,10 @@ Asset.ResetForm = function (name) {
 Asset.AddAsset = function (name) {
   element = $(name); 
   asset = element.select('.asset')[0];
-  console.log('inserted element is ', element);
-  console.log('contained asset is ', asset);
+  if (window.console && window.console.log) {
+    console.log('inserted element is ', element);
+    console.log('contained asset is ', asset);
+  }
   if (asset) {
     new Draggable(asset, { revert: true });
   }
