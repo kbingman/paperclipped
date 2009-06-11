@@ -117,8 +117,19 @@ class Asset < ActiveRecord::Base
   
   def dimensions(size='original')
     @dimensions ||= {}
+    # ext = self.extension
+    
+    # image_file = self.asset.path
+    
+    # if size != 'original'
+    #   if !self.asset.styles[size.to_sym][:format].nil?
+    #     ext = self.asset.styles[size.to_sym][:format]
+    #   end
+    #   image_file = self.asset.path(size).gsub(/\.+#{self.extension}/, ".#{ext}")
+    # end
+
     @dimensions[size] ||= image? && begin
-      image_file = self.path(size)
+      image_file = "#{RAILS_ROOT}/public#{self.thumbnail(size)}"
       image_size = ImageSize.new(open(image_file).read)
       [image_size.get_width, image_size.get_height]
     rescue
