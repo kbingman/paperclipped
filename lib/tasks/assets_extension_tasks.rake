@@ -80,6 +80,7 @@ If you would like to use this mode type \"yes\", type \"no\" or just hit enter t
       
       desc "Migrates from old 'assets' extension."
       task :migrate_from_assets => :environment do
+        Asset.delete_all("thumbnail IS NOT NULL OR parent_id IS NOT NULL")
         ActiveRecord::Base.connection.tap do |c|
           c.rename_column :assets, :filename, :asset_file_name
           c.rename_column :assets, :content_type, :asset_content_type
