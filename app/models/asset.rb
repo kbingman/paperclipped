@@ -5,16 +5,25 @@ class Asset < ActiveRecord::Base
       image_content_types.include?(asset_content_type)
     end
     
+    # A “movie” can be a flash or a video file (retained for back-compat)
     def movie?(asset_content_type)
       asset_content_type.to_s =~ /^video/ || extra_content_types[:movie].include?(asset_content_type)
     end
-        
+    
+    def video?(asset_content_type)
+      asset_content_type.to_s =~ /^video/
+    end
+    
+    def flash?(asset_content_type)
+      flash_content_types.include?(asset_content_type)
+    end
+    
     def audio?(asset_content_type)
       asset_content_type.to_s =~ /^audio/ || extra_content_types[:audio].include?(asset_content_type)
     end
     
     def other?(asset_content_type)
-      ![:image, :movie, :audio].any? { |a| send("#{a}?", asset_content_type) }
+      !(kinds - [:other]).any? { |kind| send("#{kind}?", asset_content_type) }
     end
 
     def pdf?(asset_content_type)
@@ -87,6 +96,8 @@ class Asset < ActiveRecord::Base
     case 
       when self.pdf?   : "/images/assets/pdf_#{size.to_s}.png"
       when self.movie? : "/images/assets/movie_#{size.to_s}.png"
+      when self.video? : "/images/assets/movie_#{size.to_s}.png"
+      when self.flash? : "/images/assets/movie_#{size.to_s}.png" #TODO: special icon for flash-files
       when self.audio? : "/images/assets/audio_#{size.to_s}.png"
       when self.other? : "/images/assets/doc_#{size.to_s}.png"
     else
@@ -110,10 +121,6 @@ class Asset < ActiveRecord::Base
   
   def extension
     asset_file_name.split('.').last.downcase if asset_file_name
-  end
-  
-  [:movie, :audio, :image, :other, :pdf].each do |content|
-    define_method("#{content}?") { self.class.send("#{content}?", asset_content_type) }
   end
   
   def dimensions(size='original')
@@ -169,12 +176,15 @@ class Asset < ActiveRecord::Base
     @count_by_conditions ||= @conditions.empty? ? Asset.count(:all, :conditions => type_conditions) : Asset.count(:all, :conditions => @conditions)
   end  
   
+  @@kinds = [:image, :audio, :video, :flash, :pdf, :movie, :other]
+  
   # used for extra mime types that do not follow the convention
   @@image_content_types = ['image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/jpg']
+  @@flash_content_types = ['application/x-shockwave-flash']
   @@extra_content_types = { :audio => ['application/ogg'], 
                             :movie => ['application/x-shockwave-flash'], 
                             :pdf => ['application/pdf'] }.freeze
-  cattr_reader :extra_content_types, :image_content_types
+  cattr_reader :kinds, :extra_content_types, :flash_content_types, :image_content_types
 
   # use #send due to a ruby 1.8.2 issue
   @@image_condition = send(:sanitize_sql, ['asset_content_type IN (?)', image_content_types]).freeze
@@ -188,6 +198,10 @@ class Asset < ActiveRecord::Base
   
   %w(movie audio image other).each do |type|
     named_scope type.pluralize.intern, :conditions => self.send("#{type}_condition".intern)
+  end
+
+  kinds.each do |kind|
+    define_method("#{kind}?") { self.class.send("#{kind}?", asset_content_type) }
   end
   
   private
