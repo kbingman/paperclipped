@@ -1,4 +1,27 @@
 class Asset < ActiveRecord::Base
+  @@kinds = [:image, :audio, :video, :flash, :pdf, :movie, :other]
+  
+  # used for extra mime types that do not follow the convention
+  @@image_content_types = ['image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/jpg']
+  @@flash_content_types = ['application/x-shockwave-flash']
+  @@extra_content_types = { :audio => ['application/ogg'], 
+                            :movie => ['application/x-shockwave-flash'], 
+                            :pdf => ['application/pdf'] }.freeze
+  cattr_reader :kinds, :extra_content_types, :flash_content_types, :image_content_types
+
+  # use #send due to a ruby 1.8.2 issue
+  @@image_condition = send(:sanitize_sql, ['asset_content_type IN (?)', image_content_types]).freeze
+  @@movie_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'video%', extra_content_types[:movie]]).freeze
+  @@audio_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'audio%', extra_content_types[:audio]]).freeze
+  
+  @@other_condition = send(:sanitize_sql, [
+    'asset_content_type NOT LIKE ? AND asset_content_type NOT LIKE ? AND asset_content_type NOT IN (?)',
+    'audio%', 'video%', (extra_content_types[:movie] + extra_content_types[:audio] + image_content_types)]).freeze
+  cattr_reader *%w(movie audio image other).collect! { |t| "#{t}_condition".to_sym }
+  
+  %w(movie audio image other).each do |type|
+    named_scope type.pluralize.intern, :conditions => self.send("#{type}_condition".intern)
+  end
   
   class << self
     def image?(asset_content_type)
@@ -29,6 +52,35 @@ class Asset < ActiveRecord::Base
     def pdf?(asset_content_type)
       extra_content_types[:pdf].include? asset_content_type
     end
+    
+    def search(search, filter, page)
+      unless search.blank?
+
+        search_cond_sql = []
+        search_cond_sql << 'LOWER(asset_file_name) LIKE (:term)'
+        search_cond_sql << 'LOWER(title) LIKE (:term)'
+        search_cond_sql << 'LOWER(caption) LIKE (:term)'
+
+        cond_sql = search_cond_sql.join(" or ")
+
+        @conditions = [cond_sql, {:term => "%#{search.downcase}%" }]
+      else
+        @conditions = []
+      end
+
+      options = { :conditions => @conditions,
+                  :order => 'created_at DESC',
+                  :page => page,
+                  :per_page => 10 }
+
+      @file_types = filter.blank? ? [] : filter.keys
+      if not @file_types.empty?
+        options[:total_entries] = count_by_conditions
+        Asset.paginate_by_content_types(@file_types, :all, options )
+      else
+        Asset.paginate(:all, options)
+      end
+    end
 
     def find_all_by_content_types(types, *args)
       with_content_types(types) { find *args }
@@ -37,7 +89,12 @@ class Asset < ActiveRecord::Base
     def with_content_types(types, &block)
       with_scope(:find => { :conditions => types_to_conditions(types).join(' OR ') }, &block)
     end
-
+    
+    def count_by_conditions
+      type_conditions = @file_types.blank? ? nil : Asset.types_to_conditions(@file_types.dup).join(" OR ")
+      @count_by_conditions ||= @conditions.empty? ? Asset.count(:all, :conditions => type_conditions) : Asset.count(:all, :conditions => @conditions)
+    end
+    
     def types_to_conditions(types)
       types.collect! { |t| '(' + send("#{t}_condition") + ')' }
     end
@@ -141,69 +198,11 @@ class Asset < ActiveRecord::Base
   def height(size='original')
     image? && self.dimensions(size)[1]
   end
-  
-  def self.search(search, filter, page)  
-    unless search.blank?
-
-      search_cond_sql = []
-      search_cond_sql << 'LOWER(asset_file_name) LIKE (:term)'
-      search_cond_sql << 'LOWER(title) LIKE (:term)'
-      search_cond_sql << 'LOWER(caption) LIKE (:term)'
-
-      cond_sql = search_cond_sql.join(" or ")
-    
-      @conditions = [cond_sql, {:term => "%#{search.downcase}%" }]
-    else
-      @conditions = []
-    end
-    
-    options = { :conditions => @conditions,
-                :order => 'created_at DESC',
-                :page => page,
-                :per_page => 10 }
-    
-    @file_types = filter.blank? ? [] : filter.keys
-    if not @file_types.empty?
-      options[:total_entries] = count_by_conditions
-      Asset.paginate_by_content_types(@file_types, :all, options )
-    else
-      Asset.paginate(:all, options)
-    end
-  end
-  
-  def self.count_by_conditions()
-    type_conditions = @file_types.blank? ? nil : Asset.types_to_conditions(@file_types.dup).join(" OR ")
-    @count_by_conditions ||= @conditions.empty? ? Asset.count(:all, :conditions => type_conditions) : Asset.count(:all, :conditions => @conditions)
-  end  
-  
-  @@kinds = [:image, :audio, :video, :flash, :pdf, :movie, :other]
-  
-  # used for extra mime types that do not follow the convention
-  @@image_content_types = ['image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/jpg']
-  @@flash_content_types = ['application/x-shockwave-flash']
-  @@extra_content_types = { :audio => ['application/ogg'], 
-                            :movie => ['application/x-shockwave-flash'], 
-                            :pdf => ['application/pdf'] }.freeze
-  cattr_reader :kinds, :extra_content_types, :flash_content_types, :image_content_types
-
-  # use #send due to a ruby 1.8.2 issue
-  @@image_condition = send(:sanitize_sql, ['asset_content_type IN (?)', image_content_types]).freeze
-  @@movie_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'video%', extra_content_types[:movie]]).freeze
-  @@audio_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'audio%', extra_content_types[:audio]]).freeze
-  
-  @@other_condition = send(:sanitize_sql, [
-    'asset_content_type NOT LIKE ? AND asset_content_type NOT LIKE ? AND asset_content_type NOT IN (?)',
-    'audio%', 'video%', (extra_content_types[:movie] + extra_content_types[:audio] + image_content_types)]).freeze
-  cattr_reader *%w(movie audio image other).collect! { |t| "#{t}_condition".to_sym }
-  
-  %w(movie audio image other).each do |type|
-    named_scope type.pluralize.intern, :conditions => self.send("#{type}_condition".intern)
-  end
 
   kinds.each do |kind|
     define_method("#{kind}?") { self.class.send("#{kind}?", asset_content_type) }
   end
-  
+    
   private
   
     def assign_title
