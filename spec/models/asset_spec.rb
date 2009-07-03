@@ -29,7 +29,7 @@ describe Asset do
         it "should be an image if it has a content type of #{mime}" do
           new_asset(:asset_content_type => mime).should be_image
         end
-        (Asset.types - [:image]).each do |other|
+        (Asset.known_types - [:image]).each do |other|
           it "should not be #{other}" do
             new_asset(:asset_content_type => mime).send("#{other}?").should_not be_true
           end
@@ -78,9 +78,10 @@ describe Asset do
         new_asset(:asset_content_type => 'application/x-shockwave-flash').should be_movie
       end
       describe 'scope' do
-        it 'should only return swf and video assets' do
+        it 'should return swf and video assets, not others' do
+          create_asset :asset_content_type => 'audio/mpeg'
           qt = create_asset :asset_content_type => 'video/quicktime'
-          pdf = create_asset :asset_content_type => 'application/pdf'
+          create_asset :asset_content_type => 'application/pdf'
           swf = create_asset :asset_content_type => 'application/x-shockwave-flash'
           Asset.movies.should == [qt, swf]
         end
@@ -93,7 +94,7 @@ describe Asset do
       end
       
       describe 'scope' do
-        xit 'should only return swf assets' do
+        it 'should only return swf assets' do
           gif = create_asset :asset_content_type => 'image/gif'
           pdf = create_asset :asset_content_type => 'application/pdf'
           swf = create_asset :asset_content_type => 'application/x-shockwave-flash'
@@ -108,7 +109,7 @@ describe Asset do
       end
       
       describe 'scope' do
-        xit 'should only return video assets' do
+        it 'should only return video assets' do
           qt = create_asset :asset_content_type => 'video/quicktime'
           pdf = create_asset :asset_content_type => 'application/pdf'
           swf = create_asset :asset_content_type => 'application/x-shockwave-flash'
@@ -123,7 +124,7 @@ describe Asset do
       end
       
       describe 'scope' do
-        xit 'should only return pdf assets' do
+        it 'should only return pdf assets' do
           gif = create_asset :asset_content_type => 'image/gif'
           pdf = create_asset :asset_content_type => 'application/pdf'
           swf = create_asset :asset_content_type => 'application/x-shockwave-flash'
@@ -133,6 +134,14 @@ describe Asset do
     end
     
     describe 'other' do
+      it 'text document should be other' do
+        new_asset(:asset_content_type => 'text/plain').should be_other
+      end
+
+      it 'binary should be other' do
+        new_asset(:asset_content_type => 'application/octet-stream').should be_other
+      end
+      
       describe 'scope' do
         it 'should only return types not covered by other scopes' do
           # create_asset :asset_content_type => 'application/pdf'
@@ -141,10 +150,10 @@ describe Asset do
           create_asset :asset_content_type => 'image/gif'
           create_asset :asset_content_type => 'video/quicktime'
           create_asset :asset_content_type => 'audio/mpeg'
-          app = create_asset :asset_content_type => 'application/octet-stream'
+          bin = create_asset :asset_content_type => 'application/octet-stream'
           create_asset :asset_content_type => 'application/ogg'
           
-          Asset.others.should == [txt, app]
+          Asset.others.should == [txt, bin]
         end
       end
     end

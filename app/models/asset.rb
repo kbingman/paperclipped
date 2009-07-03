@@ -1,76 +1,46 @@
-class Asset < ActiveRecord::Base
-  @@types = {
-    :image => {
-      :content_types => ['image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/jpg']
-    },
-    :audio => {
-      :type => :audio,
-      :content_types => ['application/ogg'],
-    },
-    :video => {
-      :type => :video
-    },
-    :swf => {
-      :content_types => ['application/x-shockwave-flash']
-    },
-    :pdf => {
-      :content_types => ['application/pdf']
-    },
-    :movie => {
-      :type => :video,
-      :content_types => ['application/x-shockwave-flash']
-    },
-    :other => {}
-  }
-  
-  # use #send due to a ruby 1.8.2 issue
-  @@image_condition = send(:sanitize_sql, ['asset_content_type IN (?)', @@types[:image][:content_types]]).freeze
-  @@movie_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'video%', @@types[:movie][:content_types]]).freeze
-  @@audio_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'audio%', @@types[:audio][:content_types]]).freeze
+require 'mime_type_ext'
 
-  @@other_condition = send(:sanitize_sql, [
-    'asset_content_type NOT LIKE ? AND asset_content_type NOT LIKE ? AND asset_content_type NOT IN (?)',
-    'audio%', 'video%', (@@types[:movie][:content_types] + @@types[:audio][:content_types] + @@types[:image][:content_types])]).freeze
-  cattr_reader *%w(movie audio image other).collect! { |t| "#{t}_condition".to_sym }
+class Asset < ActiveRecord::Base
+  Mime::Type.register 'image/png', :image, %w[image/png image/x-png image/jpeg image/pjpeg image/jpg image/gif]
+  Mime::Type.register 'video/mpeg', :video, %w[video/mpeg video/mp4 video/ogg video/quicktime video/x-ms-wmv video/x-flv]
+  Mime::Type.register 'audio/mpeg', :audio, %w[audio/mpeg audio/ogg application/ogg audio/x-ms-wma audio/vnd.rn-realaudio audio/x-wav]
+  Mime::Type.register 'application/x-shockwave-flash', :swf
+  Mime::Type.register 'application/pdf', :pdf
+  # A “movie” can be a swf or a video file (retained for back-compat)
+  Mime::Type.register Mime::SWF.to_s, :movie, Mime::VIDEO.all_types
   
-  %w(movie audio image other).each do |type|
-    named_scope type.pluralize.intern, :conditions => self.send("#{type}_condition".intern)
-  end
-  
+  def self.known_types
+    [:image, :video, :audio, :swf, :pdf, :movie]
+  end  
+
   class << self
-    def types
-      @@types.keys
-    end
-    
-    def image?(asset_content_type)
-      @@types[:image][:content_types].include?(asset_content_type)
-    end
-    
-    # A “movie” can be a swf or a video file (retained for back-compat)
-    def movie?(asset_content_type)
-      asset_content_type.to_s =~ /^video/ || @@types[:movie][:content_types].include?(asset_content_type)
-    end
-    
-    def video?(asset_content_type)
-      asset_content_type.to_s =~ /^video/
-    end
-    
-    def swf?(asset_content_type)
-      @@types[:swf][:content_types].include?(asset_content_type)
-    end
-    
-    def audio?(asset_content_type)
-      asset_content_type.to_s =~ /^audio/ || @@types[:audio][:content_types].include?(asset_content_type)
+    Asset.known_types.each do |type|
+      define_method "#{type}?" do |asset_content_type|
+        Mime::Type.lookup_by_extension(type.to_s) == asset_content_type.to_s
+      end
+
+      define_method "#{type}_condition" do
+        types = Mime::Type.lookup_by_extension(type.to_s).all_types
+        # use #send due to a ruby 1.8.2 issue
+        send(:sanitize_sql, ['asset_content_type IN (?)', types])
+      end
     end
     
     def other?(asset_content_type)
-      !(types - [:other]).any? { |type| send("#{type}?", asset_content_type) }
-    end
-
-    def pdf?(asset_content_type)
-      @@types[:pdf][:content_types].include? asset_content_type
+      !known_types.any? { |type| send("#{type}?", asset_content_type) }
     end
     
+    def other_condition
+      excluded_types = Mime::IMAGE.all_types + Mime::AUDIO.all_types + Mime::MOVIE.all_types
+      # use #send due to a ruby 1.8.2 issue
+      send(:sanitize_sql, ['asset_content_type NOT IN (?)', excluded_types])
+    end    
+  end
+  (known_types + [:other]).each do |type|
+    named_scope type.to_s.pluralize.intern, :conditions => self.send("#{type}_condition".intern)
+  end
+  
+  class << self
     def search(search, filter, page)
       unless search.blank?
 
@@ -217,10 +187,11 @@ class Asset < ActiveRecord::Base
     image? && self.dimensions(size)[1]
   end
 
-  types.each do |type|
+  #delegating methods like image? to class
+  (known_types+[:other]).each do |type|
     define_method("#{type}?") { self.class.send("#{type}?", asset_content_type) }
   end
-    
+  
   private
   
     def assign_title
