@@ -22,7 +22,7 @@ describe Asset do
   it 'should be valid when saved' do
     create_asset.should be_valid
   end
-  
+
   describe '#thumbnail' do
     describe 'without argument' do
       it 'should return paperclip asset url for image' do
