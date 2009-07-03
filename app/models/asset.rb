@@ -83,6 +83,7 @@ class Asset < ActiveRecord::Base
   before_save :assign_title
     
   def thumbnail(size='original')
+    return asset.url if size == 'original'
     case 
       when self.pdf?   : "/images/assets/pdf_#{size.to_s}.png"
       when self.movie? : "/images/assets/movie_#{size.to_s}.png"
