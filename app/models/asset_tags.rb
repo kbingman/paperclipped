@@ -193,6 +193,45 @@ module AssetTags
       raise TagError, "Asset is not an image"
     end
   end
+  desc %{
+    Embeds a flash-movie in a cross-browser-compatible fashion using only HTML
+    
+    *Usage:*
+    <pre><code><r:assets:flash [title="asset_title"] [width="100"] [height="100"]>Fallback content</flash></code></pre>
+    
+    *Example with text fallback:*
+    <pre><code>
+      <r:assets:flash title="flash_movie" width="300"] height="200">
+        Sorry, you need to have flash installed, <a href="http://adobe.com/flash">get it here</a>
+      </flash>
+    </code></pre>
+    
+    *Example with image fallback:*
+    <pre><code>
+      <r:assets:flash title="flash_movie" width="300"] height="200">
+        <r:assets:image title="flash_screenshot" />
+      </flash>
+    </code></pre>
+  }
+  tag 'assets:flash' do |tag|
+    asset = find_asset(tag, tag.attr.dup)
+    raise TagError, 'Must be flash' unless asset.swf?
+    dimensions = %w[width height].inject('') do |attrs, dimension|
+      attrs << %{#{dimension}="#{tag.attr[dimension]}" } if tag.attr[dimension]
+      attrs
+    end.strip
+    url = asset.thumbnail('original')
+    %{<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" #{dimensions}>
+          <param name="movie" value="#{url}" />
+          <!--[if !IE]>-->
+          <object type="application/x-shockwave-flash" data="#{url}" #{dimensions}>
+          <!--<![endif]-->
+          #{tag.expand}
+          <!--[if !IE]>-->
+          </object>
+          <!--<![endif]-->
+    </object>}
+  end
   
   tag 'assets:thumbnail' do |tag|
     options = tag.attr.dup
