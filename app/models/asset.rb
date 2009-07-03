@@ -1,22 +1,36 @@
 class Asset < ActiveRecord::Base
-  @@kinds = [:image, :audio, :video, :flash, :pdf, :movie, :other]
+  @@types = {
+    :image => {
+      :content_types => ['image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/jpg']
+    },
+    :audio => {
+      :type => :audio,
+      :content_types => ['application/ogg'],
+    },
+    :video => {
+      :type => :video
+    },
+    :swf => {
+      :content_types => ['application/x-shockwave-flash']
+    },
+    :pdf => {
+      :content_types => ['application/pdf']
+    },
+    :movie => {
+      :type => :video,
+      :content_types => ['application/x-shockwave-flash']
+    },
+    :other => {}
+  }
   
-  # used for extra mime types that do not follow the convention
-  @@image_content_types = ['image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/jpg']
-  @@flash_content_types = ['application/x-shockwave-flash']
-  @@extra_content_types = { :audio => ['application/ogg'], 
-                            :movie => ['application/x-shockwave-flash'], 
-                            :pdf => ['application/pdf'] }.freeze
-  cattr_reader :kinds, :extra_content_types, :flash_content_types, :image_content_types
-
   # use #send due to a ruby 1.8.2 issue
-  @@image_condition = send(:sanitize_sql, ['asset_content_type IN (?)', image_content_types]).freeze
-  @@movie_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'video%', extra_content_types[:movie]]).freeze
-  @@audio_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'audio%', extra_content_types[:audio]]).freeze
-  
+  @@image_condition = send(:sanitize_sql, ['asset_content_type IN (?)', @@types[:image][:content_types]]).freeze
+  @@movie_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'video%', @@types[:movie][:content_types]]).freeze
+  @@audio_condition = send(:sanitize_sql, ['asset_content_type LIKE ? OR asset_content_type IN (?)', 'audio%', @@types[:audio][:content_types]]).freeze
+
   @@other_condition = send(:sanitize_sql, [
     'asset_content_type NOT LIKE ? AND asset_content_type NOT LIKE ? AND asset_content_type NOT IN (?)',
-    'audio%', 'video%', (extra_content_types[:movie] + extra_content_types[:audio] + image_content_types)]).freeze
+    'audio%', 'video%', (@@types[:movie][:content_types] + @@types[:audio][:content_types] + @@types[:image][:content_types])]).freeze
   cattr_reader *%w(movie audio image other).collect! { |t| "#{t}_condition".to_sym }
   
   %w(movie audio image other).each do |type|
@@ -24,33 +38,37 @@ class Asset < ActiveRecord::Base
   end
   
   class << self
-    def image?(asset_content_type)
-      image_content_types.include?(asset_content_type)
+    def types
+      @@types.keys
     end
     
-    # A “movie” can be a flash or a video file (retained for back-compat)
+    def image?(asset_content_type)
+      @@types[:image][:content_types].include?(asset_content_type)
+    end
+    
+    # A “movie” can be a swf or a video file (retained for back-compat)
     def movie?(asset_content_type)
-      asset_content_type.to_s =~ /^video/ || extra_content_types[:movie].include?(asset_content_type)
+      asset_content_type.to_s =~ /^video/ || @@types[:movie][:content_types].include?(asset_content_type)
     end
     
     def video?(asset_content_type)
       asset_content_type.to_s =~ /^video/
     end
     
-    def flash?(asset_content_type)
-      flash_content_types.include?(asset_content_type)
+    def swf?(asset_content_type)
+      @@types[:swf][:content_types].include?(asset_content_type)
     end
     
     def audio?(asset_content_type)
-      asset_content_type.to_s =~ /^audio/ || extra_content_types[:audio].include?(asset_content_type)
+      asset_content_type.to_s =~ /^audio/ || @@types[:audio][:content_types].include?(asset_content_type)
     end
     
     def other?(asset_content_type)
-      !(kinds - [:other]).any? { |kind| send("#{kind}?", asset_content_type) }
+      !(types - [:other]).any? { |type| send("#{type}?", asset_content_type) }
     end
 
     def pdf?(asset_content_type)
-      extra_content_types[:pdf].include? asset_content_type
+      @@types[:pdf][:content_types].include? asset_content_type
     end
     
     def search(search, filter, page)
@@ -154,7 +172,7 @@ class Asset < ActiveRecord::Base
       when self.pdf?   : "/images/assets/pdf_#{size.to_s}.png"
       when self.movie? : "/images/assets/movie_#{size.to_s}.png"
       when self.video? : "/images/assets/movie_#{size.to_s}.png"
-      when self.flash? : "/images/assets/movie_#{size.to_s}.png" #TODO: special icon for flash-files
+      when self.swf? : "/images/assets/movie_#{size.to_s}.png" #TODO: special icon for swf-files
       when self.audio? : "/images/assets/audio_#{size.to_s}.png"
       when self.other? : "/images/assets/doc_#{size.to_s}.png"
     else
@@ -199,8 +217,8 @@ class Asset < ActiveRecord::Base
     image? && self.dimensions(size)[1]
   end
 
-  kinds.each do |kind|
-    define_method("#{kind}?") { self.class.send("#{kind}?", asset_content_type) }
+  types.each do |type|
+    define_method("#{type}?") { self.class.send("#{type}?", asset_content_type) }
   end
     
   private
