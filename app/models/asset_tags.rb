@@ -106,11 +106,7 @@ module AssetTags
       if asset.image?
         size = options['size'] ? options.delete('size') : 'icon'
         container = options.delete('container')
-        root = "#{RAILS_ROOT}/public#{asset.thumbnail(size)}"
-        img_height = 0
-        open(root, "rb") do |fh|
-          img_height = ImageSize.new(fh.read).get_height
-        end
+        img_height = asset.height(size)
         (container.to_i - img_height.to_i)/2
       else
         raise TagError, "Asset is not an image"
@@ -231,7 +227,7 @@ module AssetTags
     attributes = options.inject('') { |s, (k, v)| s << %{#{k.downcase}="#{v}" } }.strip
     attributes = " #{attributes}" unless attributes.empty?
     text = tag.double? ? tag.expand : text
-    url = asset.thumbnail(size)
+    url = asset.image? ? asset.thumbnail(size) : asset.asset.url
     %{<a href="#{url  }#{anchor}"#{attributes}>#{text}</a>} rescue nil
   end
   
