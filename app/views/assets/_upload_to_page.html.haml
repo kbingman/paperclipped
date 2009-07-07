@@ -1,8 +1,0 @@
-#upload-form
-  - form_for :asset, :url => assets_path(:page => @page), :html => { :method => "post", :multipart => true } do |form|
-    %div.file
-      %label.upload Choose a file to upload
-      = form.file_field :asset, :class => "", :style => "width: 100%"
-
-    .upload-buttons
-      = form.submit "Save and Upload", :class => "button"

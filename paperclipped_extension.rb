@@ -1,31 +1,42 @@
-require_dependency 'application'
+# require_dependency 'application_controller'
 require File.dirname(__FILE__) + '/lib/url_additions'
 include UrlAdditions
 
 class PaperclippedExtension < Radiant::Extension
-  version "1.0"
+  version "0.8.0"
   description "Assets extension based on the lightweight Paperclip plugin."
-  url "http://kbingman.com/assets"
+  url "http://github.com/kbingman/paperclipped"
   
   define_routes do |map|
-    map.resources :assets, :path_prefix => "/admin"
-    map.with_options(:controller => 'assets') do |asset|
-      asset.remove_asset      "/admin/assets/:id/remove",                :action => 'remove'
+    
+    # Main RESTful routes for Assets
+    map.namespace :admin, :member => { :remove => :get }, :collection => { :refresh => :post } do |admin|
+      admin.resources :assets
+    end
+    
+    # Bucket routes
+    map.with_options(:controller => 'admin/assets') do |asset|
       asset.add_bucket        "/admin/assets/:id/add",                   :action => 'add_bucket'
+      # asset.refresh_assets    "/admin/assets/:id/refresh",               :action => 'regenerate_thumbnails'
+      
       asset.clear_bucket      "/admin/assets/clear_bucket",              :action => 'clear_bucket'
       asset.reorder_assets    '/admin/assets/reorder/:id',               :action => 'reorder'
       asset.attach_page_asset '/admin/assets/attach/:asset/page/:page',  :action => 'attach_asset'
       asset.remove_page_asset '/admin/assets/remove/:asset/page/:page',  :action => 'remove_asset'
-      asset.refresh_assets    "/admin/assets/refresh/:id",               :action => 'regenerate_thumbnails'
     end
   end
   
   def activate
-    require_dependency 'application'
     
+    Radiant::AdminUI.send :include, AssetsAdminUI unless defined? admin.asset # UI is a singleton and already loaded
+    admin.asset = Radiant::AdminUI.load_default_asset_regions
+
     %w{page}.each do |view|
-      admin.send(view).edit.add :main, "/assets/show_bucket_link", :before => "edit_header"
-      admin.send(view).edit.add :main, "/assets/assets_bucket", :after => "edit_buttons"
+      admin.send(view).edit.add :main, "/admin/assets/show_bucket_link", :before => "edit_header"
+      admin.send(view).edit.add :main, "/admin/assets/assets_bucket", :after => "edit_buttons"
+      admin.send(view).edit.asset_tabs.concat %w{attachment_tab upload_tab bucket_tab search_tab}
+      admin.send(view).edit.bucket_pane.concat %w{bucket_notes bucket bucket_bottom}
+      admin.send(view).edit.asset_panes.concat %w{page_attachments upload search}
     end
     
     Page.class_eval {

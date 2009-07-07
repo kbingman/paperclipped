@@ -37,6 +37,55 @@ class StorageTest < Test::Unit::TestCase
     end
   end
 
+  context "" do
+    setup do
+      rebuild_model :storage => :s3,
+                    :s3_credentials => {},
+                    :bucket => "bucket",
+                    :path => ":attachment/:basename.:extension",
+                    :url => ":s3_path_url"
+      @dummy = Dummy.new
+      @dummy.avatar = StringIO.new(".")
+    end
+
+    should "return a url based on an S3 path" do
+      assert_match %r{^http://s3.amazonaws.com/bucket/avatars/stringio.txt}, @dummy.avatar.url
+    end
+  end
+  context "" do
+    setup do
+      rebuild_model :storage => :s3,
+                    :s3_credentials => {},
+                    :bucket => "bucket",
+                    :path => ":attachment/:basename.:extension",
+                    :url => ":s3_domain_url"
+      @dummy = Dummy.new
+      @dummy.avatar = StringIO.new(".")
+    end
+
+    should "return a url based on an S3 subdomain" do
+      assert_match %r{^http://bucket.s3.amazonaws.com/avatars/stringio.txt}, @dummy.avatar.url
+    end
+  end
+  context "" do
+    setup do
+      rebuild_model :storage => :s3,
+                    :s3_credentials => {
+                      :production   => { :bucket => "prod_bucket" },
+                      :development  => { :bucket => "dev_bucket" }
+                    },
+                    :s3_host_alias => "something.something.com",
+                    :path => ":attachment/:basename.:extension",
+                    :url => ":s3_alias_url"
+      @dummy = Dummy.new
+      @dummy.avatar = StringIO.new(".")
+    end
+
+    should "return a url based on the host_alias" do
+      assert_match %r{^http://something.something.com/avatars/stringio.txt}, @dummy.avatar.url
+    end
+  end
+
   context "Parsing S3 credentials with a bucket in them" do
     setup do
       rebuild_model :storage => :s3,
@@ -124,6 +173,19 @@ class StorageTest < Test::Unit::TestCase
           assert true
         end
       end
+    end
+  end
+  
+  context "An attachment with S3 storage and bucket defined as a Proc" do
+    setup do
+      rebuild_model :storage => :s3,
+                    :bucket => lambda { |attachment| "bucket_#{attachment.instance.other}" },
+                    :s3_credentials => {:not => :important}
+    end
+    
+    should "get the right bucket name" do
+      assert "bucket_a", Dummy.new(:other => 'a').avatar.bucket_name
+      assert "bucket_b", Dummy.new(:other => 'b').avatar.bucket_name
     end
   end
 

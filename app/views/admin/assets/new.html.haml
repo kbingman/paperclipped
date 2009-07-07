@@ -1,0 +1,27 @@
+- include_stylesheet 'admin/assets' 
+= render_region :top 
+
+- render_region :main do |main|
+  - main.edit_header do
+    %h1= "New Asset"
+    %p 
+      Choose an asset to upload here. If the <code>Title</code> field is left blank, the filename (without the file type) will be automatically added. 
+      By clicking on <code>More</code>, you can add a caption as well. 
+
+  - main.edit_form do  
+    - form_for :asset, :url => admin_assets_path, :html => { :method => "post", :multipart => true } do |f|
+      .form-area
+        = render :partial => "form", :locals => { :f => f }
+
+        %p.upload
+          %label.upload Choose a file to upload
+          = f.file_field :asset, :class => "", :style => "width: 100%"
+     
+        %p.buttons
+          = save_model_button(@asset)
+          = save_model_and_continue_editing_button(@asset)
+          or
+          = link_to "Cancel", admin_assets_path
+
+  - main.edit_regenerate do
+    &nbsp;

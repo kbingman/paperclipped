@@ -43,7 +43,7 @@ end
 # documentation for Paperclip::ClassMethods for more useful information.
 module Paperclip
 
-  VERSION = "2.2.2"
+  VERSION = "2.2.8"
 
   class << self
     # Provides configurability to Paperclip. There are a number of options available, such as:
@@ -67,12 +67,14 @@ module Paperclip
 
     def path_for_command command #:nodoc:
       if options[:image_magick_path]
-        ActiveSupport::Deprecation.warn(":image_magick_path is deprecated and "+
-                                        "will be removed. Use :command_path "+
-                                        "instead")
+        warn("[DEPRECATION] :image_magick_path is deprecated and will be removed. Use :command_path instead")
       end
-      path = [options[:image_magick_path] || options[:command_path], command].compact
+      path = [options[:command_path] || options[:image_magick_path], command].compact
       File.join(*path)
+    end
+
+    def interpolates key, &block
+      Paperclip::Attachment.interpolations[key] = block
     end
 
     # The run method takes a command to execute and a string of parameters
@@ -207,7 +209,8 @@ module Paperclip
       end
 
       validates_each(name) do |record, attr, value|
-        value.send(:flush_errors) unless value.valid?
+        attachment = record.attachment_for(name)
+        attachment.send(:flush_errors) unless attachment.valid?
       end
     end
 
@@ -253,6 +256,9 @@ module Paperclip
     #   match.  Allows all by default.
     # * +message+: The message to display when the uploaded file has an invalid
     #   content type.
+    # NOTE: If you do not specify an [attachment]_content_type field on your
+    # model, content_type validation will work _ONLY upon assignment_ and
+    # re-validation after the instance has been reloaded will always succeed.
     def validates_attachment_content_type name, options = {}
       attachment_definitions[name][:validations][:content_type] = lambda do |attachment, instance|
         valid_types = [options[:content_type]].flatten
@@ -260,7 +266,7 @@ module Paperclip
         unless attachment.original_filename.blank?
           unless valid_types.blank?
             content_type = attachment.instance_read(:content_type)
-            unless valid_types.any?{|t| t === content_type }
+            unless valid_types.any?{|t| content_type.nil? || t === content_type }
               options[:message] || "is not one of the allowed file types."
             end
           end

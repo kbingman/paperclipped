@@ -109,7 +109,7 @@ a set of styles for an attachment, by default it is expected that those
 "styles" are actually "thumbnails". However, you can do more than just
 thumbnail images. By defining a subclass of Paperclip::Processor, you can
 perform any processing you want on the files that are attached. Any file in
-your Rails app's lib/paperclip_processor directory is automatically loaded by
+your Rails app's lib/paperclip_processors directory is automatically loaded by
 paperclip, allowing you to easily define custom processors. You can specify a
 processor with the :processors option to has_attached_file:
 
@@ -152,7 +152,7 @@ are called before and after the processing of each attachment), and the
 attachment-specific "before_<attachment>_post_process" and
 "after_<attachment>_post_process". The callbacks are intended to be as close to
 normal ActiveRecord callbacks as possible, so if you return false (specifically
--- returning nil is not the same) in a before_ filter, the post processing step
+- returning nil is not the same) in a before_ filter, the post processing step
 will halt. Returning false in an after_ filter will not halt anything, but you
 can access the model and the attachment if necessary.
 
