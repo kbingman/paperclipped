@@ -227,7 +227,7 @@ module AssetTags
     attributes = options.inject('') { |s, (k, v)| s << %{#{k.downcase}="#{v}" } }.strip
     attributes = " #{attributes}" unless attributes.empty?
     text = tag.double? ? tag.expand : text
-    url = asset.image? ? asset.thumbnail(size) : asset.asset.url
+    url = asset.thumbnail(size)
     %{<a href="#{url  }#{anchor}"#{attributes}>#{text}</a>} rescue nil
   end
   
