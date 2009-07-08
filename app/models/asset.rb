@@ -171,7 +171,7 @@ class Asset < ActiveRecord::Base
   def dimensions(size='original')
     @dimensions ||= {}
     @dimensions[size] ||= image? && begin
-      image_file = self.path(size)
+      image_file = "#{RAILS_ROOT}/public#{self.thumbnail(size)}"
       image_size = ImageSize.new(open(image_file).read)
       [image_size.get_width, image_size.get_height]
     rescue
