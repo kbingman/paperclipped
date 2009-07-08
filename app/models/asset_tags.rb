@@ -239,16 +239,18 @@ module AssetTags
       attrs
     end.strip
     url = asset.thumbnail('original')
-    %{<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" #{dimensions}>
-          <param name="movie" value="#{url}" />
-          <!--[if !IE]>-->
-          <object type="application/x-shockwave-flash" data="#{url}" #{dimensions}>
-          <!--<![endif]-->
-          #{tag.expand}
-          <!--[if !IE]>-->
-          </object>
-          <!--<![endif]-->
-    </object>}
+    %{<!--[if !IE]> -->
+      <object type="application/x-shockwave-flash" data="#{url}" #{dimensions}>
+    <!-- <![endif]-->
+    <!--[if IE]>
+      <object #{dimensions}
+        classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+        codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0">
+        <param name="movie" value="#{url}" />
+    <!-->
+    #{tag.expand}
+      </object>
+    <!-- <![endif]-->}
   end
   
   tag 'assets:thumbnail' do |tag|
