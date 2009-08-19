@@ -78,6 +78,20 @@ If you would like to use this mode type \"yes\", type \"no\" or just hit enter t
         puts "Done."
       end
       
+      desc "Migrates from old 'assets' extension."
+      task :migrate_from_assets => :environment do
+        Asset.delete_all("thumbnail IS NOT NULL OR parent_id IS NOT NULL")
+        ActiveRecord::Base.connection.tap do |c|
+          c.rename_column :assets, :filename, :asset_file_name
+          c.rename_column :assets, :content_type, :asset_content_type
+          c.rename_column :assets, :size, :asset_file_size
+          c.remove_column :assets, :parent_id
+          c.remove_column :assets, :thumbnail
+        end
+
+        PaperclippedExtension.migrator.new(:up, PaperclippedExtension.migrations_path).send(:assume_migrated_upto_version, 3)
+        PaperclippedExtension.migrator.migrate
+      end
     end
   end
 end
