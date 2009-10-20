@@ -31,10 +31,10 @@
                 = asset.asset_content_type
             - tbody.bucket_cell do
               %td.add-to-bucket
-                = link_to_remote(image_tag('assets/add-to-bucket.png', :alt => 'Add to Bucket'), :url => add_bucket_url(:id => asset))
+                = link_to_remote('Add to bucket', :url => add_bucket_url(:id => asset))
             - tbody.remove_cell do
               %td.remove
-                = link_to image_tag('admin/remove.png', :alt => 'Remove Asset'), remove_admin_asset_path(asset)
+                = link_to 'Remove', remove_admin_asset_path(asset)
     - else
       %tr
         %td.note{ :colspan => "5" } 

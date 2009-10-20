@@ -1,0 +1,5 @@
+#asset-bucket{ :style => "display: none" }
+  = render :partial => "/admin/bucket/assets_container"
+  
+  #close-link     
+    = link_to "Close", "#", :onclick => "$(this).closePopup(); return false;"

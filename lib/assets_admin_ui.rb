@@ -11,11 +11,9 @@ module AssetsAdminUI
         def load_default_asset_regions
           returning OpenStruct.new do |asset|
             asset.edit = Radiant::AdminUI::RegionSet.new do |edit|
-              edit.main.concat %w{edit_header edit_form assets_container edit_regenerate}
-              edit.form.concat %w{edit_title edit_metadata}
-              # need to DRY this up...
-              edit.bucket_pane.concat %w{bucket_notes bucket bucket_bottom}
-              edit.asset_tabs.concat %w{bucket_tab}
+              edit.main.concat %w{edit_header edit_form}
+              edit.form.concat %w{edit_title edit_extended_metadata edit_content}
+              edit.form_bottom.concat %w{edit_buttons edit_timestamp}
             end
             asset.new = asset.edit
             asset.index = Radiant::AdminUI::RegionSet.new do |index|

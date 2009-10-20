@@ -1,20 +1,47 @@
-= render_region :form_top
-- render_region :form do |form|
-  - form.edit_title do
-    %p.title
-      %label{ :for => "asset_title" } Title
-      = f.text_field :title, :class => 'textbox', :maxlength => 100 
-  - form.edit_metadata do
-    #extended-metadata{ :class => "row", :style => "display: none" }
-      %table.fieldset{ :cellpadding => "0", :cellspacing => "0", :border => "0" }
-        %tr
-          %td.label
-            %label{ :for => "asset_caption" } Caption
-          %td.field
-            = f.text_field :caption, :class => 'textbox', :maxlength => 255 
-        = render_region :extended_metadata
-    %p
-      %small
-        %a{ :id => "more-extended-metadata", :href => "#", :onclick => "#{toggle_javascript_for('extended-metadata')}; return false;" } More
-        %a{ :id => "less-extended-metadata", :href => "#", :onclick => "#{toggle_javascript_for('extended-metadata')}; return false;", :style => "display: none" } Less
+- form_for [:admin, @asset], :html => {:onsubmit_status => onsubmit_status(@asset)}, :html => { :enctype => 'multipart/form-data' } do |f|
+  = render_region :form_top
+  .form_area
+    - render_region :form do |form|
+      - form.edit_title do
+        %p.title
+          = f.label :title, 'Title' # t('title')
+          = f.text_field :title, :class => 'textbox activate', :maxlength => 255
+      - form.edit_extended_metadata do
+        #extended_metadata{ :style => 'display:none' }
+          %table.fieldset{:cellpadding=>"0", :cellspacing=>"0", :border=>"0"}       
+            %tr
+              %th.label Caption
+              %td.field= f.text_field :caption, :class => 'textbox', :maxlength => 255 
+            - unless @asset.new_record?
+              %tr
+                %th.label Path
+                %td= @asset.thumbnail(:original)
+                
+          = render_region :extended_metadata
+        %p.more_or_less
+          %a{:id=>"more_extended_metadata", :href=>"javascript: $('extended_metadata').show(); $('less_extended_metadata').show(); $('more_extended_metadata').hide(); this.stop()", :style=>(meta_errors? ? "display: none" : nil)} More
+          %a{:id=>"less_extended_metadata", :href=>"javascript: $('extended_metadata').hide(); $('more_extended_metadata').show(); $('less_extended_metadata').hide(); this.stop()", :style=>(!meta_errors? ? "display: none" : nil)} Hide       
+      - form.edit_content do
+        - unless @asset.new_record?
+          %p.filename
+            = "Filename: #{@asset.asset_file_name unless @asset.new_record?}"
+          %p.content
+            - if @asset.image?
+              = image_tag @asset.thumbnail(Radiant::Config['assets.display_size'].to_sym)
+            - else
+              = link_to image_tag(@asset.thumbnail(:thumbnail)), @asset.asset.url
+        %p
+          = f.label :asset, t('replace_file')
+          = f.file_field :asset
+            
+  - render_region :form_bottom do |form_bottom|
+    - form_bottom.edit_buttons do
+      %p.buttons{:style=>"clear: left"}
+        = save_model_button(@asset)
+        = save_model_and_continue_editing_button(@asset)
+        = t('or')
+        = link_to t('cancel'), admin_assets_url
+    - form_bottom.edit_timestamp do
+      %p.updated_line
+        = updated_stamp @asset
 

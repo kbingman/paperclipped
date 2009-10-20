@@ -1,7 +1,4 @@
 document.observe("dom:loaded", function() {
-  if($('asset-bucket')){
-    new Draggable('asset-bucket', { starteffect: false, endeffect: false });
-  }
   if($('page-attachments')){
     Asset.ChooseTabByName('page-attachments');
   }
@@ -98,7 +95,7 @@ Asset.ShowBucket = Behavior.create({
   onclick: function(e){
     e.stop();
     var element = $('asset-bucket');
-    center(element);
+
     element.toggle();
     Asset.MakeDroppables();
   }

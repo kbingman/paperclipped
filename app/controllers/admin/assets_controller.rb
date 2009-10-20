@@ -10,7 +10,7 @@ class Admin::AssetsController < Admin::ResourceController
       format.js {
         @template_name = 'index'
         if !@page.nil?
-          render :partial => 'admin/assets/search_results.html.haml', :layout => false
+          render :partial => 'admin/bucket/search_results.html.haml', :layout => false
         else
           render :partial => 'admin/assets/asset_table.html.haml', :locals => { :assets => @assets }, :layout => false
         end
@@ -36,7 +36,7 @@ class Admin::AssetsController < Admin::ResourceController
             render :update do |page|
               @attachment = PageAttachment.find(:first, :conditions => { :page_id => @page.id, :asset_id => @asset.id })
               page.call('Asset.ChooseTabByName', 'page-attachments')
-              page.insert_html :bottom, "attachments", :partial => 'admin/assets/asset', :locals => {:attachment => @attachment } 
+              page.insert_html :bottom, "attachments", :partial => 'admin/bucket/asset', :locals => {:attachment => @attachment } 
               page.call('Asset.AddAsset', "attachment_#{@attachment.id}")  # we ought to reinitialise the sortable attachments too
               page.visual_effect :highlight, "attachment_#{@attachment.id}" 
               page.call('Asset.ResetForm')
@@ -77,7 +77,7 @@ class Admin::AssetsController < Admin::ResourceController
     session[:bucket][@asset.asset.url] = { :thumbnail => @asset.thumbnail(:thumbnail), :id => @asset.id, :title => @asset.title, :type => asset_type }
 
     render :update do |page|
-      page[:bucket_list].replace_html "#{render :partial => 'bucket'}"
+      page[:bucket_list].replace_html "#{render :partial => 'admin/bucket/bucket'}"
     end
   end
   
@@ -94,7 +94,7 @@ class Admin::AssetsController < Admin::ResourceController
     @page = Page.find(params[:page])
     @page.assets << @asset unless @page.assets.include?(@asset)
     clear_model_cache
-    render :partial => 'page_assets', :locals => { :page => @page }
+    render :partial => 'admin/bucket/page_assets', :locals => { :page => @page }
     # render :update do |page|
     #   page[:attachments].replace_html "#{render :partial => 'page_assets', :locals => {:page => @page}}"
     # end
@@ -112,7 +112,7 @@ class Admin::AssetsController < Admin::ResourceController
   def reorder
     params[:attachments].each_with_index do |id,idx| 
       page_attachment = PageAttachment.find(id)
-      page_attachment.position = idx+1
+      page_attachment.position = idx + 1
       page_attachment.save
     end
     clear_model_cache
