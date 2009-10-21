@@ -101,6 +101,8 @@ table#site-map td.assets, table#site-map th.assets  { text-align: right; border:
 #filesearchform a:hover { color: blue; text-decoration: underline; }
 #filesearchform a.pressed { color: #cc0000; }
 
+#actions form { display: inline; }
+
 .move a { cursor: move; }
 
 #show-bucket {
