@@ -19,7 +19,7 @@
       - render_region :bucket_pane do |bucket_pane|
         - bucket_pane.bucket_notes do      
           %p
-            %span.note The Bucket provides temporary storage for your items. You can use it to place items in your pages or snippets.
+            %span.note The Bucket provides temporary storage for your items for use in pages or snippets.
             %span#clear-bucket
               = link_to_remote('Clear Bucket', {:url => clear_bucket_url} )
         - bucket_pane.bucket do 

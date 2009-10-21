@@ -40,6 +40,7 @@ class Admin::AssetsController < Admin::ResourceController
               page.call('Asset.AddAsset', "attachment_#{@attachment.id}")  # we ought to reinitialise the sortable attachments too
               page.visual_effect :highlight, "attachment_#{@attachment.id}" 
               page.call('Asset.ResetForm')
+              page.call('Asset.MakeDraggables')
             end
           end
         } 

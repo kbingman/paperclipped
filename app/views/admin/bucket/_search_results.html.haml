@@ -10,6 +10,7 @@
       
 %script
   Asset.MakeDroppables();
+  Asset.MakeDraggables();
   Event.addBehavior({ '.asset a' : Asset.DisableLinks, 'a.add_asset' : Asset.AddToPage });
 
   

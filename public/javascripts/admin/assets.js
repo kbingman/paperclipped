@@ -1,7 +1,9 @@
 document.observe("dom:loaded", function() {
-  if($('page-attachments')){
+  when('page-attachments', function(){ 
     Asset.ChooseTabByName('page-attachments');
-  }
+    Asset.MakeDroppables();
+  });
+  
 });
 
 var Asset = {};
@@ -54,16 +56,28 @@ Asset.AddToPage = Behavior.create({
     new Ajax.Updater('attachments', url, {
       asynchronous : true, 
       evalScripts  : true, 
-      method       : 'get'
-      // onComplete   : Element.highlight('page-attachments')
+      method       : 'get',
+      onSuccess    : Asset.ChooseTabByName('page-attachments')
     });
     
   }
 });
 
+Asset.AddToBucket = Behavior.create({
+  onclick: function(e){
+    e.stop();
+    url = this.element.href;
+    new Ajax.Request(url, {
+      onSuccess: function(response) {
+        alert('asset added to bucket');
+      }
+    });
+  }
+});
+
 Asset.MakeDroppables = function () {
   $$('.textarea').each(function(box){
-    if (!box.hasClassName('droppable')) {
+    if (!box.hasClassName('droppable') && !box.hasClassName('wymified')) {
       Droppables.add(box, {
         accept: 'asset',
         onDrop: function(element) {
@@ -91,47 +105,29 @@ Asset.MakeDroppables = function () {
   });
 }
 
-Asset.ShowBucket = Behavior.create({
-  onclick: function(e){
-    e.stop();
-    var element = $('asset-bucket');
-
-    element.toggle();
-    Asset.MakeDroppables();
-  }
-});
-
-Asset.HideBucket = Behavior.create({
-  onclick: function(e){
-    e.stop();
-    var element = $('asset-bucket');
-    element.hide();
-  }
-});
-
-Asset.FileTypes = Behavior.create({
-  onclick: function(e){
-    e.stop();
-    var element = this.element;
-    var type_id = element.text.downcase();
-    var type_check = $(type_id + '-check');
-    var search_form = $('filesearchform');
-    if(element.hasClassName('pressed')) {
-      element.removeClassName('pressed');
-      type_check.removeAttribute('checked');
-    } else {
-      element.addClassName('pressed');
-      type_check.setAttribute('checked', 'checked');
-    }
-    new Ajax.Updater('assets_table', search_form.action, {
-      asynchronous: true, 
-      evalScripts:  true, 
-      parameters:   Form.serialize(search_form),
-      method: 'get',
-      onComplete: 'assets_table'
-    });
-  }
-});
+// Asset.FileTypes = Behavior.create({
+//   onclick: function(e){
+//     e.stop();
+//     var element = this.element;
+//     var type_id = element.text.downcase();
+//     var type_check = $(type_id + '-check');
+//     var search_form = $('filesearchform');
+//     if(element.hasClassName('pressed')) {
+//       element.removeClassName('pressed');
+//       type_check.removeAttribute('checked');
+//     } else {
+//       element.addClassName('pressed');
+//       type_check.setAttribute('checked', 'checked');
+//     }
+//     new Ajax.Updater('assets_table', search_form.action, {
+//       asynchronous: true, 
+//       evalScripts:  true, 
+//       parameters:   Form.serialize(search_form),
+//       method: 'get',
+//       onComplete: 'assets_table'
+//     });
+//   }
+// });
 
 Asset.WaitingForm = Behavior.create({
   onsubmit: function(e){
@@ -144,6 +140,11 @@ Asset.ResetForm = function (name) {
   var element = $('asset-upload');
   element.removeClassName('waiting');
   element.reset();
+  
+  ta = $$(".wymified");
+	for (var i = 0; i < ta.length; i++){
+		boot_wym(ta[i]);
+	}
 }
 
 Asset.AddAsset = function (name) {
@@ -160,10 +161,17 @@ Asset.AddAsset = function (name) {
 
 Event.addBehavior({
   '#asset-tabs a'     : Asset.Tabs,
-  '#close-link a'     : Asset.HideBucket,
-  '#show-bucket a'    : Asset.ShowBucket,
   '#filesearchform a' : Asset.FileTypes,
   '#asset-upload'     : Asset.WaitingForm,
   'div.asset a'       : Asset.DisableLinks,
-  'a.add_asset'       : Asset.AddToPage
+  'a.add_asset'       : Asset.AddToPage,
+  '.add-to-bucket a'  : Asset.AddToBucket
 });
+
+// Stolen from the admin.js for Radiant, but for some reason it does not load. 
+// When object is available, do function fn.
+function when(obj, fn) {
+  if (Object.isString(obj)) obj = /^[\w-]+$/.test(obj) ? $(obj) : $(document.body).down(obj);
+  if (Object.isArray(obj) && !obj.length) return;
+  if (obj) fn(obj);
+}

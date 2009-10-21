@@ -4,33 +4,15 @@
   = render_region :top 
   #assets_table
     = render :partial => 'asset_table', :locals => { :assets => @assets }
-  // - preamble.new_button do
-  //  %p= link_to image_tag('assets/new-asset.png', :alt => 'New Asset'), new_admin_asset_path
-
-  // - preamble.filters do
-  //   %p
-  //     %label Search
-  //     %input{ :type => "search", :id => "search", :name => "search" , :value => params[:search] }
-  //     = submit_tag "Search"
-  //     = observe_field 'search',  :frequency => 1, :update => 'assets_table', :url =>  { :controller => 'assets', :action=> 'index' }, :method => 'get', :with => "'search=' + escape(value)"
-
-
-
-=#  render :partial => 'assets_container'
-  
-// - render_region :bottom do |bottom|
-//   - bottom.regenerate do
-//     - if admin?
-//       %p 
-//         You can regenerate all thumbnails here. Beware that this will take a while and consume considerable resources on your server. 
-//       - form_tag refresh_admin_assets_path do
-//         %input.button{ :type => "submit", :value => "Regenerate" }
 
 #actions
   %ul
     %li= link_to "New Asset", new_admin_asset_path 
+    %li= link_to "Show Bucket", "#asset-bucket", :class => "popup"
     %li
-      // - form_tag do 
-      %input{ :type => "search", :id => "search", :name => "search" , :value => params[:search] }
-      = submit_tag "Search"
-      = observe_field 'search',  :frequency => 1, :update => 'assets_table', :url =>  { :controller => 'assets', :action=> 'index' }, :method => 'get', :with => "'search=' + escape(value)"
+      - form_tag nil, :method => 'get' do 
+        %input{ :type => "search", :id => "search", :name => "search" , :value => params[:search] }
+        = submit_tag "Search"
+        = observe_field 'search',  :frequency => 1, :update => 'assets_table', :url =>  { :controller => 'assets', :action=> 'index' }, :method => 'get', :with => "'search=' + escape(value)"
+      
+= render :partial => 'admin/bucket/assets_bucket'

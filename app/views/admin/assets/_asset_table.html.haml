@@ -14,11 +14,10 @@
   %tbody
     - unless assets.empty?
       - for asset in assets 
-        %tr.node.level-1
+        %tr.node.level-1{ :id => "asset_#{asset.id.to_s}" }
           - render_region :tbody, :locals => { :asset => asset } do |tbody|
             - tbody.thumbnail_cell do
               %td.asset
-                - asset_id = "asset_#{asset.id.to_s}"
                 = link_to image_tag(asset.thumbnail(:icon)), edit_admin_asset_path(asset), :class => 'icon'
             - tbody.title_cell do
               %td.asset-title
@@ -30,8 +29,8 @@
               %td.content_type
                 = asset.asset_content_type
             - tbody.bucket_cell do
-              %td.add-to-bucket
-                = link_to_remote('Add to bucket', :url => add_bucket_url(:id => asset))
+              %td.add-to-bucket 
+                = link_to 'Add to bucket', add_bucket_url(asset)
             - tbody.remove_cell do
               %td.remove
                 = link_to 'Remove', remove_admin_asset_path(asset)
