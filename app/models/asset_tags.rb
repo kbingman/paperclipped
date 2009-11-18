@@ -29,6 +29,7 @@ module AssetTags
     options = tag.attr.dup
     result = []
     assets = tag.locals.page.assets.find(:all, assets_find_options(tag))
+    tag.locals.assets = assets
     assets.each do |asset|
       tag.locals.asset = asset
       result << tag.expand
@@ -58,6 +59,14 @@ module AssetTags
      end
    end
    
+   tag 'assets:unless_first' do |tag|
+     attachments = tag.locals.assets
+     asset = tag.locals.asset
+     if asset != attachments.first.asset
+       tag.expand
+     end
+   end
+
    desc %{
      Renders the contained elements only if the current contextual page has one or
      more assets. The @min_count@ attribute specifies the minimum number of required
