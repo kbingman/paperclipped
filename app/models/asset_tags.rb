@@ -54,7 +54,7 @@ module AssetTags
    tag 'assets:if_first' do |tag|
      attachments = tag.locals.assets
      asset = tag.locals.asset
-     if asset == attachments.first.asset
+     if asset == attachments.first
        tag.expand
      end
    end
@@ -62,7 +62,7 @@ module AssetTags
    tag 'assets:unless_first' do |tag|
      attachments = tag.locals.assets
      asset = tag.locals.asset
-     if asset != attachments.first.asset
+     if asset != attachments.first
        tag.expand
      end
    end
