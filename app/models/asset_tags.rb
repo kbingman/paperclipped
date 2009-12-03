@@ -43,20 +43,66 @@ module AssetTags
     <pre><code><r:assets:first>...</r:assets:first></code></pre>
   }
   tag 'assets:first' do |tag|
-     attachments = tag.locals.page.page_attachments
-     if first = attachments.first
-       tag.locals.asset = first.asset
-       tag.expand
-     end
-   end
-   
-   tag 'assets:if_first' do |tag|
-     attachments = tag.locals.assets
-     asset = tag.locals.asset
-     if asset == attachments.first.asset
-       tag.expand
-     end
-   end
+    asset = tag.locals.page.assets.find(:first, assets_find_options(tag))  
+    tag.locals.asset = asset
+    tag.expand
+  end
+  
+  desc %{
+    Renders the contained elements only if the asset is the first in the returned collection.  
+    
+    *Usage:* 
+    <pre><code><r:assets:first>...</r:assets:first></code></pre>
+  }
+  tag 'assets:if_first' do |tag|
+    assets = tag.locals.assets    
+    asset = tag.locals.asset
+    if asset == assets.first
+      tag.expand
+    end
+  end
+  
+  desc %{
+    Renders the contained elements unless the asset is the first in the returned collection.  
+    
+    *Usage:* 
+    <pre><code><r:assets:first>...</r:assets:first></code></pre>
+  }
+  tag 'assets:unless_first' do |tag|
+    assets = tag.locals.assets      
+    asset = tag.locals.asset
+    unless asset == assets.first
+      tag.expand
+    end
+  end
+  
+  desc %{
+    Renders the contained elements only if the asset is the last in the returned collection.  
+    
+    *Usage:* 
+    <pre><code><r:assets:first>...</r:assets:first></code></pre>
+  }
+  tag 'assets:if_last' do |tag|
+    assets = tag.locals.assets       
+    asset = tag.locals.asset
+    if asset == assets.last
+      tag.expand
+    end
+  end
+  
+  desc %{
+    Renders the contained elements unless the asset is the last in the returned collection.  
+    
+    *Usage:* 
+    <pre><code><r:assets:first>...</r:assets:first></code></pre>
+  }
+  tag 'assets:unless_last' do |tag|
+    assets = tag.locals.assets               
+    asset = tag.locals.asset
+    unless asset == assets.last
+      tag.expand
+    end
+  end
    
    desc %{
      Renders the contained elements only if the current contextual page has one or
