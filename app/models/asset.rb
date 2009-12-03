@@ -13,10 +13,34 @@ class Asset < ActiveRecord::Base
     [:image, :video, :audio, :swf, :pdf, :movie]
   end  
 
-  class << self
-    Asset.known_types.each do |type|
-      define_method "#{type}?" do |asset_content_type|
-        Mime::Type.lookup_by_extension(type.to_s) == asset_content_type.to_s
+  def self.register_type(type, mimes)
+    constname = type.to_s.upcase.to_sym
+    Mime.send(:remove_const, constname) if Mime.const_defined?(constname)
+    constname = type.to_s.upcase.to_sym
+    Mime.send(:remove_const, constname) if Mime.const_defined?(constname)
+    Mime::Type.register mimes.shift, type, mimes       # Mime::Type.register 'image/png', :image, %w[image/x-png image/jpeg image/pjpeg image/jpg image/gif]
+
+    self.class.send :define_method, "#{type}?".intern do |content_type|
+      Mime::Type.lookup_by_extension(type.to_s) == content_type.to_s
+    end
+  
+    define_method "#{type}?".intern do
+      self.class.send "#{type}?".intern, asset_content_type
+    end
+
+    self.class.send :define_method, "#{type}_condition".intern do
+      types = Mime::Type.lookup_by_extension(type.to_s).all_types
+      send(:sanitize_sql, ['asset_content_type IN (?)', types])
+    end
+
+    self.class.send :define_method, "not_#{type}_condition".intern do
+      types = Mime::Type.lookup_by_extension(type.to_s).all_types
+      send(:sanitize_sql, ['NOT asset_content_type IN (?)', types])
+    end
+  
+    named_scope type.to_s.pluralize.intern, :conditions => self.send("#{type}_condition".intern) do
+      def paged (options={})
+        paginate({:per_page => 20, :page => 1}.merge(options))
       end
 
       define_method "#{type}_condition" do
