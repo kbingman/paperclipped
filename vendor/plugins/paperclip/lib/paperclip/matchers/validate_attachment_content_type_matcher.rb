@@ -46,8 +46,9 @@ module Paperclip
           types.all? do |type|
             file = StringIO.new(".")
             file.content_type = type
-            (subject = @subject.new).attachment_for(@attachment_name).assign(file)
-            subject.valid? && subject.errors.on(:"#{@attachment_name}_content_type").blank?
+            attachment = @subject.new.attachment_for(@attachment_name)
+            attachment.assign(file)
+            attachment.errors[:content_type].nil?
           end
         end
 
