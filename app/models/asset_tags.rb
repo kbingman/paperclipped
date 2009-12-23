@@ -29,6 +29,7 @@ module AssetTags
     options = tag.attr.dup
     result = []
     assets = tag.locals.page.assets.find(:all, assets_find_options(tag))
+    tag.locals.assets = assets
     assets.each do |asset|
       tag.locals.asset = asset
       result << tag.expand
@@ -43,44 +44,65 @@ module AssetTags
     <pre><code><r:assets:first>...</r:assets:first></code></pre>
   }
   tag 'assets:first' do |tag|
-     attachments = tag.locals.page.page_attachments
-     if first = attachments.first
-       tag.locals.asset = first.asset
-       tag.expand
-     end
-   end
-   
-   tag 'assets:if_first' do |tag|
-     attachments = tag.locals.assets
-     asset = tag.locals.asset
-     if asset == attachments.first.asset
-       tag.expand
-     end
-   end
-   
-   desc %{
-     Renders the contained elements only if the current contextual page has one or
-     more assets. The @min_count@ attribute specifies the minimum number of required
-     assets. You can also filter by extensions with the @extensions@ attribute.
-
-     *Usage:*
-     <pre><code><r:if_assets [min_count="n"] [extensions="pdf|jpg"]>...</r:if_assets></code></pre>
-   }
-   tag 'if_assets' do |tag|
-     count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 1
-     assets = tag.locals.page.assets.count(:conditions => assets_find_options(tag)[:conditions])
-     tag.expand if assets >= count
-   end
-   
-   desc %{
-     The opposite of @<r:if_attachments/>@.
-   }
-   tag 'unless_assets' do |tag|
-     count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 1
-     assets = tag.locals.page.assets.count(:conditions => assets_find_options(tag)[:conditions])
-     tag.expand unless assets >= count
-   end
-
+    attachments = tag.locals.page.page_attachments
+    if first = attachments.first
+      tag.locals.asset = first.asset
+      tag.expand
+    end
+  end
+  
+  desc %{
+    Renders the asset only if the asset is the first asset attached to the current page.   
+  
+    *Usage:*
+    <pre><code><r:if_assets [min_count="n"] [extensions="pdf|jpg"]>...</r:if_assets></code></pre>
+  }
+  tag 'assets:if_first' do |tag|
+    attachments = tag.locals.assets
+    asset = tag.locals.asset
+    if asset == attachments.first
+      tag.expand
+    end
+  end  
+  
+  
+  desc %{
+    Renders the asset only if the asset is not the first asset attached to the current page.
+    
+    *Usage:*
+    <pre><code><r:if_assets [min_count="n"] [extensions="pdf|jpg"]>...</r:if_assets></code></pre>
+  }
+  tag 'assets:unless_first' do |tag|
+    attachments = tag.locals.assets
+    asset = tag.locals.asset
+    if asset != attachments.first
+      tag.expand
+    end
+  end
+  
+  desc %{
+    Renders the contained elements only if the current contextual page has one or
+    more assets. The @min_count@ attribute specifies the minimum number of required
+    assets. You can also filter by extensions with the @extensions@ attribute.
+  
+    *Usage:*
+    <pre><code><r:if_assets [min_count="n"] [extensions="pdf|jpg"]>...</r:if_assets></code></pre>
+  }
+  tag 'if_assets' do |tag|
+    count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 1
+    assets = tag.locals.page.assets.count(:conditions => assets_find_options(tag)[:conditions])
+    tag.expand if assets >= count
+  end
+  
+  desc %{
+    The opposite of @<r:if_attachments/>@.
+  }
+  tag 'unless_assets' do |tag|
+    count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 1
+    assets = tag.locals.page.assets.count(:conditions => assets_find_options(tag)[:conditions])
+    tag.expand unless assets >= count
+  end
+  
     desc %{
       Renders the value for a top padding for the image. Put the image in a container with specified height and using this tag you can vertically align the image within it's container.
 

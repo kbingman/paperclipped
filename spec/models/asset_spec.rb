@@ -64,6 +64,5 @@ describe Asset do
       image.thumbnail('thumbnail').should == "/images/assets/pdf_thumbnail.png"
     end
   end
->>>>>>> dd09602a1ff50a836b9f26300e4bd7c6f1e9471d:spec/models/asset_spec.rb
 
 end
