@@ -4,7 +4,7 @@ module AssetTags
   class TagError < StandardError; end
   
   desc %{
-    The namespace for referencing images and assets.  You may specify the 'title'
+    The namespace for referencing images and assets.  You may specify the @title@
     attribute on this tag for all contained tags to refer to that asset.  
     
     *Usage:* 
@@ -18,9 +18,9 @@ module AssetTags
   desc %{
     Cycles through all assets attached to the current page.  
     This tag does not require the title atttribute, nor do any of its children.
-    Use the `limit' and `offset` attribute to render a specific number of assets.
-    Use `by` and `order` attributes to control the order of assets.
-    Use `extensions` attribute to specify which assets to be rendered.
+    Use the @limit@ and @offset@ attribute to render a specific number of assets.
+    Use @by@ and @order@ attributes to control the order of assets.
+    Use @extensions@ attribute to specify which assets to be rendered.
     
     *Usage:* 
     <pre><code><r:assets:each [limit=0] [offset=0] [order="asc|desc"] [by="position|title|..."] [extensions="png|pdf|doc"]>...</r:assets:each></code></pre>
@@ -43,99 +43,99 @@ module AssetTags
     <pre><code><r:assets:first>...</r:assets:first></code></pre>
   }
   tag 'assets:first' do |tag|
-     attachments = tag.locals.page.page_attachments
-     if first = attachments.first
-       tag.locals.asset = first.asset
-       tag.expand
-     end
-   end
-   
-   tag 'assets:if_first' do |tag|
-     attachments = tag.locals.assets
-     asset = tag.locals.asset
-     if asset == attachments.first.asset
-       tag.expand
-     end
-   end
-   
-   desc %{
-     Renders the contained elements only if the current contextual page has one or
-     more assets. The @min_count@ attribute specifies the minimum number of required
-     assets. You can also filter by extensions with the @extensions@ attribute.
-
-     *Usage:*
-     <pre><code><r:if_assets [min_count="n"] [extensions="pdf|jpg"]>...</r:if_assets></code></pre>
-   }
-   tag 'if_assets' do |tag|
-     count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 1
-     assets = tag.locals.page.assets.count(:conditions => assets_find_options(tag)[:conditions])
-     tag.expand if assets >= count
-   end
-   
-   desc %{
-     The opposite of @<r:if_attachments/>@.
-   }
-   tag 'unless_assets' do |tag|
-     count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 1
-     assets = tag.locals.page.assets.count(:conditions => assets_find_options(tag)[:conditions])
-     tag.expand unless assets >= count
-   end
-
+    attachments = tag.locals.page.page_attachments
+    if first = attachments.first
+      tag.locals.asset = first.asset
+      tag.expand
+    end
+  end
+  
+  tag 'assets:if_first' do |tag|
+    attachments = tag.locals.assets
+    asset = tag.locals.asset
+    if asset == attachments.first.asset
+      tag.expand
+    end
+  end
+  
+  desc %{
+    Renders the contained elements only if the current contextual page has one or
+    more assets. The @min_count@ attribute specifies the minimum number of required
+    assets. You can also filter by extensions with the @extensions@ attribute.
+  
+    *Usage:*
+    <pre><code><r:if_assets [min_count="n"] [extensions="pdf|jpg"]>...</r:if_assets></code></pre>
+  }
+  tag 'if_assets' do |tag|
+    count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 1
+    assets = tag.locals.page.assets.count(:conditions => assets_find_options(tag)[:conditions])
+    tag.expand if assets >= count
+  end
+  
+  desc %{
+    The opposite of @<r:if_assets/>@.
+  }
+  tag 'unless_assets' do |tag|
+    count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 1
+    assets = tag.locals.page.assets.count(:conditions => assets_find_options(tag)[:conditions])
+    tag.expand unless assets >= count
+  end
+  
+  desc %{
+    Renders the value for a top padding for the image. Put the image in a container with specified height and using this tag you can vertically align the image within it's container.
+  
+    *Usage*:
+    <pre><code><r:assets:top_padding container = "140" [size="icon"]/></code></pre>
+  
+    *Working Example*:
+    <pre><code>
+      <ul>
+        <r:assets:each>
+          <li style="height:140px">
+            <img style="padding-top:<r:top_padding size='category' container='140' />px" 
+                 src="<r:url />" alt="<r:title />" />
+          </li>
+        </r:assets:each>
+      </ul>
+    </code></pre>
+  }
+  tag 'assets:top_padding' do |tag|
+    raise TagError, "'container' attribute required" unless tag.attr['container']
+    options = tag.attr.dup
+    asset = find_asset(tag, options)
+    if asset.image?
+      size = options['size'] ? options.delete('size') : 'icon'
+      container = options.delete('container')
+      img_height = asset.height(size)
+      (container.to_i - img_height.to_i)/2
+    else
+      raise TagError, "Asset is not an image"
+    end
+  end
+  
+  ['height','width'].each do |dimension|
     desc %{
-      Renders the value for a top padding for the image. Put the image in a container with specified height and using this tag you can vertically align the image within it's container.
-
-      *Usage*:
-      <pre><code><r:assets:top_padding container = "140" [size="icon"]/></code></pre>
-
-      *Working Example*:
-      <pre><code>
-        <ul>
-          <r:assets:each>
-            <li style="height:140px">
-              <img style="padding-top:<r:top_padding size='category' container='140' />px" 
-                   src="<r:url />" alt="<r:title />" />
-            </li>
-          </r:assets:each>
-        </ul>
-      </code></pre>
+      Renders the #{dimension} of the asset.
     }
-    tag "assets:top_padding" do |tag|
-      raise TagError, "'container' attribute required" unless tag.attr['container']
+    tag "assets:#{dimension}" do |tag|
       options = tag.attr.dup
       asset = find_asset(tag, options)
-      if asset.image?
-        size = options['size'] ? options.delete('size') : 'icon'
-        container = options.delete('container')
-        img_height = asset.height(size)
-        (container.to_i - img_height.to_i)/2
+      if asset.dimensions_known?
+        size = options['size'] ? options.delete('size') : 'original'
+        asset.send(dimension, size)
       else
-        raise TagError, "Asset is not an image"
+        raise TagError, "Can't determine #{dimension} for this Asset. It may not be a supported type."
       end
     end
-   
-    ['height','width'].each do |dimension|
-      desc %{
-        Renders the #{dimension} of the asset.
-      }
-      tag "assets:#{dimension}" do |tag|
-        options = tag.attr.dup
-        asset = find_asset(tag, options)
-        if asset.dimensions_known?
-          size = options['size'] ? options.delete('size') : 'original'
-          asset.send(dimension, size)
-        else
-          raise TagError, "Can't determine #{dimension} for this Asset. It may not be a supported type."
-        end
-      end
-    end
+  end
 
   desc %{
-    Renders the containing elements only if the asset's content type matches the regular expression given in the matches attribute.
-    The 'title' attribute is required on the parent tag unless this tag is used in assets:each.
-    If the 'ignore_case' attribute is set to false, the match is case sensitive. By default, 'ignore_case' is set to true.
+    Renders the containing elements only if the asset's content type matches the regular expression given in the @matches@ attribute.
+    The @title@ attribute is required on the parent tag unless this tag is used in @assets:each@.
+    If the @ignore_case@ attribute is set to false, the match is case sensitive. By default, @ignore_case@ is set to true.
 
     *Usage:* 
-    <pre><code><r:assets:each:if_content_type matches="regexp" [ignore_case=true|false"]>...</r:assets:each:if_content_type></code></pre>
+    <pre><code><r:assets:each><r:if_content_type matches="regexp" [ignore_case=true|false"]>...</r:if_content_type></r:assets:each></code></pre>
   }
   tag 'assets:if_content_type' do |tag|
     options = tag.attr.dup
@@ -189,6 +189,7 @@ module AssetTags
       raise TagError, "Asset is not an image"
     end
   end
+  
   desc %{
     Embeds a flash-movie in a cross-browser-compatible fashion using only HTML
     If no width and height attributes are given it will use the intrinsic
@@ -264,7 +265,7 @@ module AssetTags
   end
 
   desc %{
-  Renders the 'extension' virtual attribute of the asset, extracted from filename.
+  Renders the extension of the asset, as extracted from its filename.
   
   *Usage*:
     <pre><code>
