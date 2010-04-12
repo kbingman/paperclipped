@@ -126,17 +126,14 @@ module AssetTags
     </code></pre>
   }
   tag 'assets:top_padding' do |tag|
-    raise TagError, "'container' attribute required" unless tag.attr['container']
     options = tag.attr.dup
     asset = find_asset(tag, options)
-    if asset.image?
-      size = options['size'] ? options.delete('size') : 'icon'
-      container = options.delete('container')
-      img_height = asset.height(size)
-      (container.to_i - img_height.to_i)/2
-    else
-      raise TagError, "Asset is not an image"
-    end
+    raise TagError, 'Asset is not an image' unless asset.image?
+    raise TagError, "'container' attribute required" unless options['container']
+    size = options['size'] ? options.delete('size') : 'icon'
+    container = options.delete('container')
+    img_height = asset.height(size)
+    (container.to_i - img_height.to_i)/2
   end
   
   ['height','width'].each do |dimension|
@@ -146,12 +143,11 @@ module AssetTags
     tag "assets:#{dimension}" do |tag|
       options = tag.attr.dup
       asset = find_asset(tag, options)
-      if asset.dimensions_known?
-        size = options['size'] ? options.delete('size') : 'original'
-        asset.send(dimension, size)
-      else
+      unless asset.dimensions_known?
         raise TagError, "Can't determine #{dimension} for this Asset. It may not be a supported type."
       end
+      size = options['size'] ? options.delete('size') : 'original'
+      asset.send(dimension, size)
     end
   end
 
@@ -223,20 +219,17 @@ module AssetTags
   tag 'assets:image' do |tag|
     options = tag.attr.dup
     asset = find_asset(tag, options)
-    if asset.image?
-      size = options['size'] ? options.delete('size') : 'original'
-      geometry = options['geometry'] ? options.delete('geometry') : nil
-      #This is very exoerimental and will generate new sizes on the fly
-      asset.generate_style(size, { :size => geometry }) if geometry
-      
-      alt = " alt='#{asset.title}'" unless tag.attr['alt'] rescue nil
-      attributes = options.inject('') { |s, (k, v)| s << %{#{k.downcase}="#{v}" } }.strip
-      attributes << alt unless alt.nil?
-      url = asset.thumbnail(size)
-      %{<img src="#{url}" #{attributes unless attributes.empty?} />} rescue nil
-    else
-      raise TagError, 'Asset is not an image'
-    end
+    raise TagError, 'Asset is not an image' unless asset.image?
+    size = options['size'] ? options.delete('size') : 'original'
+    geometry = options['geometry'] ? options.delete('geometry') : nil
+    #This is very experimental and will generate new sizes on the fly
+    asset.generate_style(size, { :size => geometry }) if geometry
+    
+    alt = " alt='#{asset.title}'" unless tag.attr['alt'] rescue nil
+    attributes = options.inject('') { |s, (k, v)| s << %{#{k.downcase}="#{v}" } }.strip
+    attributes << alt unless alt.nil?
+    url = asset.thumbnail(size)
+    %{<img src="#{url}" #{attributes unless attributes.empty?} />} rescue nil
   end
   
   desc %{
