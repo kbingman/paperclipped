@@ -170,21 +170,20 @@ class Asset < ActiveRecord::Base
   
   def dimensions(size='original')
     @dimensions ||= {}
-    @dimensions[size] ||= image? && begin
-      image_file = "#{RAILS_ROOT}/public#{self.thumbnail(size)}"
-      image_size = ImageSize.new(open(image_file).read)
-      [image_size.get_width, image_size.get_height]
+    @dimensions[size] ||= supported_by_image_size? && begin
+      image_size = ImageSize.new(File.read(filesystem_path(size)))
+      [image_size.width, image_size.height]
     rescue
       [0, 0]
     end
   end
   
   def width(size='original')
-    image? && self.dimensions(size)[0]
+    supported_by_image_size? && self.dimensions(size)[0]
   end
   
   def height(size='original')
-    image? && self.dimensions(size)[1]
+    supported_by_image_size? && self.dimensions(size)[1]
   end
 
   #delegating methods like image? to class
@@ -193,6 +192,13 @@ class Asset < ActiveRecord::Base
   end
   
   private
+    def filesystem_path(size='original')
+      "#{RAILS_ROOT}/public#{thumbnail(size)}"
+    end
+    
+    def supported_by_image_size?
+      image? || swf?
+    end
   
     def assign_title
       self.title = basename if title.blank?
