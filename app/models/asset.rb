@@ -246,24 +246,24 @@ class Asset < ActiveRecord::Base
   
   def dimensions(size='original')
     @dimensions ||= {}
-    @dimensions[size] ||= supported_by_image_size? && begin
-      image_size = ImageSize.new(File.read(filesystem_path(size)))
-      [image_size.width, image_size.height]
+    @dimensions[size] ||= supported_by_image_spec? && begin
+      image_spec = ImageSpec.new(filesystem_path(size))
+      [image_spec.width, image_spec.height]
     rescue
       [0, 0]
     end
   end
   
   def dimensions_known?
-    defined?(ImageSize) && supported_by_image_size?
+    defined?(ImageSpec) && supported_by_image_spec?
   end
   
   def width(size='original')
-    supported_by_image_size? && self.dimensions(size)[0]
+    supported_by_image_spec? && self.dimensions(size)[0]
   end
   
   def height(size='original')
-    supported_by_image_size? && self.dimensions(size)[1]
+    supported_by_image_spec? && self.dimensions(size)[1]
   end
   
   private
@@ -271,7 +271,7 @@ class Asset < ActiveRecord::Base
       "#{RAILS_ROOT}/public#{thumbnail(size)}"
     end
     
-    def supported_by_image_size?
+    def supported_by_image_spec?
       image? || swf?
     end
   
