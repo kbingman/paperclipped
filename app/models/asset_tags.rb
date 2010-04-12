@@ -4,7 +4,7 @@ module AssetTags
   class TagError < StandardError; end
   
   desc %{
-    The namespace for referencing images and assets.  You may specify the @title@
+    The namespace for referencing images and assets. You may specify the @title@
     attribute on this tag for all contained tags to refer to that asset.  
     
     *Usage:* 
@@ -52,10 +52,11 @@ module AssetTags
   end
   
   desc %{
-    Renders the asset only if the asset is the first asset attached to the current page.   
+    Renders the contained elements only if the current asset is the first
+    asset attached to the current page.
   
     *Usage:*
-    <pre><code><r:if_assets [min_count="n"] [extensions="pdf|jpg"]>...</r:if_assets></code></pre>
+    <pre><code><r:if_first>...</r:if_first></code></pre>
   }
   tag 'assets:if_first' do |tag|
     attachments = tag.locals.assets
@@ -67,10 +68,11 @@ module AssetTags
   
   
   desc %{
-    Renders the asset only if the asset is not the first asset attached to the current page.
+    Renders the contained elements only if the current asset is not the first
+    asset attached to the current page.
     
     *Usage:*
-    <pre><code><r:if_assets [min_count="n"] [extensions="pdf|jpg"]>...</r:if_assets></code></pre>
+    <pre><code><r:unless_first>...</r:unless_first></code></pre>
   }
   tag 'assets:unless_first' do |tag|
     attachments = tag.locals.assets
@@ -104,7 +106,9 @@ module AssetTags
   end
   
   desc %{
-    Renders the value for a top padding for the image. Put the image in a container with specified height and using this tag you can vertically align the image within it's container.
+    Renders the value for a top padding for the image. Put the image in a
+    container with specified height and using this tag you can vertically
+    align the image within it's container.
   
     *Usage*:
     <pre><code><r:assets:top_padding container = "140" [size="icon"]/></code></pre>
@@ -152,9 +156,12 @@ module AssetTags
   end
 
   desc %{
-    Renders the containing elements only if the asset's content type matches the regular expression given in the @matches@ attribute.
+    Renders the containing elements only if the asset's content type matches
+    the regular expression given in the @matches@ attribute. If the
+    @ignore_case@ attribute is set to false, the match is case sensitive. By
+    default, @ignore_case@ is set to true.
+      
     The @title@ attribute is required on the parent tag unless this tag is used in @assets:each@.
-    If the @ignore_case@ attribute is set to false, the match is case sensitive. By default, @ignore_case@ is set to true.
 
     *Usage:* 
     <pre><code><r:assets:each><r:if_content_type matches="regexp" [ignore_case=true|false"]>...</r:if_content_type></r:assets:each></code></pre>
@@ -203,8 +210,12 @@ module AssetTags
   end
   
   desc %{
-    Renders an image tag for the asset. Using the option size attribute, different sizes can be display. Thumbnail and icon are built 
-    in, but custom sizes can be set using assets.addition_thumbnails in the Radiant::Config settings.
+    Renders an image tag for the asset.
+    
+    Using the optional @size@ attribute, different sizes can be display.
+    “thumbnail” and “icon” sizes are built in, but custom ones can be set
+    using by changing assets.addition_thumbnails in the Radiant::Config
+    settings.
     
     *Usage:* 
     <pre><code><r:assets:image [title="asset_title"] [size="icon|thumbnail"]></code></pre>
@@ -224,7 +235,7 @@ module AssetTags
       url = asset.thumbnail(size)
       %{<img src="#{url}" #{attributes unless attributes.empty?} />} rescue nil
     else
-      raise TagError, "Asset is not an image"
+      raise TagError, 'Asset is not an image'
     end
   end
   
@@ -280,7 +291,7 @@ module AssetTags
     generate a link to that size. 
     
     *Usage:* 
-    <pre><code><r:image [title="asset_title"] [size="icon|thumbnail"]></code></pre>
+    <pre><code><r:assets:link [title="asset_title"] [size="icon|thumbnail"] /></code></pre>
   }
   tag 'assets:link' do |tag|
     options = tag.attr.dup
@@ -316,8 +327,8 @@ module AssetTags
       </ul>
     </code></pre>
   }
-  tag "assets:extension" do |tag|
-    raise TagError, "must be nested inside an assets or assets:each tag" unless tag.locals.asset
+  tag 'assets:extension' do |tag|
+    raise TagError, 'must be nested inside an assets or assets:each tag' unless tag.locals.asset
     asset = tag.locals.asset
     asset.asset_file_name[/\.(\w+)$/, 1]
   end
@@ -339,8 +350,8 @@ module AssetTags
         nil
       end
       
-      by = attr[:by] || "page_attachments.position"
-      order = attr[:order] || "asc"
+      by = attr[:by] || 'page_attachments.position'
+      order = attr[:order] || 'asc'
       
       options = {
         :order => "#{by} #{order}",
