@@ -126,8 +126,7 @@ module AssetTags
     </code></pre>
   }
   tag 'assets:top_padding' do |tag|
-    options = tag.attr.dup
-    asset = find_asset(tag, options)
+    asset, options = asset_and_options(tag)
     raise TagError, 'Asset is not an image' unless asset.image?
     raise TagError, "'container' attribute required" unless options['container']
     size = options['size'] ? options.delete('size') : 'icon'
@@ -141,8 +140,7 @@ module AssetTags
       Renders the #{dimension} of the asset.
     }
     tag "assets:#{dimension}" do |tag|
-      options = tag.attr.dup
-      asset = find_asset(tag, options)
+      asset, options = asset_and_options(tag)
       unless asset.dimensions_known?
         raise TagError, "Can't determine #{dimension} for this Asset. It may not be a supported type."
       end
@@ -193,15 +191,13 @@ module AssetTags
       Renders the @#{method.to_s}@ attribute of the asset
     }
     tag "assets:#{method.to_s}" do |tag|
-      options = tag.attr.dup
-      asset = find_asset(tag, options)
+      asset, options = asset_and_options(tag)
       asset.send(method) rescue nil
     end
   end
   
   tag 'assets:filename' do |tag|
-    options = tag.attr.dup
-    asset = find_asset(tag, options)
+    asset, options = asset_and_options(tag)
     asset.asset_file_name rescue nil
   end
   
@@ -217,8 +213,7 @@ module AssetTags
     <pre><code><r:assets:image [title="asset_title"] [size="icon|thumbnail"]></code></pre>
   }    
   tag 'assets:image' do |tag|
-    options = tag.attr.dup
-    asset = find_asset(tag, options)
+    asset, options = asset_and_options(tag)
     raise TagError, 'Asset is not an image' unless asset.image?
     size = options['size'] ? options.delete('size') : 'original'
     geometry = options['geometry'] ? options.delete('geometry') : nil
@@ -251,7 +246,7 @@ module AssetTags
       </flash></code></pre>
   }
   tag 'assets:flash' do |tag|
-    asset = find_asset(tag, tag.attr.dup)
+    asset, options = asset_and_options(tag)
     raise TagError, 'Must be flash' unless asset.swf?
     url = asset.thumbnail('original')
     dimensions = [(tag.attr['width'] || asset.width),(tag.attr['height'] || asset.height)]
@@ -259,8 +254,7 @@ module AssetTags
   end
   
   tag 'assets:thumbnail' do |tag|
-    options = tag.attr.dup
-    asset = find_asset(tag, options)
+    asset, options = asset_and_options(tag)
     asset.generate_thumbnail('test', ['24x24#',nil])
     asset.save    
   end
@@ -273,8 +267,7 @@ module AssetTags
     <pre><code><r:image [title="asset_title"] [size="icon|thumbnail"]></code></pre>
   }    
   tag 'assets:url' do |tag|
-    options = tag.attr.dup
-    asset = find_asset(tag, options)
+    asset, options = asset_and_options(tag)
     size = options['size'] ? options.delete('size') : 'original'
     asset.thumbnail(size) rescue nil
   end
@@ -287,8 +280,7 @@ module AssetTags
     <pre><code><r:assets:link [title="asset_title"] [size="icon|thumbnail"] /></code></pre>
   }
   tag 'assets:link' do |tag|
-    options = tag.attr.dup
-    asset = find_asset(tag, options)
+    asset, options = asset_and_options(tag)
     size = options['size'] ? options.delete('size') : 'original'
     text = options['text'] || asset.title
     anchor = options['anchor'] ? "##{options.delete('anchor')}" : ''
@@ -327,6 +319,10 @@ module AssetTags
   end
   
   private
+    def asset_and_options(tag)
+      options = tag.attr.dup
+      [find_asset(tag, options), options]
+    end
     
     def find_asset(tag, options)
       raise TagError, "'title' attribute required" unless title = options.delete('title') or id = options.delete('id') or tag.locals.asset
