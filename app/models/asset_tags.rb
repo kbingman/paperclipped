@@ -4,7 +4,7 @@ module AssetTags
   class TagError < StandardError; end
   
   desc %{
-    The namespace for referencing images and assets.  You may specify the 'title'
+    The namespace for referencing images and assets.  You may specify the @title@
     attribute on this tag for all contained tags to refer to that asset.  
     
     *Usage:* 
@@ -18,9 +18,9 @@ module AssetTags
   desc %{
     Cycles through all assets attached to the current page.  
     This tag does not require the title atttribute, nor do any of its children.
-    Use the `limit' and `offset` attribute to render a specific number of assets.
-    Use `by` and `order` attributes to control the order of assets.
-    Use `extensions` attribute to specify which assets to be rendered.
+    Use the @limit@ and @offset@ attribute to render a specific number of assets.
+    Use @by@ and @order@ attributes to control the order of assets.
+    Use @extensions@ attribute to specify which assets to be rendered.
     
     *Usage:* 
     <pre><code><r:assets:each [limit=0] [offset=0] [order="asc|desc"] [by="position|title|..."] [extensions="png|pdf|doc"]>...</r:assets:each></code></pre>
@@ -95,7 +95,7 @@ module AssetTags
   end
   
   desc %{
-    The opposite of @<r:if_attachments/>@.
+    The opposite of @<r:if_assets/>@.
   }
   tag 'unless_assets' do |tag|
     count = tag.attr['min_count'] && tag.attr['min_count'].to_i || 1
@@ -103,61 +103,61 @@ module AssetTags
     tag.expand unless assets >= count
   end
   
+  desc %{
+    Renders the value for a top padding for the image. Put the image in a container with specified height and using this tag you can vertically align the image within it's container.
+  
+    *Usage*:
+    <pre><code><r:assets:top_padding container = "140" [size="icon"]/></code></pre>
+  
+    *Working Example*:
+    <pre><code>
+      <ul>
+        <r:assets:each>
+          <li style="height:140px">
+            <img style="padding-top:<r:top_padding size='category' container='140' />px" 
+                 src="<r:url />" alt="<r:title />" />
+          </li>
+        </r:assets:each>
+      </ul>
+    </code></pre>
+  }
+  tag 'assets:top_padding' do |tag|
+    raise TagError, "'container' attribute required" unless tag.attr['container']
+    options = tag.attr.dup
+    asset = find_asset(tag, options)
+    if asset.image?
+      size = options['size'] ? options.delete('size') : 'icon'
+      container = options.delete('container')
+      img_height = asset.height(size)
+      (container.to_i - img_height.to_i)/2
+    else
+      raise TagError, "Asset is not an image"
+    end
+  end
+  
+  ['height','width'].each do |dimension|
     desc %{
-      Renders the value for a top padding for the image. Put the image in a container with specified height and using this tag you can vertically align the image within it's container.
-
-      *Usage*:
-      <pre><code><r:assets:top_padding container = "140" [size="icon"]/></code></pre>
-
-      *Working Example*:
-      <pre><code>
-        <ul>
-          <r:assets:each>
-            <li style="height:140px">
-              <img style="padding-top:<r:top_padding size='category' container='140' />px" 
-                   src="<r:url />" alt="<r:title />" />
-            </li>
-          </r:assets:each>
-        </ul>
-      </code></pre>
+      Renders the #{dimension} of the asset.
     }
-    tag "assets:top_padding" do |tag|
-      raise TagError, "'container' attribute required" unless tag.attr['container']
+    tag "assets:#{dimension}" do |tag|
       options = tag.attr.dup
       asset = find_asset(tag, options)
-      if asset.image?
-        size = options['size'] ? options.delete('size') : 'icon'
-        container = options.delete('container')
-        img_height = asset.height(size)
-        (container.to_i - img_height.to_i)/2
+      if asset.dimensions_known?
+        size = options['size'] ? options.delete('size') : 'original'
+        asset.send(dimension, size)
       else
-        raise TagError, "Asset is not an image"
+        raise TagError, "Can't determine #{dimension} for this Asset. It may not be a supported type."
       end
     end
-   
-    ['height','width'].each do |att|
-      desc %{
-        Renders the #{att} of the asset.
-      }
-      tag "assets:#{att}" do |tag|
-        options = tag.attr.dup
-        asset = find_asset(tag, options)
-        if asset.image?
-          size = options['size'] ? options.delete('size') : 'original'
-          asset.send(att, size)
-        else
-          raise TagError, "Asset is not an image"
-        end
-      end
-    end
+  end
 
   desc %{
-    Renders the containing elements only if the asset's content type matches the regular expression given in the matches attribute.
-    The 'title' attribute is required on the parent tag unless this tag is used in assets:each.
-    If the 'ignore_case' attribute is set to false, the match is case sensitive. By default, 'ignore_case' is set to true.
+    Renders the containing elements only if the asset's content type matches the regular expression given in the @matches@ attribute.
+    The @title@ attribute is required on the parent tag unless this tag is used in @assets:each@.
+    If the @ignore_case@ attribute is set to false, the match is case sensitive. By default, @ignore_case@ is set to true.
 
     *Usage:* 
-    <pre><code><r:assets:each:if_content_type matches="regexp" [ignore_case=true|false"]>...</r:assets:each:if_content_type></code></pre>
+    <pre><code><r:assets:each><r:if_content_type matches="regexp" [ignore_case=true|false"]>...</r:if_content_type></r:assets:each></code></pre>
   }
   tag 'assets:if_content_type' do |tag|
     options = tag.attr.dup
@@ -168,10 +168,26 @@ module AssetTags
     tag.expand unless asset_content_type.match(regexp).nil?
   end
   
+  #TODO: could use better docs for Asset#other? case explaining what types it covers
+  Asset.known_types.each do |known_type|
+    desc %{
+      Renders the contents only of the asset is of the type #{known_type}
+    }
+    tag "assets:if_#{known_type}" do |tag|
+      tag.expand if find_asset(tag, tag.attr.dup).send("#{known_type}?".to_sym)
+    end
+
+    desc %{
+      Renders the contents only of the asset is not of the type #{known_type}
+    }
+    tag "assets:unless_#{known_type}" do |tag|
+      tag.expand unless find_asset(tag, tag.attr.dup).send("#{known_type}?".to_sym)
+    end
+  end
+  
   [:title, :caption, :asset_file_name, :asset_content_type, :asset_file_size, :id].each do |method|
     desc %{
-      Renders the `#{method.to_s}' attribute of the asset.     
-      The 'title' attribute is required on this tag or the parent tag.
+      Renders the @#{method.to_s}@ attribute of the asset
     }
     tag "assets:#{method.to_s}" do |tag|
       options = tag.attr.dup
@@ -180,7 +196,7 @@ module AssetTags
     end
   end
   
-  tag "assets:filename" do |tag|
+  tag 'assets:filename' do |tag|
     options = tag.attr.dup
     asset = find_asset(tag, options)
     asset.asset_file_name rescue nil
@@ -211,46 +227,31 @@ module AssetTags
       raise TagError, "Asset is not an image"
     end
   end
+  
   desc %{
     Embeds a flash-movie in a cross-browser-compatible fashion using only HTML
+    If no width and height attributes are given it will use the intrinsic
+    dimensions of the swf file
     
     *Usage:*
     <pre><code><r:assets:flash [title="asset_title"] [width="100"] [height="100"]>Fallback content</flash></code></pre>
     
     *Example with text fallback:*
-    <pre><code>
-      <r:assets:flash title="flash_movie" width="300"] height="200">
+    <pre><code><r:assets:flash title="flash_movie">
         Sorry, you need to have flash installed, <a href="http://adobe.com/flash">get it here</a>
-      </flash>
-    </code></pre>
+    </flash></code></pre>
     
-    *Example with image fallback:*
-    <pre><code>
-      <r:assets:flash title="flash_movie" width="300"] height="200">
+    *Example with image fallback and explicit dimensions:*
+    <pre><code><r:assets:flash title="flash_movie" width="300" height="200">
         <r:assets:image title="flash_screenshot" />
-      </flash>
-    </code></pre>
+      </flash></code></pre>
   }
   tag 'assets:flash' do |tag|
     asset = find_asset(tag, tag.attr.dup)
     raise TagError, 'Must be flash' unless asset.swf?
-    dimensions = %w[width height].inject('') do |attrs, dimension|
-      attrs << %{#{dimension}="#{tag.attr[dimension]}" } if tag.attr[dimension]
-      attrs
-    end.strip
     url = asset.thumbnail('original')
-    %{<!--[if !IE]> -->
-      <object type="application/x-shockwave-flash" data="#{url}" #{dimensions}>
-    <!-- <![endif]-->
-    <!--[if IE]>
-      <object #{dimensions}
-        classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-        codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0">
-        <param name="movie" value="#{url}" />
-    <!-->
-    #{tag.expand}
-      </object>
-    <!-- <![endif]-->}
+    dimensions = [(tag.attr['width'] || asset.width),(tag.attr['height'] || asset.height)]
+    swf_embed_markup url, dimensions, tag.expand
   end
   
   tag 'assets:thumbnail' do |tag|
@@ -302,7 +303,7 @@ module AssetTags
   end
 
   desc %{
-  Renders the 'extension' virtual attribute of the asset, extracted from filename.
+  Renders the extension of the asset, as extracted from its filename.
   
   *Usage*:
     <pre><code>
@@ -347,5 +348,21 @@ module AssetTags
         :offset => attr[:offset] || nil,
         :conditions => conditions
       }
-    end    
+    end
+    
+    def swf_embed_markup(url, dimensions, fallback_content)
+      width, height = dimensions
+      %{<!--[if !IE]> -->
+        <object type="application/x-shockwave-flash" data="#{url}" width="#{width}" height="#{height}">
+      <!-- <![endif]-->
+      <!--[if IE]>
+        <object width="#{width}" height="#{height}"
+          classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+          codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0">
+          <param name="movie" value="#{url}" />
+      <!-->
+      #{fallback_content}
+        </object>
+      <!-- <![endif]-->}
+    end
 end
