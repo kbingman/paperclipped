@@ -148,7 +148,7 @@ module AssetTags
   
   [:title, :caption, :asset_file_name, :asset_content_type, :asset_file_size, :id].each do |method|
     desc %{
-      Renders the `#{method.to_s}' attribute of the asset.     
+      Renders the '#{method.to_s}' attribute of the asset.     
       The 'title' attribute is required on this tag or the parent tag.
     }
     tag "assets:#{method.to_s}" do |tag|
@@ -158,7 +158,7 @@ module AssetTags
     end
   end
   
-  tag "assets:filename" do |tag|
+  tag 'assets:filename' do |tag|
     options = tag.attr.dup
     asset = find_asset(tag, options)
     asset.asset_file_name rescue nil
@@ -191,44 +191,28 @@ module AssetTags
   end
   desc %{
     Embeds a flash-movie in a cross-browser-compatible fashion using only HTML
+    If no width and height attributes are given it will use the intrinsic
+    dimensions of the swf file
     
     *Usage:*
     <pre><code><r:assets:flash [title="asset_title"] [width="100"] [height="100"]>Fallback content</flash></code></pre>
     
     *Example with text fallback:*
-    <pre><code>
-      <r:assets:flash title="flash_movie" width="300"] height="200">
+    <pre><code><r:assets:flash title="flash_movie">
         Sorry, you need to have flash installed, <a href="http://adobe.com/flash">get it here</a>
-      </flash>
-    </code></pre>
+    </flash></code></pre>
     
-    *Example with image fallback:*
-    <pre><code>
-      <r:assets:flash title="flash_movie" width="300"] height="200">
+    *Example with image fallback and explicit dimensions:*
+    <pre><code><r:assets:flash title="flash_movie" width="300" height="200">
         <r:assets:image title="flash_screenshot" />
-      </flash>
-    </code></pre>
+      </flash></code></pre>
   }
   tag 'assets:flash' do |tag|
     asset = find_asset(tag, tag.attr.dup)
     raise TagError, 'Must be flash' unless asset.swf?
-    dimensions = %w[width height].inject('') do |attrs, dimension|
-      attrs << %{#{dimension}="#{tag.attr[dimension]}" } if tag.attr[dimension]
-      attrs
-    end.strip
     url = asset.thumbnail('original')
-    %{<!--[if !IE]> -->
-      <object type="application/x-shockwave-flash" data="#{url}" #{dimensions}>
-    <!-- <![endif]-->
-    <!--[if IE]>
-      <object #{dimensions}
-        classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-        codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0">
-        <param name="movie" value="#{url}" />
-    <!-->
-    #{tag.expand}
-      </object>
-    <!-- <![endif]-->}
+    dimensions = [(tag.attr['width'] || asset.width),(tag.attr['height'] || asset.height)]
+    swf_embed_markup url, dimensions, tag.expand
   end
   
   tag 'assets:thumbnail' do |tag|
@@ -325,5 +309,21 @@ module AssetTags
         :offset => attr[:offset] || nil,
         :conditions => conditions
       }
-    end    
+    end
+    
+    def swf_embed_markup(url, dimensions, fallback_content)
+      width, height = dimensions
+      %{<!--[if !IE]> -->
+        <object type="application/x-shockwave-flash" data="#{url}" width="#{width}" height="#{height}">
+      <!-- <![endif]-->
+      <!--[if IE]>
+        <object width="#{width}" height="#{height}"
+          classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+          codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0">
+          <param name="movie" value="#{url}" />
+      <!-->
+      #{fallback_content}
+        </object>
+      <!-- <![endif]-->}
+    end
 end
