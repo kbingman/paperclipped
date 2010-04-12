@@ -146,10 +146,25 @@ module AssetTags
     tag.expand unless asset_content_type.match(regexp).nil?
   end
   
+  Asset.known_types.each do |known_type|
+    desc %{
+      Renders the contents only of the asset is of the type #{known_type}
+    }
+    tag "assets:if_#{known_type}" do |tag|
+      tag.expand if find_asset(tag, tag.attr.dup).send("#{known_type}?".to_sym)
+    end
+
+    desc %{
+      Renders the contents only of the asset is not of the type #{known_type}
+    }
+    tag "assets:unless_#{known_type}" do |tag|
+      tag.expand unless find_asset(tag, tag.attr.dup).send("#{known_type}?".to_sym)
+    end
+  end
+  
   [:title, :caption, :asset_file_name, :asset_content_type, :asset_file_size, :id].each do |method|
     desc %{
-      Renders the '#{method.to_s}' attribute of the asset.     
-      The 'title' attribute is required on this tag or the parent tag.
+      Renders the @#{method.to_s}@ attribute of the asset
     }
     tag "assets:#{method.to_s}" do |tag|
       options = tag.attr.dup
