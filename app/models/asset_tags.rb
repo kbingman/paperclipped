@@ -113,18 +113,18 @@ module AssetTags
       end
     end
    
-    ['height','width'].each do |att|
+    ['height','width'].each do |dimension|
       desc %{
-        Renders the #{att} of the asset.
+        Renders the #{dimension} of the asset.
       }
-      tag "assets:#{att}" do |tag|
+      tag "assets:#{dimension}" do |tag|
         options = tag.attr.dup
         asset = find_asset(tag, options)
-        if asset.image?
+        if asset.dimensions_known?
           size = options['size'] ? options.delete('size') : 'original'
-          asset.send(att, size)
+          asset.send(dimension, size)
         else
-          raise TagError, "Asset is not an image"
+          raise TagError, "Can't determine #{dimension} for this Asset. It may not be a supported type."
         end
       end
     end

@@ -178,6 +178,10 @@ class Asset < ActiveRecord::Base
     end
   end
   
+  def dimensions_known?
+    defined?(ImageSize) && supported_by_image_size?
+  end
+  
   def width(size='original')
     supported_by_image_size? && self.dimensions(size)[0]
   end
