@@ -366,3 +366,4 @@ module AssetTags
       <!-- <![endif]-->}
     end
 end
+
