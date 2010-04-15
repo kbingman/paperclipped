@@ -264,7 +264,7 @@ module AssetTags
     generate the url for that size. 
     
     *Usage:* 
-    <pre><code><r:image [title="asset_title"] [size="icon|thumbnail"]></code></pre>
+    <pre><code><r:url [title="asset_title"] [size="icon|thumbnail"]></code></pre>
   }    
   tag 'assets:url' do |tag|
     asset, options = asset_and_options(tag)
