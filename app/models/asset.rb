@@ -179,7 +179,7 @@ class Asset < ActiveRecord::Base
                     },
                     :bucket => Radiant::Config["assets.s3.bucket"],
                     :url => Radiant::Config["assets.url"] ? Radiant::Config["assets.url"] : "/:class/:id/:basename:no_original_style.:extension", 
-                    :path => Radiant::Config["assets.path"] ? Radiant::Config["assets.path"] : ":class/:id/:basename:no_original_style.:extension"
+                    :path => Radiant::Config["assets.path"] ? Radiant::Config["assets.path"] : ":rails_root/public/:class/:id/:basename:no_original_style.:extension"
                                  
   has_many :page_attachments, :dependent => :destroy
   has_many :pages, :through => :page_attachments
