@@ -21,15 +21,11 @@ This runs the database migrations and installs the javascripts, images and css.
 
 If you install the Settings Extension (highly recommended), you can also easily adjust both the sizes of any additional thumbnails and which thumbnails are displayed in the image edit view. The default is the original file, but any image size can be used by giving in the name of that size. 
 
-If you do install the Settings Extension you should be sure to add a config.exetensions line to your environment.rb file: 
+If you do install the Settings Extension you should be sure to add a config.extensions line to your environment.rb file: 
 
     config.extensions = [ :settings, :all ]
    
 Also the Settings Extension migration should be run before Paperclipped's migration.
-
-You also need the ImageSize gem required in `environment.rb`:
-
-    config.gem 'imagesize', :lib => 'image_size'
 
 The configuration settings also enable a list of the allowed file types, maximum file size and should you need it, the path to your installation of Image Magick (this should not be needed, but I sometimes had a problem when using mod_rails).
 
