@@ -23,7 +23,7 @@
           = check_box_tag 'filter[image]',  '1', false, :id => 'images-check' 
           = check_box_tag 'filter[other]',  '1', false, :id => 'others-check' 
           = check_box_tag 'filter[movie]',  '1', false, :id => 'movies-check'
-      - if current_user.admin?
+      - if false #current_user.admin? # turned off for now, this might be too dangerous to reveal
         .regenerator
           = link_to 'Regenerate Thumbnails', refresh_admin_assets_path, :confirm => 'Beware that this will take a while and consume considerable resources on your server. Are you sure you want to continue?'
 #assets_table.outset
@@ -33,7 +33,7 @@
 
 
 #actions
-  =# will_paginate @assets
+  =# will_paginate @assets # wait for radiant to be updated
   %ul
     %li= link_to((image('plus', :alt => '') + ' New Asset'), new_admin_asset_path)
     
