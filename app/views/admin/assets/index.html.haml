@@ -31,11 +31,9 @@
     = render :partial => 'asset_table', :locals => { :assets => @assets }
 
 = render :partial => 'assets_container'
-
-
-#actions
-  =# will_paginate @assets # wait for radiant to be updated
-  %ul
-    %li= link_to((image('plus', :alt => '') + ' New Asset'), new_admin_asset_path)
     
-= render_region :bottom
+- render_region :bottom do |bottom|
+  #actions
+    =# will_paginate @assets # wait for radiant to be updated
+    %ul
+      %li= link_to((image('plus', :alt => '') + ' New Asset'), new_admin_asset_path)
