@@ -1,33 +1,34 @@
 - include_stylesheet 'admin/assets'
-- render_region :top do |top|
+.outset
+  - render_region :top do |top|
 
-  - top.filters do
-    .asset_filters
-      - form_tag(admin_assets_path,:id => 'filesearchform', :method => 'get') do
-        %input{ :type => "search", :id => "search", :name => "search" , :value => params[:search] }
-        = submit_tag "Search"
-        = observe_field 'search',  :frequency => 1, :update => 'assets_table', :url =>  { :controller => 'assets', :action=> 'index' }, :method => 'get', :with => "'search=' + escape(value)"
+    - top.filters do
+      .asset_filters
+        - form_tag(admin_assets_path,:id => 'filesearchform', :method => 'get') do
+          %input{ :type => "search", :id => "search", :name => "search" , :value => params[:search] }
+          = submit_tag "Search"
+          = observe_field 'search',  :frequency => 1, :update => 'assets_table', :url =>  { :controller => 'assets', :action=> 'index' }, :method => 'get', :with => "'search=' + escape(value)"
 
-        Types to find:
-        %span
-          = link_to "Images", "#"
-        %span
-          = link_to "Others", "#"
-        %span
-          = link_to "Audio", "#"
-        %span
-          = link_to "Movies", "#"
+          Types to find:
+          %span
+            = link_to "Images", "#"
+          %span
+            = link_to "Others", "#"
+          %span
+            = link_to "Audio", "#"
+          %span
+            = link_to "Movies", "#"
     
-        #type_boxes{ :style => "display: none" }
-          = check_box_tag 'filter[audio]',  '1', false, :id => 'audio-check' 
-          = check_box_tag 'filter[image]',  '1', false, :id => 'images-check' 
-          = check_box_tag 'filter[other]',  '1', false, :id => 'others-check' 
-          = check_box_tag 'filter[movie]',  '1', false, :id => 'movies-check'
-      - if false #current_user.admin? # turned off for now, this might be too dangerous to reveal
-        .regenerator
-          = link_to 'Regenerate Thumbnails', refresh_admin_assets_path, :confirm => 'Beware that this will take a while and consume considerable resources on your server. Are you sure you want to continue?'
-#assets_table.outset
-  = render :partial => 'asset_table', :locals => { :assets => @assets }
+          #type_boxes{ :style => "display: none" }
+            = check_box_tag 'filter[audio]',  '1', false, :id => 'audio-check' 
+            = check_box_tag 'filter[image]',  '1', false, :id => 'images-check' 
+            = check_box_tag 'filter[other]',  '1', false, :id => 'others-check' 
+            = check_box_tag 'filter[movie]',  '1', false, :id => 'movies-check'
+        - if false #current_user.admin? # turned off for now, this might be too dangerous to reveal
+          .regenerator
+            = link_to 'Regenerate Thumbnails', refresh_admin_assets_path, :confirm => 'Beware that this will take a while and consume considerable resources on your server. Are you sure you want to continue?'
+  #assets_table
+    = render :partial => 'asset_table', :locals => { :assets => @assets }
 
 = render :partial => 'assets_container'
 
