@@ -1,3 +1,5 @@
+#content { padding-bottom: 50px;} /*fix main css for #actions part*/
+
 .asset_filters {
   background: #ccc;
   border-top: 1px solid #ccc;
