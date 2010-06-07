@@ -64,9 +64,6 @@ class Asset < ActiveRecord::Base
   named_scope :others, lambda {{:conditions => self.other_condition}}
   known_types.push(:other)
   
-  # this is just a convenience to omit site-layout images from galleries
-  named_scope :furniture, {:conditions => 'assets.furniture = 1'}
-  named_scope :not_furniture, {:conditions => 'assets.furniture = 0 or assets.furniture is null'}
   named_scope :newest_first, { :order => 'created_at DESC'}
   
   def self.other_condition
