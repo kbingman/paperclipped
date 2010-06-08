@@ -86,7 +86,7 @@ class Admin::AssetsController < Admin::ResourceController
   def clear_bucket
     session[:bucket] = nil
     render :update do |page|
-      page[:bucket_list].replace_html '<li><p class="note"><em>Your bucket is empty.</em></p></li>'
+      page[:bucket_list].replace_html "<li><p class='note'>#{I18n.t('bucket.empty')}<em></em></p></li>"
     end
   end
 

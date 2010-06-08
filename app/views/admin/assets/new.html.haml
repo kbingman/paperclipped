@@ -3,18 +3,15 @@
 
 - render_region :main do |main|
   - main.edit_header do
-    %h1= "New Asset"
-    %p 
-      Choose an asset to upload here. If the <code>Title</code> field is left blank, the filename (without the file type) will be automatically added. 
-      By clicking on <code>More</code>, you can add a caption as well. 
-
+    %h1= "#{t('assets_views.new')} #{t('asset')}"
+    %p= t('assets_views.new_info') 
   - main.edit_form do  
     - form_for :asset, :url => admin_assets_path, :html => { :method => "post", :multipart => true } do |f|
       .form-area
         = render :partial => "form", :locals => { :f => f }
 
         %p.upload
-          %label.upload Choose a file to upload
+          %label.upload= t('assets_views.file_upload_info')
           = f.file_field :asset, :class => "", :style => "width: 100%"
      
         %p.buttons

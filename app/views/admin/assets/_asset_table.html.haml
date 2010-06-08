@@ -3,13 +3,13 @@
     %tr
       - render_region :thead do |thead|
         - thead.thumbnail_header do
-          %th.asset Asset
+          %th.asset= t('asset')
         - thead.title_header do
-          %th.asset-title Title
+          %th.asset-title= t('assets_views.title')
         - thead.content_type_header do
-          %th.content_type Type
+          %th.content_type= t('assets_views.type')
         - thead.modify_header do
-          %th.modify{ :colspan =>"2"} Modify
+          %th.modify{ :colspan =>"2"}= t('assets_views.modify')
 
   %tbody
     - unless assets.empty?

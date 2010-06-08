@@ -8,25 +8,25 @@
     - render_region :asset_tabs do |asset_tabs|
       - if @page && !@page.new_record? 
         - asset_tabs.attachment_tab do
-          %a.asset-tab{ :href => "#page-attachments", :id => "tab_page-attachments" } Attached Assets
+          %a.asset-tab{ :href => "#page-attachments", :id => "tab_page-attachments" }= t('assets_views.attached_assets')
         - asset_tabs.upload_tab do
-          %a.asset-tab{ :href => "#upload-assets", :id => "tab_upload-assets" } Upload
+          %a.asset-tab{ :href => "#upload-assets", :id => "tab_upload-assets" }= t('assets_views.upload')
         - asset_tabs.bucket_tab do
-          %a.asset-tab{ :href => "#bucket", :id => "tab_bucket" } Bucket
+          %a.asset-tab{ :href => "#bucket", :id => "tab_bucket" }= t('bucket.name')
         - asset_tabs.search_tab do  
-          %a.asset-tab{ :href => "#search-assets" } Search
+          %a.asset-tab{ :href => "#search-assets" }= t('buttons.search')
       - else
         - asset_tabs.bucket_tab do
-          %a.asset-tab.here{ :href => "#" } Bucket
+          %a.asset-tab.here{ :href => "#" }= t('bucket.name')
 
   #assets 
     #bucket.pane
       - render_region :bucket_pane do |bucket_pane|
         - bucket_pane.bucket_notes do      
           %p
-            %span.note The Bucket provides temporary storage for your items. You can use it to place items in your pages or snippets.
+            %span.note= t('bucket.info')
             %span#clear-bucket
-              = link_to_remote('Clear Bucket', {:url => clear_bucket_url} )
+              = link_to_remote(t('bucket.clear'), {:url => clear_bucket_url} )
         - bucket_pane.bucket do 
           = render :partial => "admin/assets/bucket"
         - bucket_pane.bucket_bottom do 
@@ -39,9 +39,7 @@
         - asset_panes.page_attachments do 
           #page-attachments.pane
             %p
-              %span.note 
-                Attached assets. These can be inserted with drag and drop 
-                or shown with the <code>&lt;r:assets:each /&gt;</code> tag.
+              %span.note= t('assets_views.attached_assets_info')
             %ul#attachments
               = render :partial => "admin/assets/page_assets" 
             .clear
@@ -49,7 +47,7 @@
         - asset_panes.upload do
           #upload-assets.pane
             %p
-              %span.note Assets uploaded here will be automatically associated with this page.
+              %span.note= t('assets_views.upload_info')
             = render :partial => "admin/assets/upload_to_page"
             .clear
           
@@ -57,10 +55,10 @@
           #search-assets.pane
             - form_tag do
               %p
-                %label.note{ :for => 'search' } Search for assets 
+                %label.note{ :for => 'search' }= t('assets_views.search_info')
                 %input{ :type => "hidden", :name => "search", :value => @page.id }
                 %input{ :type => "search", :id => "search", :name => "search" }
-                = submit_tag "Search"
+                = submit_tag t('buttons.search')
             #search-results
             .clear
             = observe_field 'search',  :frequency => 1, :update => 'search-results', :url =>  admin_assets_path(:asset_page => @page), :method => 'get', :with => "'search=' + escape(value)"

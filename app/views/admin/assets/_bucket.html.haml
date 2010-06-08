@@ -4,7 +4,7 @@
       = render :partial => 'admin/assets/bucket_asset', :locals => { :asset_url => url, :asset_id => info[:id], :asset_type => info[:type], :asset_title => info[:title], :asset_thumbnail =>info[:thumbnail], :page => @page }
   - else
     %li
-      %p.note Your bucket is empty
+      %p.note= t('bucket.empty')
       
  
 

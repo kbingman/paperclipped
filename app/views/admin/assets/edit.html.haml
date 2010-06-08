@@ -3,7 +3,7 @@
 
 - render_region :main do |main|
   - main.edit_header do
-    %h1= "Edit Asset"
+    %h1= t('assets_views.edit_asset')
   
   - main.edit_form do
     - form_for :asset, :url => admin_asset_path(@asset), :html => { :method => "put", :multipart => true } do |f|
@@ -12,7 +12,7 @@
   
         %p.content
           %label.filename
-            = "Filename: #{@asset.asset_file_name unless @asset.new_record?}"
+            = "#{t('assets_views.filename')}: #{@asset.asset_file_name unless @asset.new_record?}"
           .asset
             - if @asset.image?
               = image_tag @asset.thumbnail(Radiant::Config['assets.display_size'].to_sym)
@@ -21,16 +21,16 @@
           = updated_stamp @asset
       
         %p.upload
-          %label.upload Replace File
+          %label.upload= t('assets_views.replace_file')
           = f.file_field :asset, :class => "", :style => "width: 100%"
 
         %p.buttons
           = save_model_button(@asset)
           = save_model_and_continue_editing_button(@asset)
-          or
-          = link_to_remote 'Add asset to Bucket', :url => add_bucket_path(:id => @asset)
-          or
-          = link_to "Cancel", admin_assets_path
+          = t('assets_views.or')
+          = link_to_remote t('links.add_to_bucket'), :url => add_bucket_path(:id => @asset)
+          = t('assets_views.or')
+          = link_to t('links.cancel'), admin_assets_path
           
   - main.assets_container do
     = render :partial => 'assets_container'
@@ -38,12 +38,12 @@
   - main.edit_regenerate do
     - if current_user.admin? or current_user.developer?
       %p 
-        You can regenerate the asset thumbnails here. Beware that this will take a while and consume considerable resources on your server. 
-
+        = t('bucket.regenerate_info')
+        
       - form_tag refresh_admin_assets_path do
         %p.asset-buttons
           %input{ :type => "hidden", :name => "id", :value => @asset.id }
-          %input.button{ :type => "submit", :value => "Regenerate" }
+          %input.button{ :type => "submit", :value => t('buttons.regenerate') }
 
 
 

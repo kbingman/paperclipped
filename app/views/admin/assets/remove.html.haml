@@ -2,12 +2,9 @@
   table td.asset { vertical-align: top; font-weight: bold; }
 
 
-%h1 Remove Asset
-%p 
-  Are you sure you want to  
-  %strong.warning permanently remove
-  the following asset?
-
+%h1= t('assets_views.remove_asset')
+%p= t('assets_views.remove_info')
+  
 %table#site-map.index{ :cellpadding => "0", :cellspacing => "0", :border => "0" }
   %tbody
     %tr.node.level-1{ :onmouseover => "Element.addClassName(this, 'highlight');", :onmouseout => "Element.removeClassName(this, 'highlight');" }
@@ -18,6 +15,6 @@
 
 - form_for [:admin, @asset], :html => { :method => 'delete' } do
   %p.buttons
-    %input.button{ :type => "submit", :value => "Delete Asset" }
-    or
-    = link_to 'Cancel', admin_assets_path 
+    %input.button{ :type => "submit", :value => "#{t('buttons.delete_asset')}" }
+    = t('assets_views.or')
+    = link_to t('links.cancel'), admin_assets_path 

@@ -53,6 +53,7 @@ class PaperclippedExtension < Radiant::Extension
     end
     
     admin.tabs.add "Assets", "/admin/assets", :after => "Snippets", :visibility => [:all]
+    I18n.load_path<<"vendor/extensions/paperclipped/lib/locale/de.yml"
   end
   
   def deactivate

@@ -1,0 +1,53 @@
+---
+en:
+  assets: Assets
+  asset: Asset
+  assets_views:
+    attached_assets: Attached Assets
+    attached_assets_info: Attached assets. These can be inserted with drag and drop or shown with the <code> r:assets:each </code> tag.
+    caption: Caption
+    choose_file: Choose a file to upload
+    edit_asset: Edit Asset
+    info: "Assets and images can be uploaded and then attached or inserted into pages, snippets and layouts. Click on a asset name below to edit it or click <code>Remove</code> to delete it."
+    file_upload_info: Choose a file to upload
+    filename: Filename
+    modify: Modify
+    new: New
+    new_info: Choose an asset to upload here. If the <code>Title</code> field is left blank, the filename (without the file type) will be automatically added. By clicking on <code>More</code>, you can add a caption as well. 
+    name: Assets
+    or: or
+    remove_asset: Remove Asset
+    remove_info: Are you sure you want to <strong class='warning'> permanently remove </strong> the following asset?
+    replace_file: Replace File
+    search_info: Search for assets
+    show_bucket: Show Assets Bucket
+    title: Title
+    type: Type
+    types:
+      images: Images
+      audio: Audio
+      movies: Movies
+      others: Others
+    upload: Upload
+    upload_info: Assets uploaded here will be automatically associated with this page.
+  bucket:
+    clear: clear Bucket
+    empty: Your bucket is empty.
+    info: The Bucket provides temporary storage for your items. You can use it to place items in your pages or snippets.
+    name: Bucket
+    regenerate_info:  You can regenerate all thumbnails here. Beware that this will take a while and consume considerable resources on your server.
+  buttons:
+    search: Search
+    delete_asset: Delete Asset
+    hints:
+      edit: Edit
+      remove: Remove from page
+      reorder: Reorder
+    regenerate: Regenerate
+    upload: Save and Upload
+  links:
+    add_to_bucket: Add asset to Bucket
+    cancel: abbrechen
+    close: Close
+    less: Less
+    more: More

@@ -3,13 +3,10 @@
 
 - render_region :preamble do |preamble|
   - preamble.header do
-    %h1 Assets
+    %h1= t('assets')
 
   - preamble.explanation do
-    %p 
-      Assets and images can be uploaded and then attached or inserted into pages, snippets and layouts. 
-      Click on a asset name below to edit it or click <code>Remove</code> to delete it.
-
+    %p= t('assets_views.info')
   - preamble.new_button do
     %p= link_to image_tag('assets/new-asset.png', :alt => 'New Asset'), new_admin_asset_path
 
@@ -17,13 +14,17 @@
     %p
       - form_tag(admin_assets_path,:id => 'filesearchform', :method => 'get') do
         %span
-          = link_to "Images", "#"
+          = link_to t("assets_views.types.images"), "#"
+          |
         %span
-          = link_to "Others", "#"
+          = link_to t("assets_views.types.audio"), "#"
+          |
         %span
-          = link_to "Audio", "#"
+          = link_to t("assets_views.types.movies"), "#"
+          |
         %span
-          = link_to "Movies", "#"
+          = link_to t("assets_views.types.others"), "#"
+          |
     
         #type_boxes{ :style => "display: none" }
           = check_box_tag 'filter[audio]',  '1', false, :id => 'audio-check' 
@@ -33,7 +34,7 @@
 
         %label Search
         %input{ :type => "search", :id => "search", :name => "search" , :value => params[:search] }
-        = submit_tag "Search"
+        = submit_tag t('buttons.search')
         = observe_field 'search',  :frequency => 1, :update => 'assets_table', :url =>  { :controller => 'assets', :action=> 'index' }, :method => 'get', :with => "'search=' + escape(value)"
 
 #assets_table
@@ -44,7 +45,7 @@
 - render_region :bottom do |bottom|
   - bottom.regenerate do
     - if current_user.admin?
-      %p 
-        You can regenerate all thumbnails here. Beware that this will take a while and consume considerable resources on your server. 
+      %p
+        = t('bucket.regenerate_info') 
       - form_tag refresh_admin_assets_path do
-        %input.button{ :type => "submit", :value => "Regenerate" }
+        %input.button{ :type => "submit", :value => t('buttons.regenerate') }
