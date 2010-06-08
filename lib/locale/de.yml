@@ -1,0 +1,53 @@
+---
+de:
+  assets: Anlagen
+  asset: Anlage
+  assets_views:
+    attached_assets: Zugeordnete Anlagen
+    attached_assets_info: Zugeordnete Anlagen. Diese können per Drag & Drop oder mit dem <code> r:assets:each </code>-Tag eingefügt werden.
+    caption: Beschriftung
+    choose_file: Bitte Datei auswählen
+    edit_asset: Anlage bearbeiten
+    file_upload_info: Wählen Sie eine Datei aus
+    filename: Dateiname
+    info: "Anlagen und Bilder können hier hochgeladen und dann in die Seiten, Snippets und Layouts eingefügt werden. Klicken Sie auf einen Anlagen-Namen um sie zu bearbeiten oder klicken Sie auf <code>Entfernen</code>, um sie zu löschen."
+    modify:
+    new: Neue
+    new_info: Wählen Sie eine Anlage, welche Sie hochladen möchten, hier aus. Wenn das <code>Titel</code> Feld leer bleibt, wird der Dateiname (ohne den Datei-Typ) automatisch hinzugefügt. Mit einem Klick auf <code>Mehr</code> können Sie eine Bildunterschrift hinzufügen.
+    name: Anlagen
+    or: oder
+    remove_asset: Anlage löschen
+    remove_info: Sind Sie sich sicher, dass Sie die Anlage <strong class='warning'>vollständig entfernen</strong> wollen?
+    replace_file: Datei ersetzen
+    search_info: Suche nach Anlagen
+    show_bucket: Anlagen-Merkliste zeigen
+    title: Titel
+    type: Typ
+    types:
+      images: Bilder
+      audio: Audio
+      movies: Video
+      others: Andere
+    upload: Hochladen
+    upload_info: Hier hochgeladene Anlagen, werden automatisch mit der Seite verknüpft.
+  bucket:
+    clear: "Merkliste löschen"
+    empty: Ihre Merkliste ist leer.
+    info: Die Merkliste ist für die vorübergehende Speicherung ihre Anlagen. Sie können sie verwenden, um Anlagen in ihre Seiten oder Snippets einzufügen.
+    name: Merkliste
+    regenerate_info: Sie können alle Thumbnails hier neu generieren. Beachten Sie, dass dies eine Weile dauern kann.
+  buttons:
+    search: Suchen
+    delete_asset: Anlage löschen
+    hints:
+      edit: Bearbeite
+      remove: Zuordnung entfernen
+      reorder: Sortierung ändern
+    regenerate: neu generieren
+    upload: Hochladen
+  links:
+    add_to_bucket: zu Merkliste hinzufügen
+    cancel: abbrechen
+    close: Schließen
+    less: Verbergen
+    more: Mehr
