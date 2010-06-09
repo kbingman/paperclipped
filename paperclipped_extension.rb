@@ -10,7 +10,7 @@ class PaperclippedExtension < Radiant::Extension
   define_routes do |map|
     
     # Main RESTful routes for Assets
-    map.namespace :admin, :member => { :remove => :get }, :collection => { :refresh => :post } do |admin|
+    map.namespace :admin, :member => { :remove => :get }, :collection => { :refresh => :post, :multi_upload => :get, :upload_all=>:post  } do |admin|
       admin.resources :assets
     end
     
@@ -54,6 +54,7 @@ class PaperclippedExtension < Radiant::Extension
     
     admin.tabs.add "Assets", "/admin/assets", :after => "Snippets", :visibility => [:all]
     I18n.load_path<<"vendor/extensions/paperclipped/lib/locale/de.yml"
+    I18n.load_path<<"vendor/extensions/paperclipped/lib/locale/en.yml"
   end
   
   def deactivate
