@@ -10,7 +10,7 @@ class PaperclippedExtension < Radiant::Extension
   define_routes do |map|
     
     # Main RESTful routes for Assets
-    map.namespace :admin, :member => { :remove => :get }, :collection => { :refresh => :post, :multi_upload => :get, :upload_all=>:post  } do |admin|
+    map.namespace :admin, :member => { :remove => :get }, :collection => { :refresh => :post } do |admin|
       admin.resources :assets
     end
     
