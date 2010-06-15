@@ -59,7 +59,7 @@ For example:
 or
 
     rm -rf vendor/extensions/page_attachments
-    script/extension install 
+    script/extension install paperclipped
   
 The migration has now copied your original page_attachments table to old_page_attachments.
 
