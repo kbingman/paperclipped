@@ -168,7 +168,7 @@ class Asset < ActiveRecord::Base
   has_attached_file :asset,
                     :processors => lambda {|instance| instance.choose_processors },   # this allows us to set processors per file type, and to add more in other extensions
                     :styles => lambda { thumbnail_definitions },                      # and this lets extensions add thumbnailers (and also usefully defers the call)
-                    :whiny_thumbnails => false,
+                    :whiny => false,
                     :storage => Radiant::Config["assets.storage"] == "s3" ? :s3 : :filesystem, 
                     :s3_credentials => {
                       :access_key_id => Radiant::Config["assets.s3.key"],
