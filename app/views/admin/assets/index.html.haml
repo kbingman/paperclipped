@@ -34,6 +34,6 @@
     
 - render_region :bottom do |bottom|
   #actions
-    =# will_paginate @assets # wait for radiant to be updated
+    = pagination_for @assets
     %ul
       %li= link_to((image('plus', :alt => '') + ' New Asset'), new_admin_asset_path)
