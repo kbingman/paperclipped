@@ -1,8 +1,8 @@
 module UrlAdditions
   
-  Paperclip::Attachment.interpolations[:no_original_style] = lambda do |attachment, style|
+  Paperclip.interpolates :no_original_style do |attachment, style|
     style ||= :original
-    style == attachment.default_style ? nil : "_#{style}"
+    style == attachment.instance.default_style ? nil : "_#{style}"
   end
   
 end
