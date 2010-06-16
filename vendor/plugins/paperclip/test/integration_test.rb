@@ -9,7 +9,7 @@ class IntegrationTest < Test::Unit::TestCase
         Dummy.create! :avatar => @file
       end
     end
-    
+
     should "not exceed the open file limit" do
        assert_nothing_raised do
          dummies = Dummy.find(:all)
@@ -157,7 +157,7 @@ class IntegrationTest < Test::Unit::TestCase
       end
     end
   end
-  
+
   context "A model with no convert_options setting" do
     setup do
       rebuild_model :styles => { :large => "300x300>",
@@ -168,7 +168,7 @@ class IntegrationTest < Test::Unit::TestCase
                     :path => ":rails_root/tmp/:attachment/:class/:style/:id/:basename.:extension"
       @dummy     = Dummy.new
     end
-    
+
     should "have its definition return nil when asked about convert_options" do
       assert ! Dummy.attachment_definitions[:avatar][:convert_options]
     end
@@ -189,7 +189,7 @@ class IntegrationTest < Test::Unit::TestCase
       end
     end
   end
-  
+
   context "A model with a filesystem attachment" do
     setup do
       rebuild_model :styles => { :large => "300x300>",
@@ -281,7 +281,7 @@ class IntegrationTest < Test::Unit::TestCase
       Dummy.validates_attachment_presence :avatar
       @d2 = Dummy.find(@dummy.id)
       @d2.avatar = @file
-      assert   @d2.valid?, @d2.errors.full_messages.inspect 
+      assert   @d2.valid?, @d2.errors.full_messages.inspect
       @d2.avatar = @bad_file
       assert ! @d2.valid?
     end
@@ -294,7 +294,7 @@ class IntegrationTest < Test::Unit::TestCase
       @dummy.reload
       assert_equal "5k.png", @dummy.avatar_file_name
     end
-    
+
     context "that is assigned its file from another Paperclip attachment" do
       setup do
         @dummy2 = Dummy.new
@@ -302,7 +302,7 @@ class IntegrationTest < Test::Unit::TestCase
         assert  @dummy2.avatar = @file2
         @dummy2.save
       end
-      
+
       should "work when assigned a file" do
         assert_not_equal `identify -format "%wx%h" "#{@dummy.avatar.path(:original)}"`,
                          `identify -format "%wx%h" "#{@dummy2.avatar.path(:original)}"`
@@ -312,7 +312,7 @@ class IntegrationTest < Test::Unit::TestCase
         assert_equal `identify -format "%wx%h" "#{@dummy.avatar.path(:original)}"`,
                      `identify -format "%wx%h" "#{@dummy2.avatar.path(:original)}"`
       end
-    end    
+    end
 
   end
 
@@ -379,6 +379,11 @@ class IntegrationTest < Test::Unit::TestCase
         @files_on_s3 = s3_files_for @dummy.avatar
       end
 
+      should "have the same contents as the original" do
+        @file.rewind
+        assert_equal @file.read, @files_on_s3[:original].read
+      end
+
       should "write and delete its files" do
         [["434x66", :original],
          ["300x46", :large],
@@ -403,10 +408,8 @@ class IntegrationTest < Test::Unit::TestCase
         assert @dummy.valid?
         assert @dummy.save
 
-        saved_keys = [:thumb, :medium, :large, :original].collect{|s| @dummy.avatar.to_file(s) }
-
-        saved_keys.each do |key|
-          assert key.exists?
+        [:thumb, :medium, :large, :original].each do |style|
+          assert @dummy.avatar.exists?(style)
         end
 
         @dummy.avatar.clear
@@ -414,8 +417,8 @@ class IntegrationTest < Test::Unit::TestCase
         assert @dummy.valid?
         assert @dummy.save
 
-        saved_keys.each do |key|
-          assert ! key.exists?
+        [:thumb, :medium, :large, :original].each do |style|
+          assert ! @dummy.avatar.exists?(style)
         end
 
         @d2 = Dummy.find(@dummy.id)
@@ -427,7 +430,7 @@ class IntegrationTest < Test::Unit::TestCase
 
         assert_equal @dummy.avatar_file_name, @d2.avatar_file_name
         [:thumb, :medium, :large, :original].each do |style|
-          assert_equal @dummy.avatar.to_file(style).to_s, @d2.avatar.to_file(style).to_s
+          assert_equal @dummy.avatar.to_file(style).read, @d2.avatar.to_file(style).read
         end
 
         saved_keys = [:thumb, :medium, :large, :original].collect{|s| @dummy.avatar.to_file(s) }
@@ -435,8 +438,8 @@ class IntegrationTest < Test::Unit::TestCase
         @d2.avatar.clear
         assert @d2.save
 
-        saved_keys.each do |key|
-          assert ! key.exists?
+        [:thumb, :medium, :large, :original].each do |style|
+          assert ! @dummy.avatar.exists?(style)
         end
       end
 
@@ -444,7 +447,7 @@ class IntegrationTest < Test::Unit::TestCase
         expected = @dummy.avatar.to_file
         @dummy.avatar = "not a file"
         assert @dummy.valid?
-        assert_equal expected.full_name, @dummy.avatar.to_file.full_name
+        assert_equal expected.read, @dummy.avatar.to_file.read
 
         @dummy.avatar = @bad_file
         assert ! @dummy.valid?
@@ -472,7 +475,6 @@ class IntegrationTest < Test::Unit::TestCase
 
       should "have the right content type" do
         headers = s3_headers_for(@dummy.avatar, :original)
-        p headers
         assert_equal 'image/png', headers['content-type']
       end
     end
