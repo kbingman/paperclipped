@@ -1,4 +1,7 @@
 %table{ :class => "index", :cellpadding => "0", :cellspacing => "0", :border => "0"}
+  %tfoot
+    %tr
+      %td{:colspan => 5} Assets and images can be uploaded and then attached or inserted into pages, snippets and layouts. Click on a asset name below to edit it or click <code>Remove</code> to delete it.
   %thead
     %tr
       - render_region :thead do |thead|
@@ -30,15 +33,15 @@
               %td.content_type
                 = asset.asset_content_type
             - tbody.bucket_cell do
-              %td.add-to-bucket
-                = link_to_remote(image_tag('assets/add-to-bucket.png', :alt => 'Add to Bucket'), :url => add_bucket_url(:id => asset))
+              %td.add-to-bucket.add_child
+                = link_to_remote 'Add to Bucket', :url => add_bucket_url(:id => asset)
             - tbody.remove_cell do
               %td.remove
-                = link_to image_tag('admin/remove.png', :alt => 'Remove Asset'), remove_admin_asset_path(asset)
+                = link_to 'Remove', remove_admin_asset_path(asset)
     - else
       %tr
         %td.note{ :colspan => "5" } 
           No Assets
 
-= will_paginate @assets
+= will_paginate @assets, :param_name => :page
 

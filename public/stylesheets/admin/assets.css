@@ -1,17 +1,25 @@
-#assets-table table { margin-bottom: 0; }
-table.index h4 { font-size: 110%; margin-top: .5em; margin-bottom: .25em;}
- 
-table.index p { margin-top: .25em; margin-bottom: .5em; }
-table.index td.asset { width: 72px; }
+#content { padding-bottom: 50px;} /*fix main css for #actions part*/
 
-table.index td.asset a {   }
-table.index td.asset a img { padding: 2px; background-color: #eee; border: 1px solid #ccc;}
+.asset_filters {
+  background: #ccc;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+.asset_filters form { margin: 10px;}
+.regenerator { float: right; margin-top: -40px; }
+.regenerator a { background: #000; color: #ccc; padding: 5px; font-size: 80%; text-decoration: none; }
 
-table.index td.asset-title, table.index td.tag-name { font-size: 115%; font-weight: bold;}
-table.index td.asset-title a, table.index td.tag-name a { text-decoration: none; color: black; }
 
-table.index td.asset-tags a { color: black; text-decoration:none; }
-table td.asset-title a:hover, table.index td.asset-tags a:hover, table.index td.tag-name a:hover {
+td.asset { width: 72px; }
+
+td.asset a {   }
+td.asset a img { padding: 2px; background-color: #eee; border: 1px solid #ccc;}
+
+td.asset-title, td.tag-name { font-size: 115%; font-weight: bold;}
+td.asset-title a, td.tag-name a { text-decoration: none; color: black; }
+
+td.asset-tags a { color: black; text-decoration:none; }
+table td.asset-title a:hover, td.asset-tags a:hover, td.tag-name a:hover {
  color: blue; text-decoration: underline; }
 table .caption { color: #9eb3bf; font-style: italic; font-weight: normal; margin: 10px; }
 
@@ -64,11 +72,6 @@ table td.add-to-bucket { width: 90px;}
   
 #assets .info  a:hover { color: blue; text-decoration: underline; }
 #assets .image_info h4 { margin: 0 0 10px 0; padding: 0; background: none; }
- 
-.pagination { margin-top: -10px;  margin-bottom: 25px; font-weight: bold; font-size: 90%; color: silver; }
-.pagination a { text-decoration: none; color: black; }
-.pagination a:hover { text-decoration: underline; color: blue; }
-.pagination .current { color: black; }
 
 #content .form-area p.upload { margin: 2px 0 10px 0; padding: 10px 10px; background: white; border: 1px solid #cdc295; }
 #content .form-area div.asset { margin: 2px 0; padding: 10px; background: white; border: 1px solid #cdc295; }
@@ -94,12 +97,12 @@ table#site-map td.assets, table#site-map th.assets  { text-align: right; border:
 #asset-upload.waiting .spinner { display: block;}
 #asset-upload.waiting .button { display: none;}
 
-#filesearchform { margin-bottom: 18px; }
+#filesearchform {  }
 #filesearchform #search p input{ margin: -3px 0 -3px; padding: 1px; }
 #filesearchform label { font-weight: bold; }
-#filesearchform a { font-weight: bold; color: black; text-decoration: none; outline: none; -moz-outline: none; }
-#filesearchform a:hover { color: blue; text-decoration: underline; }
-#filesearchform a.pressed { color: #cc0000; }
+#filesearchform a { background: #999; color: #000; border: 1px solid #777; padding: 3px; text-decoration: none; outline: none; -moz-outline: none; font-size: 80%; }
+#filesearchform a:hover { background: #eee; text-decoration: underline; }
+#filesearchform a.pressed { background: #eee; }
 
 .move a { cursor: move; }
 

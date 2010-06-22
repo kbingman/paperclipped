@@ -98,7 +98,7 @@ Asset.ShowBucket = Behavior.create({
   onclick: function(e){
     e.stop();
     var element = $('asset-bucket');
-    center(element);
+    element.centerInViewport();
     element.toggle();
     Asset.MakeDroppables();
   }

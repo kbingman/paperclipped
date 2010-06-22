@@ -7,25 +7,6 @@ class PaperclippedExtension < Radiant::Extension
   description "Assets extension based on the lightweight Paperclip plugin."
   url "http://github.com/kbingman/paperclipped"
   
-  define_routes do |map|
-    
-    # Main RESTful routes for Assets
-    map.namespace :admin, :member => { :remove => :get }, :collection => { :refresh => :post } do |admin|
-      admin.resources :assets
-    end
-    
-    # Bucket routes
-    map.with_options(:controller => 'admin/assets') do |asset|
-      asset.add_bucket        "/admin/assets/:id/add",                   :action => 'add_bucket'
-      # asset.refresh_assets    "/admin/assets/:id/refresh",               :action => 'regenerate_thumbnails'
-      
-      asset.clear_bucket      "/admin/assets/clear_bucket",              :action => 'clear_bucket'
-      asset.reorder_assets    '/admin/assets/reorder/:id',               :action => 'reorder'
-      asset.attach_page_asset '/admin/assets/attach/:asset/page/:page',  :action => 'attach_asset'
-      asset.remove_page_asset '/admin/assets/remove/:asset/page/:page',  :action => 'remove_asset'
-    end
-  end
-  
   def activate
     
     Radiant::AdminUI.send :include, AssetsAdminUI unless defined? admin.asset # UI is a singleton and already loaded
@@ -40,7 +21,8 @@ class PaperclippedExtension < Radiant::Extension
     end
     
     Page.class_eval {
-      include PageAssetAssociations
+      has_many :page_attachments, :order => :position
+      has_many :assets, :through => :page_attachments
       include AssetTags
     }
 
@@ -52,11 +34,13 @@ class PaperclippedExtension < Radiant::Extension
       Paperclip.options[:image_magick_path] = Radiant::Config["assets.image_magick_path"]
     end
     
-    admin.tabs.add "Assets", "/admin/assets", :after => "Snippets", :visibility => [:all]
+    tab "Content" do
+      add_item "Assets", "/admin/assets"
+    end
   end
   
   def deactivate
-    # admin.tabs.remove "Assets"
+    
   end
   
 end
