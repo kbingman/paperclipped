@@ -18,6 +18,7 @@ table .caption { color: #9eb3bf; font-style: italic; font-weight: normal; margin
 table th.content_type { width: 120px; }
 table td.content_type { width: 120px; color: #9eb3bf; font-style: italic; font-weight: normal; }
 table td.add-to-bucket { width: 90px;}
+table td.add-to-bucket a { background: url("../../images/admin/plus.png") no-repeat scroll 4px 0 transparent; color: black; font-size: 80%; padding: 0 0 0 20px; text-decoration: none;}
 
 #assets { clear: both; position: relative; margin-bottom: 4px; padding: 0; cursor: default;
   border: solid #cdc295; border-width: 0 1px 1px 1px; min-height: 150px; height: auto !important; height: 150px; background: white; }

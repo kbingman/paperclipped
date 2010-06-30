@@ -187,7 +187,7 @@ class Asset < ActiveRecord::Base
   belongs_to :created_by, :class_name => 'User'
   belongs_to :updated_by, :class_name => 'User'
   
-  validates_attachment_presence :asset, :message => "You must choose a file to upload!"
+  validates_attachment_presence :asset
   validates_attachment_content_type :asset, 
     :content_type => Radiant::Config["assets.content_types"].gsub(' ','').split(',') if Radiant::Config.table_exists? && Radiant::Config["assets.content_types"] && Radiant::Config["assets.skip_filetype_validation"] == nil
   validates_attachment_size :asset, 
