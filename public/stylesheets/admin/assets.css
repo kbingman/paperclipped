@@ -31,7 +31,8 @@ table td.add-to-bucket a { background: url("../../images/admin/plus.png") no-rep
 #assets { clear: both; position: relative; margin-bottom: 4px; padding: 0; cursor: default;
   border: solid #cdc295; border-width: 0 1px 1px 1px; min-height: 150px; height: auto !important; height: 150px; background: white; }
 
-#asset-bucket { width: 70%; border: 5px solid #c0c0c0; background: white; padding: 20px; cursor: move; }
+#asset-bucket { width: 70%; border: 5px solid #c0c0c0; background: white; padding: 20px; cursor: move; }      
+#content #asset-bucket form label { color: black; display: inline; text-shadow: none; }
 #close-link { margin-top: 10px; }
    
 #assets h4 { font-size: 100%; font-weight: bold; margin: 0; } 
@@ -107,11 +108,5 @@ table#site-map td.assets, table#site-map th.assets  { text-align: right; border:
 
 .move a { cursor: move; }
 
-#show-bucket {
-  float: right;
-  position: relative;
-}
-#show-bucket a { display: block; text-decoration: none; color: black; border: 1px solid rgb(0, 92, 157);
-  line-height: 20px; width: 120px; cursor: pointer; margin: 0 5px; padding: 5px 10px;
-  font-size: 80%; font-style: italic; background: white; -moz-border-radius: 3px; -webkit-border-radius: 3px;
-}
+#show-bucket { font-size: 85%; padding: 0 0 0 4px; }
+#content form #show-bucket a { color: #44e; }

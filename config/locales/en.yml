@@ -52,5 +52,6 @@ en:
     search: 'Search'
     show_assets_bucket: 'Show Assets Bucket'
     title: 'Title'
-    type: 'Type'
+    type: 'Type'  
+    types_to_find: 'Types to find'
     upload: 'Upload'

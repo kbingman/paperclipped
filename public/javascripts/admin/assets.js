@@ -1,7 +1,7 @@
 document.observe("dom:loaded", function() {
-  if($('asset-bucket')){
-    new Draggable('asset-bucket', { starteffect: false, endeffect: false });
-  }
+  // if($('asset-bucket')){
+  //   new Draggable('asset-bucket', { starteffect: false, endeffect: false });
+  // }
   if($('page-attachments')){
     Asset.ChooseTabByName('page-attachments');
   }

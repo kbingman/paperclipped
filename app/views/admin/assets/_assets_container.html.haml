@@ -8,7 +8,7 @@
       - if @page && !@page.new_record? 
         - asset_tabs.attachment_tab do
           %a.asset-tab{ :href => "#page-attachments", :id => "tab_page-attachments" }
-          = t("paperclipped.attached_assets")
+            = t("paperclipped.attached_assets")
         - asset_tabs.upload_tab do
           %a.asset-tab{ :href => "#upload-assets", :id => "tab_upload-assets" }
             = t("paperclipped.upload")

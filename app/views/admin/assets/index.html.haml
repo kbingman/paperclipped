@@ -30,10 +30,9 @@
     = render :partial => 'asset_table', :locals => { :assets => @assets }
 
 = render :partial => 'assets_container'
-
-
+    
+- render_region :bottom do |bottom|
   #actions
     = pagination_for @assets
     %ul
-      %li=# link_to((image('plus', :alt => '') + ' New Asset'), new_admin_asset_path)
-
+      %li= link_to((image('plus', :alt => '') + ' ' + t('paperclipped.new_asset')), new_admin_asset_path)
