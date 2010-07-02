@@ -1,50 +1,38 @@
 - include_stylesheet 'admin/assets'
-= render_region :top 
+.outset
+  - render_region :top do |top|
+    - top.filters do
+      .asset_filters
+        - form_tag(admin_assets_path,:id => 'filesearchform', :method => 'get') do
+          %input{ :type => "search", :id => "search", :name => "search" , :value => params[:search] }
+          = submit_tag t("paperclipped.search")   
+          = observe_field 'search',  :frequency => 1, :update => 'assets_table', :url =>  { :controller => 'assets', :action=> 'index' }, :method => 'get', :with => "'search=' + escape(value)"
 
-- render_region :preamble do |preamble|
-  - preamble.header do
-    %h1 Assets
-
-  - preamble.explanation do
-    %p 
-      Assets and images can be uploaded and then attached or inserted into pages, snippets and layouts. 
-      Click on a asset name below to edit it or click <code>Remove</code> to delete it.
-
-  - preamble.new_button do
-    %p= link_to image_tag('assets/new-asset.png', :alt => 'New Asset'), new_admin_asset_path
-
-  - preamble.filters do
-    %p
-      - form_tag(admin_assets_path,:id => 'filesearchform', :method => 'get') do
-        %span
-          = link_to "Images", "#"
-        %span
-          = link_to "Others", "#"
-        %span
-          = link_to "Audio", "#"
-        %span
-          = link_to "Movies", "#"
+          == #{t('paperclipped.types_to_find')}:
+          %span
+            = link_to t("paperclipped.images"), "#"
+          %span
+            = link_to t("paperclipped.others"), "#"
+          %span
+            = link_to t("paperclipped.audio"), "#"
+          %span
+            = link_to t("paperclipped.movies"), "#"
     
-        #type_boxes{ :style => "display: none" }
-          = check_box_tag 'filter[audio]',  '1', false, :id => 'audio-check' 
-          = check_box_tag 'filter[image]',  '1', false, :id => 'images-check' 
-          = check_box_tag 'filter[other]',  '1', false, :id => 'others-check' 
-          = check_box_tag 'filter[movie]',  '1', false, :id => 'movies-check'
-
-        %label Search
-        %input{ :type => "search", :id => "search", :name => "search" , :value => params[:search] }
-        = submit_tag "Search"
-        = observe_field 'search',  :frequency => 1, :update => 'assets_table', :url =>  { :controller => 'assets', :action=> 'index' }, :method => 'get', :with => "'search=' + escape(value)"
-
-#assets_table
-  = render :partial => 'asset_table', :locals => { :assets => @assets }
+          #type_boxes{ :style => "display: none" }
+            = check_box_tag 'filter[audio]',  '1', false, :id => 'audio-check' 
+            = check_box_tag 'filter[image]',  '1', false, :id => 'images-check' 
+            = check_box_tag 'filter[other]',  '1', false, :id => 'others-check' 
+            = check_box_tag 'filter[movie]',  '1', false, :id => 'movies-check'
+        - if false #current_user.admin? # turned off for now, this might be too dangerous to reveal
+          .regenerator
+            = link_to t('paperclipped.regenerate_all_thumbnails') , refresh_admin_assets_path, :confirm => 'Beware that this will take a while and consume considerable resources on your server. Are you sure you want to continue?'
+  #assets_table
+    = render :partial => 'asset_table', :locals => { :assets => @assets }
 
 = render :partial => 'assets_container'
-  
+    
 - render_region :bottom do |bottom|
-  - bottom.regenerate do
-    - if current_user.admin?
-      %p 
-        You can regenerate all thumbnails here. Beware that this will take a while and consume considerable resources on your server. 
-      - form_tag refresh_admin_assets_path do
-        %input.button{ :type => "submit", :value => "Regenerate" }
+  #actions
+    = pagination_for @assets
+    %ul
+      %li= link_to((image('plus', :alt => '') + ' ' + t('paperclipped.new_asset')), new_admin_asset_path)

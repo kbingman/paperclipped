@@ -3,10 +3,9 @@
 
 - render_region :main do |main|
   - main.edit_header do
-    %h1= "New Asset"
+    %h1= t("paperclipped.new_asset")
     %p 
-      Choose an asset to upload here. If the <code>Title</code> field is left blank, the filename (without the file type) will be automatically added. 
-      By clicking on <code>More</code>, you can add a caption as well. 
+      != t("paperclipped.asset_upload_note")
 
   - main.edit_form do  
     - form_for :asset, :url => admin_assets_path, :html => { :method => "post", :multipart => true } do |f|
@@ -14,14 +13,15 @@
         = render :partial => "form", :locals => { :f => f }
 
         %p.upload
-          %label.upload Choose a file to upload
+          %label.upload
+            = t("paperclipped.choose_upload")
           = f.file_field :asset, :class => "", :style => "width: 100%"
      
         %p.buttons
           = save_model_button(@asset)
           = save_model_and_continue_editing_button(@asset)
-          or
-          = link_to "Cancel", admin_assets_path
+          = t("or")
+          = link_to t("cancel"), admin_assets_path
 
   - main.edit_regenerate do
     &nbsp;
