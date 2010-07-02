@@ -64,9 +64,6 @@ class Asset < ActiveRecord::Base
   named_scope :others, lambda {{:conditions => self.other_condition}}
   known_types.push(:other)
   
-  # this is just a convenience to omit site-layout images from galleries
-  named_scope :furniture, {:conditions => 'assets.furniture = 1'}
-  named_scope :not_furniture, {:conditions => 'assets.furniture = 0 or assets.furniture is null'}
   named_scope :newest_first, { :order => 'created_at DESC'}
   
   def self.other_condition
@@ -171,7 +168,7 @@ class Asset < ActiveRecord::Base
   has_attached_file :asset,
                     :processors => lambda {|instance| instance.choose_processors },   # this allows us to set processors per file type, and to add more in other extensions
                     :styles => lambda { thumbnail_definitions },                      # and this lets extensions add thumbnailers (and also usefully defers the call)
-                    :whiny_thumbnails => false,
+                    :whiny => false,
                     :storage => Radiant::Config["assets.storage"] == "s3" ? :s3 : :filesystem, 
                     :s3_credentials => {
                       :access_key_id => Radiant::Config["assets.s3.key"],

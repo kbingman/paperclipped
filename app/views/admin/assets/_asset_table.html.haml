@@ -1,4 +1,7 @@
 %table{ :class => "index", :cellpadding => "0", :cellspacing => "0", :border => "0"}
+  %tfoot
+    %tr
+      %td{:colspan => 5} Assets and images can be uploaded and then attached or inserted into pages, snippets and layouts. Click on a asset name below to edit it or click <code>Remove</code> to delete it.
   %thead
     %tr
       - render_region :thead do |thead|
@@ -39,10 +42,11 @@
             - tbody.remove_cell do
               %td.remove
                 = link_to t("paperclipped.remove_asset"), remove_admin_asset_path(asset)
+
     - else
       %tr
         %td.note{ :colspan => "5" } 
           = t("paperclipped.no_assets")
 
-= will_paginate @assets
+= will_paginate @assets, :param_name => :page
 

@@ -1,48 +1,39 @@
 - include_stylesheet 'admin/assets'
-= render_region :top 
+.outset
+  - render_region :top do |top|
+    - top.filters do
+      .asset_filters
+        - form_tag(admin_assets_path,:id => 'filesearchform', :method => 'get') do
+          %input{ :type => "search", :id => "search", :name => "search" , :value => params[:search] }
+          = submit_tag t("paperclipped.search")   
+          = observe_field 'search',  :frequency => 1, :update => 'assets_table', :url =>  { :controller => 'assets', :action=> 'index' }, :method => 'get', :with => "'search=' + escape(value)"
 
-- render_region :preamble do |preamble|
-  - preamble.header do
-    %h1= t("paperclipped.assets_title")
-
-  - preamble.explanation do
-    %p 
-      != t("paperclipped.assets_explanation")
-
-  - preamble.new_button do
-    %p= link_to image_tag('assets/new-asset.png', :alt => t("paperclipped.new_asset")), new_admin_asset_path
-
-  - preamble.filters do
-    %p
-      - form_tag(admin_assets_path,:id => 'filesearchform', :method => 'get') do
-        %span
-          = link_to t("paperclipped.images"), "#"
-        %span
-          = link_to t("paperclipped.others"), "#"
-        %span
-          = link_to t("paperclipped.audio"), "#"
-        %span
-          = link_to t("paperclipped.movies"), "#"
+          == #{t('paperclipped.types_to_find')}:
+          %span
+            = link_to t("paperclipped.images"), "#"
+          %span
+            = link_to t("paperclipped.others"), "#"
+          %span
+            = link_to t("paperclipped.audio"), "#"
+          %span
+            = link_to t("paperclipped.movies"), "#"
     
-        #type_boxes{ :style => "display: none" }
-          = check_box_tag 'filter[audio]',  '1', false, :id => 'audio-check' 
-          = check_box_tag 'filter[image]',  '1', false, :id => 'images-check' 
-          = check_box_tag 'filter[other]',  '1', false, :id => 'others-check' 
-          = check_box_tag 'filter[movie]',  '1', false, :id => 'movies-check'
-
-        %label= t("paperclipped.search")
-        %input{ :type => "search", :id => "search", :name => "search" , :value => params[:search] }
-        = submit_tag t("paperclipped.search")
-        = observe_field 'search',  :frequency => 1, :update => 'assets_table', :url =>  { :controller => 'assets', :action=> 'index' }, :method => 'get', :with => "'search=' + escape(value)"
-
-#assets_table
-  = render :partial => 'asset_table', :locals => { :assets => @assets }
+          #type_boxes{ :style => "display: none" }
+            = check_box_tag 'filter[audio]',  '1', false, :id => 'audio-check' 
+            = check_box_tag 'filter[image]',  '1', false, :id => 'images-check' 
+            = check_box_tag 'filter[other]',  '1', false, :id => 'others-check' 
+            = check_box_tag 'filter[movie]',  '1', false, :id => 'movies-check'
+        - if false #current_user.admin? # turned off for now, this might be too dangerous to reveal
+          .regenerator
+            = link_to t('paperclipped.regenerate_all_thumbnails') , refresh_admin_assets_path, :confirm => 'Beware that this will take a while and consume considerable resources on your server. Are you sure you want to continue?'
+  #assets_table
+    = render :partial => 'asset_table', :locals => { :assets => @assets }
 
 = render :partial => 'assets_container'
-  
-- render_region :bottom do |bottom|
-  - bottom.regenerate do
-    - if current_user.admin?
-      %p= t("paperclipped.regenerate_all_thumbnails")
-      - form_tag refresh_admin_assets_path do
-        %input.button{ :type => "submit", :value => t("paperclipped.regenerate") }
+
+
+  #actions
+    = pagination_for @assets
+    %ul
+      %li=# link_to((image('plus', :alt => '') + ' New Asset'), new_admin_asset_path)
+

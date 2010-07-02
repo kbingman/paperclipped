@@ -21,7 +21,8 @@ class PaperclippedExtension < Radiant::Extension
     end
     
     Page.class_eval {
-      include PageAssetAssociations
+      has_many :page_attachments, :order => :position
+      has_many :assets, :through => :page_attachments
       include AssetTags
     }
 
@@ -39,7 +40,7 @@ class PaperclippedExtension < Radiant::Extension
   end
   
   def deactivate
-    # admin.tabs.remove "Assets"
+    
   end
   
 end
