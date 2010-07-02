@@ -38,6 +38,7 @@ namespace :radiant do
         task :sync => :environment do
           # The main translation root, basically where English is kept
           language_root = PaperclippedExtension.get_translation_keys(language_root)
+          words = TranslationSupport.get_translation_keys(language_root)
 
           Dir["#{language_root}/*.yml"].each do |filename|
             next if filename.match('_available_tags')
