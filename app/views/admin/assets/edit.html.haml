@@ -10,10 +10,11 @@
       .form-area
         = render :partial => "form", :locals => { :f => f }
   
-        %p.content
-          %label.filename
-            = "#{t("paperclipped.filename")}: #{@asset.asset_file_name unless @asset.new_record?}"
-          .asset
+        %div.content
+          %p
+            %label.filename
+              = "#{t("paperclipped.filename")}: #{@asset.asset_file_name unless @asset.new_record?}"
+          %p.asset
             - if @asset.image?
               = image_tag @asset.thumbnail(Radiant::Config['assets.display_size'].to_sym)
             - else

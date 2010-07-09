@@ -64,7 +64,8 @@ table td.add-to-bucket a { background: url("../../images/admin/plus.png") no-rep
   -box-shadow: rgba(0, 0, 0, 0.148438) 2px 2px 3px;
 }
 
-#assets .pane {
+#assets .pane,
+#content .form-area .asset {
   background: #F5F1E2 url(/images/admin/vertical_tan_gradient.png) repeat-x 0% 0%;
   padding: 12px 20px;
 }
@@ -120,8 +121,8 @@ table td.add-to-bucket a { background: url("../../images/admin/plus.png") no-rep
 #assets .info  a:hover { color: blue; text-decoration: underline; }
 #assets .image_info h4 { margin: 0 0 10px 0; padding: 0; background: none; }
 
-#content .form-area p.upload { margin: 2px 0 10px 0; padding: 10px 10px; background: white; border: 1px solid #cdc295; }
-#content .form-area div.asset { margin: 2px 0; padding: 10px; background: white; border: 1px solid #cdc295; }
+#content .form-area .asset {padding-top: 20px;padding-bottom:20px;}
+#content .form-area .upload {}
 #content p.content label.filename { margin-bottom: -5px; display: block; }
 #content .form-area p.upload  label { margin-bottom: 5px; display: block; }
 p#asset-name { padding-top: 8px; font-size: 80%; }
