@@ -43,7 +43,8 @@ table td.add-to-bucket a { background: url("../../images/admin/plus.png") no-rep
   margin-right: -20px;
   padding: 20px;
 }
-#content #asset-bucket form label { color: black; display: inline; text-shadow: none; }
+#content #asset-bucket form label { color: black; text-shadow: none; }
+#content #asset-bucket #search-assets form label { display: inline; }
 #close-link { margin-top: 10px; }
 
 #assets {
@@ -71,9 +72,8 @@ table td.add-to-bucket a { background: url("../../images/admin/plus.png") no-rep
 }
    
 #assets h4 { font-size: 100%; font-weight: bold; margin: 0; } 
-#assets p { padding: 0; margin: 0; height: 20px; line-height: 22px; }
-#assets .note { font-weight: normal; color: black; }
-
+#assets p { padding: 0; margin: 0; line-height: 22px; }
+#assets .note { font-weight: normal; color: black; font-size: 80%; }
 
 #assets p.note { margin: 5px 0; font-style: italic;}
 
@@ -137,7 +137,7 @@ table#site-map td.assets, table#site-map th.assets  { text-align: right; border:
 #upload-assets a:hover { color: blue; text-decoration: underline; }
 #upload-form .file { padding: 10px 10px 5px; }
 #upload-form .upload-buttons { padding: 0 10px; font-size: 80%; }
-#upload-form label { margin-bottom: 5px; display: block; font-weight: bold; margin-left: 10px;  }
+#upload-form label { margin-bottom: 5px; display: block; font-weight: bold;  }
 #upload-form iframe { width: 1px; height: 1px; border: 0; }
 
 #asset-upload .spinner { display: none; width: 16px; height: 16px; background-image: url(/images/admin/spinner.gif);}
