@@ -24,7 +24,7 @@ class PaperclippedExtension < Radiant::Extension
     Page.class_eval {
       has_many :page_attachments, :order => :position
       has_many :assets, :through => :page_attachments
-      include AssetTags
+      include AssetPageTags
     }
 
     # connect UserActionObserver with my models 
