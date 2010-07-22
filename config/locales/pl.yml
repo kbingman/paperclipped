@@ -53,6 +53,6 @@ pl:
     search: 'Szukaj'
     show_assets_bucket: 'Pokaż Przybornik z Zasobami'
     title: 'Tytuł'
-    type: 'Typ'  
+    type: 'Typ '  
     types_to_find: 'Typy do znalezienia'
     upload: 'Załaduj'
