@@ -37,7 +37,7 @@
     = render :partial => 'assets_container'
     
   - main.edit_regenerate do
-    - if current_user.admin? or current_user.developer?
+    - if current_user.admin? or current_user.designer?
       %p= t("paperclipped.regenerate_thumbnails")
 
       - form_tag refresh_admin_assets_path do
