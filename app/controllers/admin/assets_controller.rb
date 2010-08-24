@@ -2,7 +2,7 @@ class Admin::AssetsController < Admin::ResourceController
   skip_before_filter :verify_authenticity_token, :only => :create
 
   def index
-    @assets = Asset.search(params[:search], params[:filter], params[:page])
+    @assets = Asset.search(params[:search], params[:filter], params[:p])
     @page = Page.find(params[:asset_page]) if params[:asset_page]
 
     respond_to do |format|
@@ -21,8 +21,8 @@ class Admin::AssetsController < Admin::ResourceController
   def create
     @asset = Asset.new(params[:asset])
     if @asset.save
-      if params[:page]
-        @page = Page.find(params[:page])
+      if params[:p]
+        @page = Page.find(params[:p])
         @asset.pages << @page
       end
 
@@ -93,7 +93,7 @@ class Admin::AssetsController < Admin::ResourceController
   # Attaches an asset to the current page
   def attach_asset
     @asset = Asset.find(params[:asset])
-    @page = Page.find(params[:page])
+    @page = Page.find(params[:p])
     @page.assets << @asset unless @page.assets.include?(@asset)
     clear_model_cache
     render :partial => 'page_assets', :locals => { :page => @page }
@@ -105,7 +105,7 @@ class Admin::AssetsController < Admin::ResourceController
   # Removes asset from the current page
   def remove_asset
     @asset = Asset.find(params[:asset])
-    @page = Page.find(params[:page])
+    @page = Page.find(params[:p])
     @page.assets.delete(@asset)
     clear_model_cache
     render :nothing => true
