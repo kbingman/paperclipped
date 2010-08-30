@@ -33,13 +33,13 @@ class Asset < ActiveRecord::Base
   
     named_scope type.to_s.pluralize.intern, :conditions => self.send("#{type}_condition".intern) do
       def paged (options={})
-        paginate({:per_page => 2, :page => 1}.merge(options))
+        paginate({:per_page => 20, :page => 1}.merge(options))
       end
     end
  
     named_scope "not_#{type.to_s.pluralize}".intern, :conditions => self.send("not_#{type}_condition".intern) do
       def paged (options={})
-        paginate({:per_page => 2, :page => 1}.merge(options))
+        paginate({:per_page => 20, :page => 1}.merge(options))
       end
     end
     
@@ -93,7 +93,7 @@ class Asset < ActiveRecord::Base
       options = { :conditions => @conditions,
                   :order => 'created_at DESC',
                   :page => page,
-                  :per_page => 2 }
+                  :per_page => 10 }
  
       @file_types = filter.blank? ? [] : filter.keys
       if not @file_types.empty?
