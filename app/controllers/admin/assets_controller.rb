@@ -1,4 +1,5 @@
 class Admin::AssetsController < Admin::ResourceController
+  paginate_models
   skip_before_filter :verify_authenticity_token, :only => :create
 
   def index
@@ -120,5 +121,4 @@ class Admin::AssetsController < Admin::ResourceController
     clear_model_cache
     render :nothing => true
   end
-
 end
