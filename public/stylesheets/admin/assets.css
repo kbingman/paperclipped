@@ -156,3 +156,6 @@ table#site-map td.assets, table#site-map th.assets  { text-align: right; border:
 
 #show-bucket { font-size: 85%; padding: 0 0 0 4px; }
 #content form #show-bucket a { color: #44e; }
+
+
+.pagination { float: right; margin: 14px 10px 0 0;}
