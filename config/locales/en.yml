@@ -15,7 +15,7 @@ en:
     asset_errors: 'Sorry. {{errors}}'
     asset_page_attachment_note: 'Attached assets. These can be inserted with drag and drop or shown with the <code>&lt;r:assets:each /&gt;</code> tag.'
     asset_note: 'Attached assets. '
-    assets_explanation: 'Assets and images can be uploaded and then attached or inserted into pages, snippets and layouts. Click on a asset name below to edit it or click <code>Remove</code> to delete it.'
+    assets_explanation: 'Assets and images can be uploaded and then attached or inserted into pages, snippets and layouts. Click on a asset name above to edit it or click <code>Remove</code> to delete it.'
     assets_title: 'Assets'
     asset_upload_note: 'Assets uploaded here will be automatically associated with this page.'
     asset_upload_note: 'Choose an asset to upload here. If the <code>Title</code> field is left blank, the filename (without the file type) will be automatically added. By clicking on <code>More</code>, you can add a caption as well.'
