@@ -88,6 +88,10 @@ Also, for vertical centering of images, you have the handy `<r:assets:top_paddin
    
     
 ###Using Amazon s3
+First, be sure you have the aws\-s3 gem installed. 
+
+<pre><code>gem install aws-s3</code></pre>
+
 Everything works as before, but now if you want to add S3 support, you simply set the storage setting to "s3". 
 
 <pre><code>Radiant::Config[assets.storage] = "s3"</code></pre>
