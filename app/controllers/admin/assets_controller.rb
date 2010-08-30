@@ -22,8 +22,8 @@ class Admin::AssetsController < Admin::ResourceController
   def create
     @asset = Asset.new(params[:asset])
     if @asset.save
-      if params[:p]
-        @page = Page.find(params[:p])
+      if params[:page]
+        @page = Page.find(params[:page])
         @asset.pages << @page
       end
 
@@ -94,7 +94,7 @@ class Admin::AssetsController < Admin::ResourceController
   # Attaches an asset to the current page
   def attach_asset
     @asset = Asset.find(params[:asset])
-    @page = Page.find(params[:p])
+    @page = Page.find(params[:page])
     @page.assets << @asset unless @page.assets.include?(@asset)
     clear_model_cache
     render :partial => 'page_assets', :locals => { :page => @page }
@@ -106,7 +106,7 @@ class Admin::AssetsController < Admin::ResourceController
   # Removes asset from the current page
   def remove_asset
     @asset = Asset.find(params[:asset])
-    @page = Page.find(params[:p])
+    @page = Page.find(params[:page])
     @page.assets.delete(@asset)
     clear_model_cache
     render :nothing => true
