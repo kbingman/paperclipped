@@ -147,6 +147,7 @@ Asset.ResetForm = function (name) {
   var element = $('asset-upload');
   element.removeClassName('waiting');
   element.reset();
+  Asset.MakeDroppables();
 }
 
 Asset.AddAsset = function (name) {

@@ -29,6 +29,10 @@ Also the Settings Extension migration should be run before Paperclipped's migrat
 
 The configuration settings also enable a list of the allowed file types, maximum file size and should you need it, the path to your installation of Image Magick (this should not be needed, but I sometimes had a problem when using mod_rails).
 
+Paperclipped will integrate with the Styles'n'Scripts extension. For that to work, you'll need to load that extension before paperclipped:
+
+    config.extensions = [ :sns, :all ]
+
 ###Using Paperclipped
 
 Once installed, you get a new Tab with the entire assets library, a Bucket à la Mephisto (though only the concept is stolen) and a search. You can also easily attach assets to any page and directly upload them to a page.
@@ -88,6 +92,10 @@ Also, for vertical centering of images, you have the handy `<r:assets:top_paddin
    
     
 ###Using Amazon s3
+First, be sure you have the aws\-s3 gem installed. 
+
+<pre><code>gem install aws-s3</code></pre>
+
 Everything works as before, but now if you want to add S3 support, you simply set the storage setting to "s3". 
 
 <pre><code>Radiant::Config[assets.storage] = "s3"</code></pre>

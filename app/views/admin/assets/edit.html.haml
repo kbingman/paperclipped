@@ -10,10 +10,11 @@
       .form-area
         = render :partial => "form", :locals => { :f => f }
   
-        %p.content
-          %label.filename
-            = "#{t("paperclipped.filename")}: #{@asset.asset_file_name unless @asset.new_record?}"
-          .asset
+        %div.content
+          %p
+            %label.filename
+              = "#{t("paperclipped.filename")}: #{@asset.asset_file_name unless @asset.new_record?}"
+          %p.asset
             - if @asset.image?
               = image_tag @asset.thumbnail(Radiant::Config['assets.display_size'].to_sym)
             - else
@@ -37,7 +38,7 @@
     = render :partial => 'assets_container'
     
   - main.edit_regenerate do
-    - if current_user.admin? or current_user.developer?
+    - if current_user.admin? or current_user.designer?
       %p= t("paperclipped.regenerate_thumbnails")
 
       - form_tag refresh_admin_assets_path do

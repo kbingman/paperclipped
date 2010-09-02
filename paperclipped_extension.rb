@@ -24,8 +24,13 @@ class PaperclippedExtension < Radiant::Extension
     Page.class_eval {
       has_many :page_attachments, :order => :position
       has_many :assets, :through => :page_attachments
-      include AssetTags
+      include AssetPageTags
     }
+    
+    # Make asset tags available in stylesheets and javascripts
+    if defined?(TextAsset)
+      TextAsset.send :include, AssetTags
+    end
 
     # connect UserActionObserver with my models 
     UserActionObserver.instance.send :add_observer!, Asset 
