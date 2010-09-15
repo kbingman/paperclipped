@@ -77,7 +77,7 @@ class Admin::AssetsController < Admin::ResourceController
       render :nothing => true and return
     end
     asset_type = @asset.image? ? 'image' : 'link'
-    session[:bucket][@asset.asset.url] = { :thumbnail => @asset.thumbnail(:thumbnail), :id => @asset.id, :title => @asset.title, :type => asset_type }
+    session[:bucket][@asset.asset.url] = { :thumbnail => @asset.thumbnail(:thumbnail), :id => @asset.id, :title => @asset.title, :type => asset_type, :filename => @asset.asset_file_name }
 
     render :update do |page|
       page[:bucket_list].replace_html "#{render :partial => 'bucket'}"
