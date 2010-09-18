@@ -17,6 +17,7 @@ pl:
     asset_note: 'Załączone zasoby. '
     assets_explanation: 'Zasoby i obrazki mogą być załadowane, a następnie załączone lub wstawione do stron, skrawków i szablonów. Kliknij na nazwę zasobu powyżej aby go edytować lub na <code>Usuń</code> aby go usunąć.'
     assets_title: 'Zasoby'
+    asset_successfully_uploaded: "Asset successfully uploaded."
     asset_upload_note: 'Zasoby załadowane tutaj będą automatycznie przypisane do tej strony.'
     asset_upload_note: 'Wybierz zasób do załadowania. Jeśli pole <code>Tytuł</code> pozostanie puste, nazwa pliku (bez rozszerzenia) zostanie użyta automatycznie. Po kliknięciu na <code>Więcej</code> możesz też dodać podpis.'
     attached_assets: 'Załączone Zasoby'
@@ -52,6 +53,7 @@ pl:
     search: 'Szukaj'
     show_assets_bucket: 'Pokaż Przybornik z Zasobami'
     title: 'Tytuł'
+    thumbnails_successfully_refreshed: 'Thumbnails successfully refreshed.'
     type: 'Typ'  
     types_to_find: 'Typy do znalezienia'
     upload: 'Załaduj'

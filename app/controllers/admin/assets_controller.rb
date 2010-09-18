@@ -29,7 +29,7 @@ class Admin::AssetsController < Admin::ResourceController
 
       respond_to do |format|
         format.html {
-          flash[:notice] = "Asset successfully uploaded."
+          flash[:notice] = I18n.t('paperclipped.asset_successfully_uploaded')
           redirect_to(@page ? edit_admin_page_path(@page) : (params[:continue] ? edit_admin_asset_path(@asset) : admin_assets_path))
         }
         format.js {
@@ -58,12 +58,12 @@ class Admin::AssetsController < Admin::ResourceController
       @assets.each do |asset|
         asset.asset.reprocess!
       end
-      flash[:notice] = "Thumbnails successfully refreshed."
+      flash[:notice] = I18n.t('paperclipped.thumbnails_successfully_refreshed')
       redirect_to admin_assets_path
     else
       @asset = Asset.find(params[:id])
       @asset.asset.reprocess!
-      flash[:notice] = "Thumbnail successfully refreshed."
+      flash[:notice] = I18n.t('paperclipped.thumbnails_successfully_refreshed')
       redirect_to edit_admin_asset_path(@asset)
     end
   end
@@ -87,7 +87,7 @@ class Admin::AssetsController < Admin::ResourceController
   def clear_bucket
     session[:bucket] = nil
     render :update do |page|
-      page[:bucket_list].replace_html '<li><p class="note"><em>Your bucket is empty.</em></p></li>'
+      page[:bucket_list].replace_html '<li><p class="note"><em>' + I18n.t('paperclipped.empty_bucket') + '</em></p></li>'
     end
   end
 
