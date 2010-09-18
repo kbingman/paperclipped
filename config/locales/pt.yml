@@ -34,7 +34,6 @@ pt:
     empty_bucket: 'O repositório está vazio'
     filename: 'Nome do ficheiro'
     images: 'Imagens'
-    less: 'Menos'
     movies: 'Vídeo'
     new_asset: 'Novo asset'
     no_assets_found: 'Não foram encontrados assets'

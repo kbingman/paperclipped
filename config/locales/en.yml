@@ -34,7 +34,6 @@ en:
     empty_bucket: 'Your bucket is empty'
     filename: 'Filename'
     images: 'Images'
-    less: 'Less'
     movies: 'Movies'
     new_asset: 'New Asset'
     no_assets_found: 'There were no assets found'

@@ -34,7 +34,6 @@ pl:
     empty_bucket: 'Twój przybornik jest pusty'
     filename: 'Nazwa pliku'
     images: 'Obrazki'
-    less: 'Mniej'
     movies: 'Filmy'
     new_asset: 'Nowy Zasób'
     no_assets_found: 'Nie znaleziono zasobów'
