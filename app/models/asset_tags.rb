@@ -130,7 +130,7 @@ module AssetTags
     #This is very experimental and will generate new sizes on the fly
     asset.generate_style(size, { :size => geometry }) if geometry
     
-    alt = " alt='#{asset.title}'" unless tag.attr['alt'] rescue nil
+    alt = %Q{ alt="#{h asset.title}"} unless tag.attr['alt'] rescue nil
     attributes = options.inject('') { |s, (k, v)| s << %{#{k.downcase}="#{v}" } }.strip
     attributes << alt unless alt.nil?
     url = asset.thumbnail(size)
