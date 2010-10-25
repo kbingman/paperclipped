@@ -114,10 +114,9 @@ module AssetTags
   desc %{
     Renders an image tag for the asset.
     
-    Using the optional @size@ attribute, different sizes can be display.
+    Using the optional @size@ attribute, different sizes can be displayed.
     “thumbnail” and “icon” sizes are built in, but custom ones can be set
-    using by changing assets.addition_thumbnails in the Radiant::Config
-    settings.
+    by changing assets.addition_thumbnails in the Radiant::Config settings.
     
     *Usage:* 
     <pre><code><r:assets:image [title="asset_title"] [size="icon|thumbnail"]></code></pre>
@@ -129,10 +128,14 @@ module AssetTags
     geometry = options['geometry'] ? options.delete('geometry') : nil
     #This is very experimental and will generate new sizes on the fly
     asset.generate_style(size, { :size => geometry }) if geometry
-    
+
+    width = (options.delete('width') || asset.width(size)).to_i
+    height = (options.delete('height') || asset.height(size)).to_i
+    dimensions = %Q{ width="#{width}" height="#{height}"} if width > 0 && height > 0
     alt = %Q{ alt="#{h asset.title}"} unless tag.attr['alt'] rescue nil
     attributes = options.inject('') { |s, (k, v)| s << %{#{k.downcase}="#{v}" } }.strip
     attributes << alt unless alt.nil?
+    attributes << dimensions unless dimensions.nil?
     url = asset.thumbnail(size)
     %{<img src="#{url}" #{attributes unless attributes.empty?} />} rescue nil
   end
