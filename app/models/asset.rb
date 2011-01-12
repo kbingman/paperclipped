@@ -127,8 +127,8 @@ class Asset < ActiveRecord::Base
       else
         thumbnails = {}
       end
-      thumbnails[:icon] = ['42x42#', :png]
-      thumbnails[:thumbnail] = ['100x100>', :png]
+      thumbnails[:icon] ||= ['42x42#', :png]
+      thumbnails[:thumbnail] ||= ['100x100>', :png]
       thumbnails
     end
  
