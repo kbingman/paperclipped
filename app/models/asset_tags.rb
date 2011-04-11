@@ -159,8 +159,9 @@ module AssetTags
     asset, options = asset_and_options(tag)
     raise TagError, 'Must be flash' unless asset.swf?
     url = asset.thumbnail('original')
+    wmode = (tag.attr['wmode'] || "opaque")
     dimensions = [(tag.attr['width'] || asset.width),(tag.attr['height'] || asset.height)]
-    swf_embed_markup url, dimensions, tag.expand
+    swf_embed_markup url, dimensions, tag.expand, wmode
   end
   
   tag 'assets:thumbnail' do |tag|
@@ -253,17 +254,17 @@ module AssetTags
       }
     end
     
-    def swf_embed_markup(url, dimensions, fallback_content)
+    def swf_embed_markup(url, dimensions, fallback_content,wmode)
       width, height = dimensions
       %{<!--[if !IE]> -->
-        <object type="application/x-shockwave-flash" data="#{url}" width="#{width}" height="#{height}" wmode="transparent">
+        <object type="application/x-shockwave-flash" data="#{url}" width="#{width}" height="#{height}" wmode="#{wmode}">
       <!-- <![endif]-->
       <!--[if IE]>
-        <object width="#{width}" height="#{height}" wmode="transparent"
+        <object width="#{width}" height="#{height}" wmode="#{wmode}"
           classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
           codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0">
           <param name="movie" value="#{url}" />
-          <param name="wmode" value="transparent" />
+          <param name="wmode" value="#{wmode}" />
       <!-->
       #{fallback_content}
         </object>
