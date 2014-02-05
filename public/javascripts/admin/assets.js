@@ -133,6 +133,13 @@ Asset.FileTypes = Behavior.create({
       method: 'get',
       onComplete: 'assets_table'
     });
+    new Ajax.Updater('actions', search_form.action, {
+      asynchronous: true, 
+      evalScripts:  true, 
+      parameters:   Form.serialize(search_form) + "&repaginate=1",
+      method: 'get',
+      onComplete: 'actions'
+    });
   }
 });
 

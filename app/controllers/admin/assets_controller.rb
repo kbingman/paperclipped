@@ -12,6 +12,8 @@ class Admin::AssetsController < Admin::ResourceController
         @template_name = 'index'
         if !@page.nil?
           render :partial => 'admin/assets/search_results.html.haml', :layout => false
+        elsif params[:repaginate].present?
+          render :partial => 'admin/assets/actions.html.haml', :locals => { :assets => @assets }, :layout => false
         else
           render :partial => 'admin/assets/asset_table.html.haml', :locals => { :assets => @assets }, :layout => false
         end

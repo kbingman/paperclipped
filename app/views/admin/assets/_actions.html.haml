@@ -1,0 +1,4 @@
+#actions
+  = pagination_for @assets, :depaginate => false, :filter => params[:filter]
+  %ul
+    %li= link_to((image('plus', :alt => '') + ' ' + t('paperclipped.new_asset')), new_admin_asset_path)
