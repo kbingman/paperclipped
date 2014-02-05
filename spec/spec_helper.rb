@@ -3,10 +3,9 @@ unless defined? RADIANT_ROOT
   require "#{File.expand_path(File.dirname(__FILE__) + "/../../../../")}/config/boot"
   require "#{File.expand_path(File.dirname(__FILE__) + "/../../../../")}/config/environment"
 end
+require "#{RADIANT_ROOT}/spec/spec_helper"
 
-require 'spec/rails'
-
-# require File.expand_path(File.dirname(__FILE__) + "/blueprints")
+# Dataset::Resolver.default << (File.dirname(__FILE__) + "/datasets")
 
 Spec::Runner.configure do |config|
   config.use_transactional_fixtures = true

@@ -60,11 +60,11 @@
           
         - asset_panes.search do
           #search-assets.pane
-            - form_tag do
+            - form_remote_tag :url => admin_assets_path, :method => :get, :update => 'search-results' do
               %p
                 %label.note{ :for => 'search' }
                   = t("paperclipped.search_assets")
-                %input{ :type => "hidden", :name => "search", :value => @page.id }
+                %input{ :type => "hidden", :name => "asset_page", :value => @page.id }
                 %input{ :type => "search", :id => "search", :name => "search" }
                 = submit_tag t("paperclipped.search")
             #search-results
